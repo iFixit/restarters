@@ -16,7 +16,6 @@ use App\Http\Controllers\GroupController;
 use App\Http\Controllers\GroupTagsController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LocaleController;
-use App\Http\Controllers\MicrotaskingController;
 use App\Http\Controllers\MisccatController;
 use App\Http\Controllers\MobifixController;
 use App\Http\Controllers\MobifixOraController;
@@ -105,8 +104,6 @@ Route::middleware('ensureAPIToken')->group(function () {
         Route::get('/group-area/{area}', [CalendarEventsController::class, 'allEventsByArea'])->name('calendar-events-by-area');
         Route::get('/all-events/{hash_env}', [CalendarEventsController::class, 'allEvents'])->name('calendar-events-all');
     });
-
-    Route::get('workbench', [MicrotaskingController::class, 'index'])->name('workbench');
 
     Route::prefix('FaultCat')->group(function () {
         Route::get('/', [FaultcatController::class, 'index']);
