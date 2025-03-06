@@ -14,7 +14,7 @@
 
     <div class="d-flex flex-wrap">
       <div class="w-xs-100 w-md-50">
-        <GroupDescription class="pr-md-3" :idgroups="idgroups" :discourse-group="discourseGroup" />
+        <GroupDescription class="pr-md-3" :idgroups="idgroups"/>
       </div>
       <div class="w-xs-100 w-md-50">
         <GroupVolunteers class="pl-md-3" :idgroups="idgroups" :canedit="canedit" />
@@ -142,12 +142,7 @@ export default {
     topDevices: {
       type: Array,
       required: true
-    },
-    discourseGroup: {
-      type: String,
-      required: false,
-      default: null
-    },
+    }
   },
   data () {
     return {

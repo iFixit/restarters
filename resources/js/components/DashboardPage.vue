@@ -12,12 +12,6 @@
       </div>
       <DashboardAddData class="adddata justify-self-end" />
       <DashboardRightSidebar class="sidebar" />
-      <DiscourseDiscussion
-          class="discourse"
-          :see-all-topics-link="seeAllTopicsLink"
-          :discourse-base-url="discourseBaseUrl"
-          :is-logged-in="isLoggedIn"
-      />
     </div>
   </div>
 </template>
@@ -26,11 +20,10 @@ import auth from '../mixins/auth'
 import AlertBanner from './AlertBanner'
 import DashboardYourGroups from './DashboardYourGroups'
 import DashboardRightSidebar from './DashboardRightSidebar'
-import DiscourseDiscussion from './DiscourseDiscussion'
 import DashboardAddData from './DashboardAddData'
 
 export default {
-  components: {DashboardAddData, DashboardYourGroups,DashboardRightSidebar,AlertBanner,DiscourseDiscussion},
+  components: {DashboardAddData, DashboardYourGroups,DashboardRightSidebar,AlertBanner},
   mixins: [ auth ],
   props: {
     yourGroups: {
@@ -52,16 +45,8 @@ export default {
       required: false,
       default: null
     },
-    seeAllTopicsLink: {
-      type: String,
-      required: true
-    },
     isLoggedIn: {
       type: Boolean,
-      required: true
-    },
-    discourseBaseUrl: {
-      type: String,
       required: true
     },
     newGroups: {
@@ -146,16 +131,6 @@ export default {
     @include media-breakpoint-up(md) {
       grid-row: 3 / 4;
       grid-column: 1 / 2;
-    }
-  }
-
-  .discourse {
-    grid-row: 5 / 6;
-    grid-column: 1 / 2;
-
-    @include media-breakpoint-up(md) {
-      grid-row: 5 / 6;
-      grid-column: 1 / 3;
     }
   }
 

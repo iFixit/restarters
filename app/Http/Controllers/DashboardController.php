@@ -75,7 +75,6 @@ class DashboardController extends Controller
                 'groups_near_you' => $groupsNearYou,
                 'upcoming_events' => $upcoming_events,
                 'your_groups' => $your_groups,
-                'seeAllTopicsLink' => env('DISCOURSE_URL').'/latest',
                 'new_groups' => $new_groups,
             ]
         );

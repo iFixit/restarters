@@ -19,7 +19,6 @@ use App\Notifications\EventRepairs;
 use App\Notifications\JoinEvent;
 use App\Notifications\RSVPEvent;
 use App\Party;
-use App\Services\DiscourseService;
 use App\User;
 use App\UserGroups;
 use Auth;
@@ -37,12 +36,10 @@ use Spatie\ValidationRules\Rules\Delimited;
 class PartyController extends Controller
 {
     protected $geocoder;
-    protected $discourseService;
 
-    public function __construct(Geocoder $geocoder, DiscourseService $discourseService)
+    public function __construct(Geocoder $geocoder)
     {
         $this->geocoder = $geocoder;
-        $this->discourseService = $discourseService;
     }
 
     public static function expandEvent($event, $group = null, $countries = null, $attending = null, $invited = null, $volunteering = null)

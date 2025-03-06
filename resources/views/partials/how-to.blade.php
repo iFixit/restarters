@@ -3,8 +3,5 @@
     <div class="dashboard__block__content">
         <h4>@lang('partials.how_to_host_an_event')</h4>
         <p>@lang('partials.how_to_host_an_event_text')</p>
-        <div class="dashboard__links d-flex flex-row justify-content-end">
-            <a href="{{ env('DISCOURSE_URL' )}}/session/sso?return_path={{ env('DISCOURSE_URL') }}/t/the-restart-party-kit/324/" target="_blank" rel="noopener noreferrer">@lang('partials.view_the_materials')</a>
-        </div>
     </div>
 </section>

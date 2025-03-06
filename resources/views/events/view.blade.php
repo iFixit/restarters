@@ -74,8 +74,6 @@
           $expanded_invited = $event->expandVolunteers($invited, $can_edit_event);
           $expanded_hosts = $event->expandVolunteers($hosts, $can_edit_event);
 
-          $discourseThread = ($is_attending && $event->discourse_thread) ? (env('DISCOURSE_URL').'/t/'.$event->discourse_thread) : null;
-
           $collected_images = [];
 
           if (! empty($images)) {
@@ -113,7 +111,6 @@
             :devices="{{ json_encode($expanded_devices, JSON_INVALID_UTF8_IGNORE) }}"
             :initial-event="{{ json_encode($expanded_event, JSON_INVALID_UTF8_IGNORE) }}"
             :is-attending="{{ $is_attending ? 'true' : 'false' }}"
-            discourse-thread="{{ $discourseThread }}"
             :canedit="{{ $can_edit_event ? 'true' : 'false' }}"
             :candelete="{{ $can_delete_event ? 'true' : 'false' }}"
             :is-admin="{{ $is_admin ? 'true' : 'false' }}"

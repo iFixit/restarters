@@ -26,14 +26,6 @@
             <a :href="'mailto:' + group.email">{{ group.email }}</a>
           </div>
         </div>
-        <div class="d-flex pt-1 pb-1" v-if="discourseGroup">
-          <div class="mr-2">
-            <b-img-lazy src="/icons/talk_ico.svg" class="icon" />
-          </div>
-          <div>
-            <a :href="discourseGroup">{{ __('groups.talk_group') }}</a>
-          </div>
-        </div>
       </div>
     </template>
   </CollapsibleSection>
@@ -53,11 +45,6 @@ export default {
     idgroups: {
       type: Number,
       required: true
-    },
-    discourseGroup: {
-      type: String,
-      required: false,
-      default: null
     },
   },
 }

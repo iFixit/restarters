@@ -6,7 +6,6 @@ use App\EventsUsers;
 use App\Group;
 use App\Helpers\Fixometer;
 use App\Helpers\Geocoder;
-use App\Listeners\RemoveUserFromDiscourseThreadForEvent;
 use App\Network;
 use App\Notifications\AdminModerationEvent;
 use App\Notifications\NotifyRestartersOfNewEvent;
@@ -131,12 +130,6 @@ class AddRemoveVolunteerTest extends TestCase
                                       ]
                                   ]
                               ]);
-
-        Queue::assertPushed(\Illuminate\Events\CallQueuedListener::class, function ($job) use ($event, $restarter) {
-            if ($job->class == RemoveUserFromDiscourseThreadForEvent::class) {
-                return true;
-            }
-        });
 
         // Add an invited user
         $restarter = User::factory()->restarter()->create();

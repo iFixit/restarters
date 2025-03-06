@@ -13,18 +13,13 @@ use App\Events\UserLanguageUpdated;
 use App\Events\UserLeftEvent;
 use App\Events\UserRegistered;
 use App\Events\UserUpdated;
-use App\Listeners\AddUserToDiscourseGroup;
-use App\Listeners\AddUserToDiscourseThreadForEvent;
-use App\Listeners\RemoveUserFromDiscourseThreadForEvent;
 use App\Listeners\AnonymiseSoftDeletedUser;
 use App\Listeners\DeleteEventFromWordPress;
 use App\Listeners\DeviceUpdatedAt;
 use App\Listeners\RemoveSoftDeletedUserFromAllGroups;
 use App\Listeners\SendAdminModerateEventPhotosNotification;
 use App\Listeners\SendAdminUserDeletedNotification;
-use App\Listeners\SyncLanguageSettingsToDiscourse;
 use App\Listeners\SyncUserProperties;
-use App\Listeners\SyncUserToDiscourse;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Event;
 
@@ -42,7 +37,6 @@ class EventServiceProvider extends ServiceProvider
 
         \App\Events\ApproveEvent::class => [
             \App\Listeners\CreateWordpressPostForEvent::class,
-            \App\Listeners\CreateDiscourseThreadForEvent::class,
             \App\Listeners\NotifyApprovedEvent::class
         ],
 
@@ -56,7 +50,6 @@ class EventServiceProvider extends ServiceProvider
 
         \App\Events\ApproveGroup::class => [
             \App\Listeners\CreateWordpressPostForGroup::class,
-            \App\Listeners\CreateDiscourseGroupForGroup::class,
         ],
 
         \App\Events\EditGroup::class => [
@@ -72,7 +65,6 @@ class EventServiceProvider extends ServiceProvider
         ],
 
         UserFollowedGroup::class => [
-            AddUserToDiscourseGroup::class,
         ],
 
         UserDeleted::class => [
@@ -94,11 +86,9 @@ class EventServiceProvider extends ServiceProvider
         ],
 
         UserConfirmedEvent::class => [
-            AddUserToDiscourseThreadForEvent::class
         ],
 
         UserLeftEvent::class => [
-            RemoveUserFromDiscourseThreadForEvent::class
         ]
     ];
 
@@ -108,7 +98,6 @@ class EventServiceProvider extends ServiceProvider
      * @var array
      */
     protected $subscribe = [
-        \App\Listeners\DiscourseUserEventSubscriber::class,
     ];
 
     /**

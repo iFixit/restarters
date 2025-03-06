@@ -380,15 +380,6 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
         return $nameParts[0];
     }
 
-    public function existsOnDiscourse()
-    {
-        if (! config('restarters.features.discourse_integration')) {
-            return false;
-        }
-
-        return $this->username != NULL;
-    }
-
     /**
      * Convert the user's role to be a Host.
      *
@@ -492,12 +483,6 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
 
         return true;
     }
-
-    public function getTalkProfileUrl()
-    {
-        return env('DISCOURSE_URL').'/u/'.$this->username;
-    }
-
     // If just one of the networks that the group is a member of
     // should push to Wordpress, then we should push.
     public function changesShouldPushToZapier()

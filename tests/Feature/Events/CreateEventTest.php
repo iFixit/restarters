@@ -522,14 +522,7 @@ class CreateEventTest extends TestCase
             }
         });
 
-        // Manually call the listener for coverage and check it calls through to Discourse.
-        $this->instance(
-            DiscourseService::class,
-            \Mockery::mock(DiscourseService::class, function ($mock) {
-                $mock->shouldReceive('addUserToPrivateMessage')->once();
-                $mock->shouldReceive('removeUserFromPrivateMessage')->once();
-            })
-        );
+
 
         $listener = app()->make(AddUserToDiscourseThreadForEvent::class);
         $event = new UserConfirmedEvent($party->idevents, $host->id);

@@ -40,7 +40,6 @@ class Party extends Model implements Auditable
         'updated_at',
         'shareable_code',
         'online',
-        'discourse_thread',
         'devices_updated_at',
         'link',
         'timezone',
@@ -77,7 +76,6 @@ class Party extends Model implements Auditable
                     `e`.`pax`,
                     `e`.`free_text`,
                     `e`.`hours`,
-                    `e`.`discourse_thread`,
                     `g`.`name` AS `group_name`,
                     `g`.`idgroups` AS `group_id`
                 FROM `events` AS `e`
@@ -109,7 +107,6 @@ class Party extends Model implements Auditable
                     `e`.`wordpress_post_id`,
                     `e`.`approved`,
                     `e`.`online`,
-                    `e`.`discourse_thread`,
                     `g`.`name` AS `group_name`,
                     `g`.`idgroups` AS `group_id`
 

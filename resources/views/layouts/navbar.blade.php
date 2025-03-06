@@ -42,10 +42,7 @@
 {{-- Left side of the Navigation --}}
 <ul class="nav-left d-flex justify-content-between w-100 pr-md-3" id="nav-left">
     <li style="flex-basis: 100%;">
-
-        <a href="{{{ env('DISCOURSE_URL')}}}/session/sso?return_path={{{ env('DISCOURSE_URL') }}}" rel="noopener noreferrer">
-        @include('svgs/navigation/talk-icon')
-        <span>@lang('general.menu_discourse')</span>
+        <a href="{{ route('notifications') }}" rel="noopener noreferrer">
     </a>
     </li>
 
@@ -88,7 +85,7 @@
     @else
       <li class="d-flex" style="width: 152px">
           <div class="vue">
-            <Notifications :user-id="{{{ Auth::user()->id }}}" discourse-base-url="{{{ env('DISCOURSE_URL') }}}" discourse-user-name="{{{ Auth::user()->username }}}" />
+            <Notifications :user-id="{{{ Auth::user()->id }}}" />
           </div>
       </li>
 
@@ -157,7 +154,6 @@
                         <svg width="11" height="14" viewBox="0 0 9 11" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="1.414"><path d="M8.55 0H0v10.687l4.253-3.689 4.297 3.689V0z" fill="#0394a6"/></svg> @lang('general.menu_tools')
                         <ul>
                             <li><a href="{{ route('dashboard') }}">Dashboard</a></li>
-                            <li><a href="{{{ env('DISCOURSE_URL')}}}/session/sso?return_path={{{ env('DISCOURSE_URL') }}}" rel="noopener noreferrer">@lang('general.menu_discourse')</a></li>
                             <li><a href="{{ config('restarters.wiki.base_url') }}" rel="noopener noreferrer">@lang('general.menu_wiki')</a></li>
                             @if ( App\Helpers\Fixometer::hasPermission('repair-directory') )
                                 <li><a href="{{ config('restarters.repairdirectory.base_url') }}/admin" target="_blank" rel="noopener noreferrer">Repair Directory</a></li>

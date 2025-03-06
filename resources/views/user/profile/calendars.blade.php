@@ -2,7 +2,6 @@
     <div class="form-row">
     <div class="col-lg-12">
         <h3>@lang('profile.calendars.title')</h3>
-        <p>@lang('profile.calendars.explainer') <a href="{{ env('DISCOURSE_URL' )}}/session/sso?return_path={{ env('DISCOURSE_URL') }}@lang('general.calendar_feed_help_url')">@lang('profile.calendars.find_out_more')</a>.</p>
     </div>
     </div>
     <fieldset class="listed-calendar-links">

@@ -11,7 +11,6 @@ window.onload = function() {
 
     $(document).ready(function() {
       require('./components/dropdown.js');
-      require('./components/ajax-search-discourse-notifications.js');
       require('./components/check-auth.js');
 
       console.log('Global js ready!');

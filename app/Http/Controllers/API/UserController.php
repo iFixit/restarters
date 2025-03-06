@@ -75,7 +75,6 @@ class UserController extends Controller
         ]);
 
         $userChange = $user->toArray();
-        $userChange['talk_profile_url'] = $user->getTalkProfileUrl();
 
         $auditCreatedAtAsString = $audit->created_at->toDateTimeString();
 
@@ -100,34 +99,10 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
         $restartersNotifications = $user->unReadNotifications->count();
-        $discourseNotifications = 0;
-
-        if (config('restarters.features.discourse_integration')) {
-            if (Cache::has('talk_notification_' . $user->username)) {
-                $discourseNotifications = Cache::get('talk_notification_' . $user->username);
-            } else {
-                if (config('restarters.features.discourse_integration')) {
-                    $client = app('discourse-client');
-                    $response = $client->request('GET', '/notifications.json?username=' . $user->username);
-                    $talk_notifications = json_decode($response->getBody()->getContents(), true);
-
-                    if (!empty($talk_notifications) && array_key_exists('notifications', $talk_notifications)) {
-                        foreach ($talk_notifications['notifications'] as $notification) {
-                            if ($notification['read'] !== true) {
-                                $discourseNotifications++;
-                            }
-                        }
-
-                        Cache::put('talk_notification_' . $user->username, $discourseNotifications, 60);
-                    }
-                }
-            }
-        }
 
         return response()->json([
                                     'success' => 'success',
                                     'restarters' => $restartersNotifications,
-                                    'discourse' => $discourseNotifications
                                 ], 200);
     }
 }

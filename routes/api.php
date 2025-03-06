@@ -54,6 +54,23 @@ Route::middleware('auth:api')->group(function () {
 
     Route::get('/usersgroups/changes', [API\UserGroupsController::class, 'changes']); // Used by Zapier
     Route::delete('/usersgroups/{id}', [API\UserGroupsController::class, 'leave']); // Used by Vue client.
+
+    Route::get('/notify/updates', [API\NotifyController::class, 'updates']);
+    Route::get('/notify/count', [API\NotifyController::class, 'count']);
+    Route::get('/notify/counts', [API\NotifyController::class, 'counts']);
+    Route::get('/notify/all', [API\NotifyController::class, 'messages']);
+    Route::put('/notify/read/{id}', [API\NotifyController::class, 'read']);
+    Route::put('/notify/readall', [API\NotifyController::class, 'readAll']);
+
+    Route::get('/profile', [API\UserController::class, 'profile']);
+    
+    Route::post('/groups/{group}/join', [API\GroupsController::class, 'join']);
+    Route::post('/groups/{group}/leave', [API\GroupsController::class, 'leave']);
+    
+    Route::post('/party/{id}/attendance', [API\PartyController::class, 'attendance']);
+    
+    //Admin
+    Route::get('/admin/stats', [API\AdminController::class, 'userStats']);
 });
 
 Route::get('/devices/{page}/{size}', [App\Http\Controllers\ApiController::class, 'getDevices']); // Used by Vue client.
@@ -62,11 +79,13 @@ Route::get('/devices/{page}/{size}', [App\Http\Controllers\ApiController::class,
 // issue with exposing the number of outstanding notifications.
 Route::get('/users/{id}/notifications', [API\UserController::class, 'notifications']);
 
-// Top Talk topics.  Doesn't need authentication either.
-Route::get('/talk/topics/{tag?}', [API\DiscourseController::class, 'discussionTopics']);
-
 // Timezones
 Route::get('/timezones', [App\Http\Controllers\ApiController::class, 'timezones']);
+
+// Info about events for various purposes, not needing to be logged in.
+Route::get('/stats/group/{id}', [API\StatisticsController::class, 'group']);
+Route::get('/stats/network/{id}', [API\StatisticsController::class, 'network']);
+Route::get('/stats/all', [API\StatisticsController::class, 'all']);
 
 // We are working towards a new and more coherent API.
 Route::prefix('v2')->group(function() {

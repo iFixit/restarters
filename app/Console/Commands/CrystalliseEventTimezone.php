@@ -3,9 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Party;
-use App\Services\DiscourseService;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Log;
 
 class CrystalliseEventTimezone extends Command
 {
@@ -28,10 +26,9 @@ class CrystalliseEventTimezone extends Command
      *
      * @return void
      */
-    public function __construct(DiscourseService $discourseService)
+    public function __construct()
     {
         parent::__construct();
-        $this->discourseService = $discourseService;
     }
 
     /**

@@ -5,23 +5,18 @@ namespace App\Observers;
 use App\Events\UserConfirmedEvent;
 use App\Events\UserLeftEvent;
 use App\EventsUsers;
-use App\Role;
-use App\Services\DiscourseService;
 use App\User;
 
 /**
- * This class triggers add/removes from the Discourse thread when a user joins/leaves an event.
- * It also maintains the count of volunteers for the event.
+ * This class maintains the count of volunteers for the event.
  *
  * Class EventsUsersObserver
  * @package App\Observers
  */
 class EventsUsersObserver {
-    private $discourseService;
 
-    public function __construct(DiscourseService $discourseService)
+    public function __construct()
     {
-        $this->discourseService = $discourseService;
     }
 
         /**
