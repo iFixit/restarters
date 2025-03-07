@@ -14,7 +14,12 @@
 
     <div class="d-flex flex-wrap">
       <div class="w-xs-100 w-md-50">
-        <GroupDescription class="pr-md-3" :idgroups="idgroups" :discourse-group="discourseGroup" />
+        <GroupDescription 
+          class="pr-md-3" 
+          :idgroups="idgroups" 
+          :discourse-group="discourseGroup" 
+          :discourse-integration-enabled="discourseIntegrationEnabled"
+        />
       </div>
       <div class="w-xs-100 w-md-50">
         <GroupVolunteers class="pl-md-3" :idgroups="idgroups" :canedit="canedit" />
@@ -148,6 +153,11 @@ export default {
       required: false,
       default: null
     },
+    discourseIntegrationEnabled: {
+      type: Boolean,
+      required: false,
+      default: true
+    }
   },
   data () {
     return {

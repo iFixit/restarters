@@ -158,6 +158,7 @@
               calendar-edit-url="{{ $showCalendar ? url("/profile/edit/{$user->id}#list-calendar-links") : '' }}"
               :ingroup="{{ $in_group ? 'true' : 'false' }}"
               discourse-group="{{ $discourseGroup }}"
+              :discourse-integration-enabled="{{ config('restarters.features.discourse_integration') ? 'true' : 'false' }}"
           />
       </div>
   </div>
