@@ -35,7 +35,7 @@
     }
 
     .landing-page .has-background-gold {background-color: #FFBE5F;}
-    .landing-page .has-background-teal {background-color: #4AAEBC;}
+    .landing-page .has-background-teal {background-color: #0071CE;}
     .landing-page .has-background-pink {background-color: #F49292;}
     .landing-page .has-background-purple {background-color: #80a4e0; }
 
