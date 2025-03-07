@@ -92,6 +92,13 @@
             <span>@lang('general.menu_workbench')</span>
         </a>
     </li>
+    @else
+    <li style="flex-basis: 100%;">
+        <a href="https://www.ifixit.com/Parts" rel="noopener noreferrer">
+            @include('svgs/navigation/workbench-icon')
+            <span>@lang('general.menu_repair_parts')</span>
+        </a>
+    </li>
     @endif
 </ul>
 
