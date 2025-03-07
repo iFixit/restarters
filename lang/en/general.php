@@ -31,6 +31,7 @@ return [
   'menu_discourse' => 'Talk',
   'menu_wiki' => 'Wiki',
   'menu_repair_guide' => 'Repair Guides',
+  'menu_repair_parts' => 'Repair Parts',
   'menu_help_feedback' => 'Help & Feedback',
   'menu_faq' => 'FAQs',
   'therestartproject' => 'The Restart Project',
