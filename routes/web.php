@@ -106,7 +106,9 @@ Route::middleware('ensureAPIToken')->group(function () {
         Route::get('/all-events/{hash_env}', [CalendarEventsController::class, 'allEvents'])->name('calendar-events-all');
     });
 
-    Route::get('workbench', [MicrotaskingController::class, 'index'])->name('workbench');
+    if (env('FEATURE__WORKBENCH_INTEGRATION')) {
+        Route::get('workbench', [MicrotaskingController::class, 'index'])->name('workbench');
+    }
 
     Route::prefix('FaultCat')->group(function () {
         Route::get('/', [FaultcatController::class, 'index']);

@@ -197,9 +197,11 @@
           <a href="/login" class="btn btn-primary ml-3">{{ __('landing.login') }}</a>
         </div>
       </div>
+      @if(env('FEATURE__WORKBENCH_INTEGRATION'))
       <div class="landing-bottom-right">
         @include('svgs/navigation/workbench-icon')
       </div>
+      @endif
     </div>
 
     <div class="row mt-5">

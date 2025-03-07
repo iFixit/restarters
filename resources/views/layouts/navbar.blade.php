@@ -77,12 +77,14 @@
     </a>
     </li>
 
+    @if(env('FEATURE__WORKBENCH_INTEGRATION'))
     <li class="@if(Str::contains(url()->current(), route('workbench')) || Str::contains(url()->current(), '/mobifix') || Str::contains(url()->current(), '/misccat') || Str::contains(url()->current(), '/faultcat') || Str::contains(url()->current(), '/printcat')) active @endif" style="flex-basis: 100%;">
         <a href="{{ route('workbench') }}" rel="noopener noreferrer">
             @include('svgs/navigation/workbench-icon')
             <span>@lang('general.menu_workbench')</span>
         </a>
     </li>
+    @endif
 </ul>
 
 <!-- Right Side Of Navbar -->
