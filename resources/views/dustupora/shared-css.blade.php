@@ -136,7 +136,7 @@
     }
 
     div.quest-closed {
-        background-color: #4aaebc !important;
+        background-color: #0071CE !important;
     }
 
     .quest-closed li {

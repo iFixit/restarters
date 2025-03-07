@@ -87,7 +87,7 @@
         box-shadow: 6px 6px 0 0 #eee;
     }
     .mobifix div.quest-closed {
-        background-color:#4aaebc;
+        background-color:#0071CE;
     }
 
     .mobifix .quest-closed li {

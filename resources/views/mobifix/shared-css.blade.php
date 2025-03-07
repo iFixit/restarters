@@ -92,7 +92,7 @@
     }
 
     .mobifix div.quest-closed {
-        background-color:#4aaebc;
+        background-color:#0071CE;
     }
 
     .mobifix .quest-closed li {
