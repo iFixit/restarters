@@ -15,5 +15,6 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(DefaultSkills::class);
         $this->call(BrandList::class);
+        $this->call(GroupSeeder::class);
     }
 }
