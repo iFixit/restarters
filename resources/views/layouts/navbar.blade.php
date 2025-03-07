@@ -72,10 +72,17 @@
     </li>
 
     <li style="flex-basis: 100%;">
-        <a href="{{config('restarters.wiki.base_url') }}" rel="noopener noreferrer">
-        @include('svgs/navigation/wiki-icon')
-        <span>@lang('general.menu_wiki')</span>
-    </a>
+        @if(config('restarters.features.wiki_integration'))
+            <a href="{{config('restarters.wiki.base_url') }}" rel="noopener noreferrer">
+            @include('svgs/navigation/wiki-icon')
+            <span>@lang('general.menu_wiki')</span>
+            </a>
+        @else
+            <a href="https://www.ifixit.com/Guide" rel="noopener noreferrer">
+            @include('svgs/navigation/wiki-icon')
+            <span>@lang('general.menu_repair_guide')</span>
+            </a>
+        @endif
     </li>
 
     @if(env('FEATURE__WORKBENCH_INTEGRATION'))
@@ -168,7 +175,11 @@
                         <ul>
                             <li><a href="{{ route('dashboard') }}">Dashboard</a></li>
                             <li><a href="{{{ env('DISCOURSE_URL')}}}/session/sso?return_path={{{ env('DISCOURSE_URL') }}}" rel="noopener noreferrer">@lang('general.menu_discourse')</a></li>
-                            <li><a href="{{ config('restarters.wiki.base_url') }}" rel="noopener noreferrer">@lang('general.menu_wiki')</a></li>
+                            @if(config('restarters.features.wiki_integration'))
+                                <li><a href="{{ config('restarters.wiki.base_url') }}" rel="noopener noreferrer">@lang('general.menu_wiki')</a></li>
+                            @else
+                                <li><a href="https://www.ifixit.com/Guides" rel="noopener noreferrer">@lang('general.menu_repair_guides')</a></li>
+                            @endif
                             @if ( App\Helpers\Fixometer::hasPermission('repair-directory') )
                                 <li><a href="{{ config('restarters.repairdirectory.base_url') }}/admin" target="_blank" rel="noopener noreferrer">Repair Directory</a></li>
                             @endif
