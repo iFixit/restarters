@@ -28,6 +28,10 @@ class RemoveUserFromDiscourseThreadForEvent implements ShouldQueue {
     }
 
     public function handle(UserLeftEvent $e) {
+        if (! config('restarters.features.discourse_integration')) {
+            return;
+        }
+        
         if ($e->iduser) {
             $event = Party::find($e->idevents);
             $user = User::find($e->iduser);

@@ -208,6 +208,10 @@ class DiscourseService
     }
 
     public function syncGroups($idgroups = NULL) {
+        if (! config('restarters.features.discourse_integration')) {
+            return;
+        }
+
         $restartIds = $idgroups ? $idgroups : Group::whereNotNull('discourse_group')->pluck('idgroups');
 
         // Get all Discourse groups.  We need to find the ids matching the group name we store.  The groups.json
@@ -648,6 +652,10 @@ class DiscourseService
 
     public function setSetting($setting, $value)
     {
+        if (! config('restarters.features.discourse_integration')) {
+            return;
+        }
+
         Log::info("Set Discourse setting {$setting} to {$value}");
 
         $client = app('discourse-client');
@@ -668,6 +676,10 @@ class DiscourseService
 
     public function anonymise($user)
     {
+        if (! config('restarters.features.discourse_integration')) {
+            return;
+        }
+
         Log::info("Anonymise {$user->id}");
         $client = app('discourse-client');
 

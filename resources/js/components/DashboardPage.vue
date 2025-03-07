@@ -13,6 +13,7 @@
       <DashboardAddData class="adddata justify-self-end" />
       <DashboardRightSidebar class="sidebar" />
       <DiscourseDiscussion
+          v-if="discourseIntegrationEnabled"
           class="discourse"
           :see-all-topics-link="seeAllTopicsLink"
           :discourse-base-url="discourseBaseUrl"
@@ -67,6 +68,11 @@ export default {
     newGroups: {
       type: Array,
       required: true
+    },
+    discourseIntegrationEnabled: {
+      type: Boolean,
+      required: false,
+      default: true
     }
   },
   created() {

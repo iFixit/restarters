@@ -1,6 +1,6 @@
 <template>
   <div class="badge-group">
-    <button id="badge-talk-notifications" :class="{
+    <button v-if="discourseIntegrationEnabled" id="badge-talk-notifications" :class="{
       'badge': true,
       'badge-pill': true,
       'badge-info' : true,
@@ -63,6 +63,11 @@ export default {
     discourseUserName: {
       type: String,
       required: true
+    },
+    discourseIntegrationEnabled: {
+      type: Boolean,
+      required: false,
+      default: true
     }
   },
   data () {
@@ -73,6 +78,10 @@ export default {
   },
   computed: {
     url () {
+      if (! this.discourseIntegrationEnabled) {
+        return null
+      }
+
       return this.discourseBaseUrl + '/session/sso?return_path=' + this.discourseBaseUrl + '/u/' + this.discourseUserName + '/notifications'
     },
   },

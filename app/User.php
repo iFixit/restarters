@@ -495,6 +495,10 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
 
     public function getTalkProfileUrl()
     {
+        if (!config('restarters.features.discourse_integration')) {
+            return null;
+        }
+
         return env('DISCOURSE_URL').'/u/'.$this->username;
     }
 

@@ -5,7 +5,15 @@
       <EventHeading :idevents="idevents" :canedit="canedit" :candelete="candelete" :is-admin="isAdmin" :in-group="inGroup" :is-attending="isAttending" />
       <div class="ep-layout">
         <div>
-          <EventDetails class="pr-md-3" :idevents="idevents" :hosts="hosts" :calendar-links="calendarLinks" :is-attending="isAttending" :discourse-thread="discourseThread" />
+          <EventDetails 
+            class="pr-md-3" 
+            :idevents="idevents" 
+            :hosts="hosts" 
+            :calendar-links="calendarLinks" 
+            :is-attending="isAttending" 
+            :discourse-thread="discourseThread"
+            :discourse-integration-enabled="discourseIntegrationEnabled" 
+          />
           <EventDescription class="pr-md-3" :idevents="idevents" />
         </div>
         <div>
@@ -126,6 +134,11 @@ export default {
       type: Array,
       required: false,
       default: null
+    },
+    discourseIntegrationEnabled: {
+      type: Boolean,
+      required: false,
+      default: true
     }
   },
   mounted() {

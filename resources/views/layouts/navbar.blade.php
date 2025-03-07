@@ -41,6 +41,7 @@
 @endif
 {{-- Left side of the Navigation --}}
 <ul class="nav-left d-flex justify-content-between w-100 pr-md-3" id="nav-left">
+    @if(config('restarters.features.discourse_integration'))
     <li style="flex-basis: 100%;">
 
         <a href="{{{ env('DISCOURSE_URL')}}}/session/sso?return_path={{{ env('DISCOURSE_URL') }}}" rel="noopener noreferrer">
@@ -48,7 +49,7 @@
         <span>@lang('general.menu_discourse')</span>
     </a>
     </li>
-
+    @endif
     <li class="@if(Str::contains(url()->current(), route('devices'))) active @endif" style="flex-basis: 100%;">
     <a href="{{ route('devices') }}">
         @include('svgs/navigation/drill-icon')
@@ -97,7 +98,7 @@
     @else
       <li class="d-flex" style="width: 152px">
           <div class="vue">
-            <Notifications :user-id="{{{ Auth::user()->id }}}" discourse-base-url="{{{ env('DISCOURSE_URL') }}}" discourse-user-name="{{{ Auth::user()->username }}}" />
+            <Notifications :user-id="{{{ Auth::user()->id }}}" discourse-base-url="{{{ env('DISCOURSE_URL') }}}" discourse-user-name="{{{ Auth::user()->username }}}" :discourse-integration-enabled="{{ config('restarters.features.discourse_integration') ? 'true' : 'false' }}" />
           </div>
       </li>
 

@@ -450,6 +450,10 @@ class Group extends Model implements Auditable
     }
 
     public function createDiscourseGroup() {
+        if (!config('restarters.features.discourse_integration')) {
+            return false;
+        }
+
         // Get the host who created the group.
         $success = false;
         $member = UserGroups::where('group', $this->idgroups)->first();

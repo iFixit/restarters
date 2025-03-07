@@ -127,6 +127,7 @@
             :clusters="{{ json_encode($expanded_clusters, JSON_INVALID_UTF8_IGNORE) }}"
             :brands="{{ json_encode($expanded_brands, JSON_INVALID_UTF8_IGNORE) }}"
             :barrier-list="{{ json_encode(App\Helpers\Fixometer::allBarriers(), JSON_INVALID_UTF8_IGNORE) }}"
+            :discourse-integration-enabled="{{ config('restarters.features.discourse_integration') ? 'true' : 'false' }}"
           />
         </div>
       </div>

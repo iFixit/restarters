@@ -77,6 +77,7 @@ class DashboardController extends Controller
                 'your_groups' => $your_groups,
                 'seeAllTopicsLink' => env('DISCOURSE_URL').'/latest',
                 'new_groups' => $new_groups,
+                'discourse_integration_enabled' => config('restarters.features.discourse_integration'),
             ]
         );
     }
