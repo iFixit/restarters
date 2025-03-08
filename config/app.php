@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\Route;
 
+error_reporting(E_ALL ^ E_DEPRECATED);
+
 return [
 
     /*
