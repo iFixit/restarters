@@ -15,7 +15,7 @@ class TranslationServiceProvider extends ServiceProvider implements DeferrablePr
      */
     protected $siteTranslations = [
         [
-            'site' => 'fixitclinic',
+            'site' => 'ifixit',
             'domain' => 'restarters-dev.cominor.com'
         ]
         // Add more site mappings as needed:
