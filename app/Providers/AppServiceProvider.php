@@ -14,6 +14,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Translation\Translator;
 use OwenIt\Auditing\Models\Audit;
 use Schema;
+use App\Services\TranslationService;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -70,6 +71,11 @@ class AppServiceProvider extends ServiceProvider
             return $trans;
         });
 
+        // Register the TranslationService
+        $this->app->singleton(TranslationService::class, function ($app) {
+            return new TranslationService();
+        });
+
         $this->app->register(\L5Swagger\L5SwaggerServiceProvider::class);
     }
     
@@ -78,8 +84,9 @@ class AppServiceProvider extends ServiceProvider
      */
     protected function shareTranslationsWithJs()
     {
-        // Determine which translation groups to load
-        $jsTransGroups = Config::get('translation.js_groups', ['dashboard', 'common', 'auth']);
+        // Use the TranslationService to get JS translations
+        $translationService = app(TranslationService::class);
+        $jsTransGroups = $translationService->getJsGroups();
         
         View::composer('*', function ($view) use ($jsTransGroups) {
             $locale = app()->getLocale();

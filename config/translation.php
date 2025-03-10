@@ -32,18 +32,11 @@ return [
     | JavaScript Translation Groups
     |--------------------------------------------------------------------------
     |
-    | Specify which translation groups should be available to JavaScript.
-    | These translations will be loaded and shared with Vue components.
+    | This configuration is no longer used directly. The App\Services\TranslationService
+    | class now dynamically determines which translation groups should be available
+    | to JavaScript based on the files in the lang/en directory.
+    |
+    | You can customize the included/excluded groups by modifying the TranslationService.
     |
     */
-    'js_groups' => [
-        'dashboard',
-        'common',
-        'auth',
-        'landing',
-        'groups',
-        'events',
-        'nav',
-        'general',
-    ],
 ]; 
