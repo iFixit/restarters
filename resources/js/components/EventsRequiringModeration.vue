@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-if="loaded && events.length">
-      <h2 class="mt-4">{{ __('events.events_title_admin') }}</h2>
+      <h2 class="mt-4">{{ $trans.site('events.events_title_admin') }}</h2>
       <section class="mt-40">
         <GroupEventScrollTable
             :events="events"

@@ -10,7 +10,7 @@
       </div>
       <div>
         <b-btn variant="primary" :href="'/group/join/' + group.idgroups" v-if="!group.ingroup">
-          {{ __('groups.join_group_button') }}
+          {{ $trans.site('groups.join_group_button') }}
         </b-btn>
       </div>
     </div>

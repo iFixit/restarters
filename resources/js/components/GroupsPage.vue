@@ -3,17 +3,17 @@
     <h1 class="d-flex justify-content-between">
       <div class="d-flex">
         <div class="mt-2">
-        {{ __('groups.groups') }}
+        {{ $trans.site('groups.groups') }}
         </div>
         <b-img class="height ml-4" src="/images/group_doodle_ico.svg" />
       </div>
       <div>
         <b-btn variant="primary" href="/group/create" v-if="canCreate">
           <span class="d-block d-lg-none">
-            {{ __('groups.create_groups_mobile2') }}
+            {{ $trans.site('groups.create_groups_mobile2') }}
           </span>
           <span class="d-none d-lg-block">
-            {{ __('groups.create_groups') }}
+            {{ $trans.site('groups.create_groups') }}
           </span>
         </b-btn>
       </div>
@@ -21,8 +21,8 @@
     <b-tabs class="ourtabs w-100 mt-4" justified v-model="currentTab">
       <b-tab class="pt-2" lazy>
         <template slot="title">
-          <b class="text-uppercase d-block d-md-none">{{ __('groups.groups_title1_mobile') }}</b>
-          <b class="text-uppercase d-none d-md-block">{{ __('groups.groups_title1') }}</b>
+          <b class="text-uppercase d-block d-md-none">{{ $trans.site('groups.groups_title1_mobile') }}</b>
+          <b class="text-uppercase d-none d-md-block">{{ $trans.site('groups.groups_title1') }}</b>
         </template>
         <div class="pt-2 pb-2">
           <div v-if="yourGroups.length">
@@ -34,18 +34,18 @@
                 your-area="yourArea"
             />
           </div>
-          <div v-else class="mt-2 mb-2 text-center" v-html="__('groups.no_groups_mine')" />
+          <div v-else class="mt-2 mb-2 text-center" v-html="$trans.site('groups.no_groups_mine')" />
         </div>
       </b-tab>
       <b-tab class="pt-2" lazy>
         <template slot="title">
-          <b class="text-uppercase d-block d-lg-none">{{ __('groups.groups_title2_mobile') }}</b>
-          <b class="text-uppercase d-none d-lg-block">{{ __('groups.groups_title2') }}</b>
+          <b class="text-uppercase d-block d-lg-none">{{ $trans.site('groups.groups_title2_mobile') }}</b>
+          <b class="text-uppercase d-none d-lg-block">{{ $trans.site('groups.groups_title2') }}</b>
         </template>
         <div v-if="nearbyGroups.length">
           <p class="mt-1">
             {{ nearestGroups }}
-            <a href="/profile/edit" class="small">{{ __('groups.nearest_groups_change') }}</a>.
+            <a href="/profile/edit" class="small">{{ $trans.site('groups.nearest_groups_change') }}</a>.
           </p>
           <GroupsTable
               :groups="nearbyGroups"
@@ -56,14 +56,14 @@
           />
         </div>
         <div v-else class="mt-2 mb-2 text-center">
-          <div v-if="yourArea" v-html="__('groups.no_groups_nearest_with_location')" />
-          <div v-else v-html="__('groups.no_groups_nearest_no_location')" />
+          <div v-if="yourArea" v-html="$trans.site('groups.no_groups_nearest_with_location')" />
+          <div v-else v-html="$trans.site('groups.no_groups_nearest_no_location')" />
         </div>
       </b-tab>
       <b-tab class="pt-2" lazy>
         <template slot="title">
-          <b class="text-uppercase d-block d-md-none">{{ __('groups.all_groups_mobile') }}</b>
-          <b class="text-uppercase d-none d-md-block">{{ __('groups.all_groups') }}</b>
+          <b class="text-uppercase d-block d-md-none">{{ $trans.site('groups.all_groups_mobile') }}</b>
+          <b class="text-uppercase d-none d-md-block">{{ $trans.site('groups.all_groups') }}</b>
         </template>
         <GroupsTable
             :groups="groups"

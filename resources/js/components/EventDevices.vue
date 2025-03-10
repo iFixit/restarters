@@ -2,7 +2,7 @@
   <CollapsibleSection class="lineheight" collapsed :count="deviceCount" always-show-count count-class="text-black font-weight-normal">
     <template slot="title">
       <div class="d-flex">
-        <b-img class="d-none d-md-block icon" src="/images/tv.svg" />&nbsp;{{ __('devices.title_items_at_event') }}
+        <b-img class="d-none d-md-block icon" src="/images/tv.svg" />&nbsp;{{ $trans.site('devices.title_items_at_event') }}
       </div>
     </template>
     <template slot="content">
@@ -12,7 +12,7 @@
             <template slot="title">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b>{{ __('devices.title_powered') }}</b> ({{ powered.length }})
+                  <b>{{ $trans.site('devices.title_powered') }}</b> ({{ powered.length }})
                 </div>
                 <div class="d-flex">
                   <div class="mr-3 lower">
@@ -26,10 +26,10 @@
                 </div>
               </div>
             </template>
-            <p v-html="__('devices.description_powered')" />
+            <p v-html="$trans.site('devices.description_powered')" />
             <EventDeviceList :devices="powered" :powered="true" :canedit="canedit" :idevents="idevents" :brands="brands" :barrier-list="barrierList" :clusters="clusters" />
             <b-btn variant="primary" v-if="canedit" class="mb-4 ml-4 add-powered-device-desktop" @click="addPowered($event)">
-              <b-img class="icon mb-1" src="/images/add-icon.svg" /> {{ __('partials.add_device_powered') }}
+              <b-img class="icon mb-1" src="/images/add-icon.svg" /> {{ $trans.site('partials.add_device_powered') }}
             </b-btn>
             <EventDevice v-if="addingPowered" :powered="true" :add="true" :edit="false" :clusters="clusters" :eventid="idevents" :brands="brands" :barrier-list="barrierList" @close="closePowered" />
           </b-tab>
@@ -37,7 +37,7 @@
             <template slot="title">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b>{{ __('devices.title_unpowered') }}</b> ({{ unpowered.length }})
+                  <b>{{ $trans.site('devices.title_unpowered') }}</b> ({{ unpowered.length }})
                 </div>
                 <div class="d-flex">
                   <div class="mr-3 lower">
@@ -52,10 +52,10 @@
 
               </div>
             </template>
-            <p v-html="__('devices.description_unpowered')" />
+            <p v-html="$trans.site('devices.description_unpowered')" />
             <EventDeviceList :devices="unpowered" :powered="false" :canedit="canedit" :idevents="idevents" :brands="brands" :barrier-list="barrierList" :clusters="clusters" />
             <b-btn variant="primary" v-if="canedit" class="mb-4 ml-4 add-unpowered-device-desktop" @click="addUnpowered($event)">
-              <b-img class="icon mb-1" src="/images/add-icon.svg" /> {{ __('partials.add_device_unpowered') }}
+              <b-img class="icon mb-1" src="/images/add-icon.svg" /> {{ $trans.site('partials.add_device_unpowered') }}
             </b-btn>
             <EventDevice v-if="addingUnpowered" :powered="false" :add="true" :edit="false" :clusters="clusters" :eventid="idevents" :event="event" :brands="brands" :barrier-list="barrierList" @close="closeUnpowered"/>
           </b-tab>
@@ -66,7 +66,7 @@
           <template slot="title">
             <div class="d-flex justify-content-between small ml-1 align-self-center">
               <div>
-                <b>{{ __('devices.title_powered') }}</b>
+                <b>{{ $trans.site('devices.title_powered') }}</b>
               </div>
             </div>
           </template>
@@ -83,10 +83,10 @@
             </div>
           </template>
           <template slot="content">
-            <p v-html="__('devices.description_powered')" />
+            <p v-html="$trans.site('devices.description_powered')" />
             <EventDeviceList :devices="powered" :powered="true" :canedit="canedit" :idevents="idevents" :brands="brands" :barrier-list="barrierList" :clusters="clusters" />
             <b-btn variant="primary" v-if="canedit" class="mb-4 ml-4 add-powered-device-mobile" @click="addPowered($event)">
-              <b-img class="icon mb-1" src="/images/add-icon.svg" /> {{ __('partials.add_device_powered') }}
+              <b-img class="icon mb-1" src="/images/add-icon.svg" /> {{ $trans.site('partials.add_device_powered') }}
             </b-btn>
             <EventDevice v-if="addingPowered" :powered="true" :add="true" :edit="false" :clusters="clusters" :eventid="idevents" :brands="brands" :barrier-list="barrierList" @close="addingPowered = false" />
           </template>
@@ -95,7 +95,7 @@
           <template slot="title">
             <div class="d-flex justify-content-between small ml-1 align-self-center">
               <div>
-                <b>{{ __('devices.title_unpowered') }}</b>
+                <b>{{ $trans.site('devices.title_unpowered') }}</b>
               </div>
             </div>
           </template>
@@ -112,10 +112,10 @@
             </div>
           </template>
           <template slot="content">
-            <p v-html="__('devices.description_unpowered')" />
+            <p v-html="$trans.site('devices.description_unpowered')" />
             <EventDeviceList :devices="unpowered" :powered="false" :canedit="canedit" :idevents="idevents" :brands="brands" :barrier-list="barrierList" :clusters="clusters" />
             <b-btn variant="primary" v-if="canedit" class="mb-4 ml-4 add-unpowered-device-desktop" @click="addUnpowered($event)">
-              <b-img class="icon mb-1" src="/images/add-icon.svg" /> {{ __('partials.add_device_unpowered') }}
+              <b-img class="icon mb-1" src="/images/add-icon.svg" /> {{ $trans.site('partials.add_device_unpowered') }}
             </b-btn>
             <EventDevice v-if="addingUnpowered" :powered="false" :add="true" :edit="false" :clusters="clusters" :eventid="idevents" :brands="brands" :barrier-list="barrierList" @close="addingUnpowered = false" />
           </template>

@@ -1,7 +1,7 @@
 <template>
   <b-form-group>
-    <label for="event_link">{{ __('events.field_event_link') }}:</label>
-    <b-input type="url" id="event_link" name="link" :placeholder="__('events.field_event_link_helper')"
+    <label for="event_link">{{ $trans.site('events.field_event_link') }}:</label>
+    <b-input type="url" id="event_link" name="link" :placeholder="$trans.site('events.field_event_link_helper')"
              v-model="currentLink" :class="{ hasError: hasError }"/>
   </b-form-group>
 </template>

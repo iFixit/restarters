@@ -1,7 +1,7 @@
 <template>
   <div class="w-100 align-items-center device-field-row">
     <label class="text-bold">
-      {{ __('devices.weight') }}
+      {{ $trans.site('devices.weight') }}
     </label>
     <b-input type="number" @change="$emit('update:weight', parseFloat($event))" size="lg"
              class="marg p-1 text-center" min="0" step=".1" max="500"

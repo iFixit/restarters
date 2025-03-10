@@ -3,7 +3,7 @@
     <template slot="title">
       <div class="d-flex justify-content-between">
         <div>
-          <b>{{ __(this.title) }}</b> ({{ events.length }})
+          <b>{{ $trans.site(this.title) }}</b> ({{ events.length }})
         </div>
       </div>
     </template>

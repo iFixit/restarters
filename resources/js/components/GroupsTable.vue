@@ -17,10 +17,10 @@
     </div>
     <div class="d-block d-md-none" v-if="search">
       <div class="clickme d-flex justify-content-end pr-3 text-uppercase" v-if="!searchShow" @click="toggleFilters">
-        <a href="#">{{ __('groups.show_filters') }}</a>&nbsp;<b-img class="plusminusicon" src="/images/add-icon.svg" />
+        <a href="#">{{ $trans.site('groups.show_filters') }}</a>&nbsp;<b-img class="plusminusicon" src="/images/add-icon.svg" />
       </div>
       <div class="clickme d-flex justify-content-end pr-3 text-uppercase" v-if="searchShow" @click="toggleFilters">
-        <b-img class="plusminusicon" src="/images/minus-icon.svg" /><a href="#">&nbsp;{{ __('groups.hide_filters') }}</a>
+        <b-img class="plusminusicon" src="/images/minus-icon.svg" /><a href="#">&nbsp;{{ $trans.site('groups.hide_filters') }}</a>
       </div>
       <GroupsTableFilters
           v-if="searchShow"
@@ -76,7 +76,7 @@
             {{ data.item.next_event }}
           </div>
           <div v-else>
-            {{ __('groups.upcoming_none_planned') }}
+            {{ $trans.site('groups.upcoming_none_planned') }}
           </div>
         </div>
       </template>
@@ -85,25 +85,25 @@
       </template>
       <template slot="cell(following)" slot-scope="data">
         <div v-if="approve" class="cell-warning d-flex justify-content-around p-2">
-          <a :href="'/group/edit/' + data.item.idgroups">{{ __('groups.group_requires_moderation') }}</a>
+          <a :href="'/group/edit/' + data.item.idgroups">{{ $trans.site('groups.group_requires_moderation') }}</a>
         </div>
         <b-btn variant="primary" class="text-nowrap mr-2" v-else-if="!data.item.following" :to="'/group/join/' + data.item.idgroups">
           <span class="d-block d-md-none">
-            {{ __('groups.join_group_button_mobile') }}
+            {{ $trans.site('groups.join_group_button_mobile') }}
           </span>
           <span class="d-none d-md-block">
-            {{ __('groups.join_group_button') }}
+            {{ $trans.site('groups.join_group_button') }}
           </span>
         </b-btn>
         <b-btn variant="primary" class="text-nowrap mr-2" v-else @click="leaveGroup(data.item.idgroups)">
           <span class="d-block d-md-none">
-            {{ __('groups.leave_group_button_mobile') }}
+            {{ $trans.site('groups.leave_group_button_mobile') }}
           </span>
           <span class="d-none d-md-block">
-            {{ __('groups.leave_group_button') }}
+            {{ $trans.site('groups.leave_group_button') }}
           </span>
         </b-btn>
-        <ConfirmModal :key="'leavegroupmodal-' + data.item.idgroups" :ref="'confirmLeave-' + data.item.idgroups" @confirm="leaveConfirmed(data.item.idgroups)" :message="__('groups.leave_group_confirm')" />
+        <ConfirmModal :key="'leavegroupmodal-' + data.item.idgroups" :ref="'confirmLeave-' + data.item.idgroups" @confirm="leaveConfirmed(data.item.idgroups)" :message="$trans.site('groups.leave_group_confirm')" />
       </template>
     </b-table>
   </div>

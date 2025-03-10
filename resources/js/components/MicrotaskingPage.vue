@@ -4,7 +4,7 @@
     <h1 class="d-flex justify-content-between">
         <div class="d-flex">
             <div class="mt-2">
-                {{ __('microtasking.title') }}
+                {{ $trans.site('microtasking.title') }}
             </div>
             <b-img id="doodle" class="height ml-4" src="/images/workbench_doodle.svg" />
         </div>

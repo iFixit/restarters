@@ -1,12 +1,12 @@
 <template>
   <div v-if="ready">
-    <h1 v-if="idgroups">{{ __('groups.editing') }} <a class="headlink" :href="'/group/view/' + idgroups">{{ name }}</a></h1>
-    <h1 v-else>{{ __('general.new_group') }}</h1>
+    <h1 v-if="idgroups">{{ $trans.site('groups.editing') }} <a class="headlink" :href="'/group/view/' + idgroups">{{ name }}</a></h1>
+    <h1 v-else>{{ $trans.site('general.new_group') }}</h1>
     <p v-if="creating">
-      {{ __('groups.add_groups_content') }}
+      {{ $trans.site('groups.add_groups_content') }}
     </p>
     <p v-else>
-      {{ __('groups.edit_group_text') }}
+      {{ $trans.site('groups.edit_group_text') }}
     </p>
 
     <div class="layout">
@@ -32,7 +32,7 @@
           ref="email"/>
       <div class="form-group group-description">
         <b-form-group>
-          <label for="group_desc">{{ __('groups.groups_about_group') }}:</label>
+          <label for="group_desc">{{ $trans.site('groups.groups_about_group') }}:</label>
           <RichTextEditor
               id="group_desc"
               name="description"
@@ -85,12 +85,12 @@
       <b-card v-if="canApprove" no-body class="group-admin">
         <b-card-header>
           <b-img src="/images/cog.svg" />
-          {{ __('groups.group_admin_only') }}
+          {{ $trans.site('groups.group_admin_only') }}
         </b-card-header>
         <b-card-body>
           <div v-if="canNetwork">
             <label for="networks">
-              {{ __('networks.networks') }}:
+              {{ $trans.site('networks.networks') }}:
             </label>
             <multiselect
                 id="networks"
@@ -104,12 +104,12 @@
                 selectLabel=""
                 class="m-0 mb-1 mb-md-0"
                 allow-empty
-                :selectedLabel="__('partials.remove')"
+                :selectedLabel="$trans.site('partials.remove')"
             />
           </div>
           <div class="mt-2" v-if="canNetwork">
             <label for="tags">
-              {{ __('groups.group_tags') }}:
+              {{ $trans.site('groups.group_tags') }}:
             </label>
             <multiselect
                 id="tags"
@@ -123,19 +123,19 @@
                 selectLabel=""
                 class="m-0 mb-1 mb-md-0"
                 allow-empty
-                :selectedLabel="__('partials.remove')"
+                :selectedLabel="$trans.site('partials.remove')"
             />
           </div>
           <div class="mt-2">
             <b-form-group>
-              <label for="group_area">{{ __('groups.area') }}:</label>
+              <label for="group_area">{{ $trans.site('groups.area') }}:</label>
               <b-input id="group_area" name="area" v-model="area" />
             </b-form-group>
           </div>
           <div class="mt-2" v-if="!approved && canApprove">
             <b-form-group>
               <label class="groups-tags-label" for="moderate">
-                {{ __('groups.approve_group') }}
+                {{ $trans.site('groups.approve_group') }}
               </label>
               <b-select v-model="moderate" name="moderate">
                 <option></option>
@@ -149,17 +149,17 @@
 
       <div class="group-buttons text-right">
         <div v-if="failed">
-          <p v-if="creating" class="mt-2 text-danger font-weight-bold" v-html="'<div>' + __('groups.create_failed') + '</div>'"/>
-          <p v-else class="mt-2 text-danger font-weight-bold" v-html="'<div>' + __('groups.edit_failed') + '</div>'"/>
+          <p v-if="creating" class="mt-2 text-danger font-weight-bold" v-html="'<div>' + $trans.site('groups.create_failed') + '</div>'"/>
+          <p v-else class="mt-2 text-danger font-weight-bold" v-html="'<div>' + $trans.site('groups.edit_failed') + '</div>'"/>
         </div>
 
         <div class="d-flex justify-content-between flex-wrap" v-if="creating">
           <div class="text-right flex-grow-1 mr-4">
-            {{ __('groups.groups_approval_text') }}
+            {{ $trans.site('groups.groups_approval_text') }}
           </div>
           <SpinButton
               icon-name="save"
-              :label="__('groups.create_group')"
+              :label="$trans.site('groups.create_group')"
               variant="primary"
               @handle="submit"
           />
@@ -167,7 +167,7 @@
         <div class="d-flex justify-content-end" v-else>
           <SpinButton
               icon-name="save"
-              :label="__('groups.edit_group_save_changes')"
+              :label="$trans.site('groups.edit_group_save_changes')"
               variant="primary"
               @handle="submit"
           />

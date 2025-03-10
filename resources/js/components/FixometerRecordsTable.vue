@@ -1,6 +1,6 @@
 <template>
   <div>
-    <p class="text-brand small pl-3">{{ __('devices.table_intro') }}</p>
+    <p class="text-brand small pl-3">{{ $trans.site('devices.table_intro') }}</p>
     <div class="pl-md-3 pr-md-3">
       <b-table
           ref="table"
@@ -20,7 +20,7 @@
           </em>
         </template>
         <template slot="cell(device_category.name)" slot-scope="data">
-          {{ __('strings.' + data.item.category.name) }}
+          {{ $trans.site('strings.' + data.item.category.name) }}
         </template>
         <template slot="cell(short_problem)" slot-scope="data">
           <div v-line-clamp="3">
@@ -56,7 +56,7 @@
             <span class="pl-0 pl-md-2 pr-2 clickme" @click="row.toggleDetails">
               <b-img class="icon" src="/icons/edit_ico_green.svg" />
             </span>
-            <ConfirmModal :key="'modal-' + row.item.id" ref="confirmDelete" @confirm="deleteConfirmed(row.item)" :message="__('devices.confirm_delete')" />
+            <ConfirmModal :key="'modal-' + row.item.id" ref="confirmDelete" @confirm="deleteConfirmed(row.item)" :message="$trans.site('devices.confirm_delete')" />
           </div>
           <div v-else class="text-md-right">
             <span class="pl-0 pl-md-2 pr-2 clickme" @click="row.toggleDetails">
@@ -202,13 +202,13 @@ export default {
       let ret = [
         {
           key: 'item_type',
-          label: this.__('devices.model_or_type'),
+          label: this.$trans.site('devices.model_or_type'),
           sortable: true,
           tdClass: 'pl-0 pl-md-3'
         },
         {
           key: 'device_category.name',
-          label: this.__('devices.category'),
+          label: this.$trans.site('devices.category'),
           thClass: 'width20 pl-0 pl-md-3',
           tdClass: 'width20 pl-0 pl-md-3',
           sortable: true
@@ -216,21 +216,21 @@ export default {
       ]
 
       if (this.powered) {
-        ret.push({key: 'brand', label: this.__('devices.brand'), sortable: true, thClass: 'd-none d-md-table-cell', tdClass: 'd-none d-md-table-cell'})
+        ret.push({key: 'brand', label: this.$trans.site('devices.brand'), sortable: true, thClass: 'd-none d-md-table-cell', tdClass: 'd-none d-md-table-cell'})
       }
 
-      ret.push({key: 'short_problem', label: this.__('devices.assessment'), thClass: 'width10 d-none d-md-table-cell', tdClass: 'width10 d-none d-md-table-cell'})
-      ret.push({key: 'groupname', label: this.__('devices.group'), sortable: true, thClass: 'd-none d-md-table-cell', tdClass: 'd-none d-md-table-cell'})
+      ret.push({key: 'short_problem', label: this.$trans.site('devices.assessment'), thClass: 'width10 d-none d-md-table-cell', tdClass: 'width10 d-none d-md-table-cell'})
+      ret.push({key: 'groupname', label: this.$trans.site('devices.group'), sortable: true, thClass: 'd-none d-md-table-cell', tdClass: 'd-none d-md-table-cell'})
       ret.push({
         key: 'repair_status',
-        label: this.__('devices.status'),
+        label: this.$trans.site('devices.status'),
         thClass: 'width90px',
         tdClass: 'width90px',
         sortable: true
       })
       ret.push({
         key: 'created_at',
-        label: this.__('devices.devices_date'),
+        label: this.$trans.site('devices.devices_date'),
         thClass: 'width90px',
         tdClass: 'width90px',
         sortable: true

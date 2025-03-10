@@ -1,6 +1,6 @@
 <template>
   <b-badge
-      :title="title" v-if="archived_at" variant="secondary" pill class="nounderline">{{ __('groups.archived_group') }}
+      :title="title" v-if="archived_at" variant="secondary" pill class="nounderline">{{ $trans.site('groups.archived_group') }}
   </b-badge>
 </template>
 <script>

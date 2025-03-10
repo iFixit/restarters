@@ -5,16 +5,16 @@
       <!-- eslint-disable-next-line -->
       <div class="overlay">
         <div class="mt-2 m-md-2">
-          <div v-html="__('dashboard.no_groups')" v-if="!nearbyGroups.length" />
-          <div v-html="__('dashboard.no_groups_intro')" />
+          <div v-html="$trans.site('dashboard.no_groups')" v-if="!nearbyGroups.length" />
+          <div v-html="$trans.site('dashboard.no_groups_intro')" />
         </div>
       </div>
       <div class="groups mt-2 p-0 p-md-2" v-if="nearbyGroups.length">
-        <h3>{{ __('dashboard.groups_near_you_header') }}</h3>
+        <h3>{{ $trans.site('dashboard.groups_near_you_header') }}</h3>
         <hr />
         <DashboardGroup v-for="group in nearbyGroups" :key="'nearbygroup-' + group.idgroups" :group="group" />
         <a href="/group/nearby">
-          {{ __('dashboard.see_all_groups_near_you') }}
+          {{ $trans.site('dashboard.see_all_groups_near_you') }}
         </a>
       </div>
     </div>
@@ -22,13 +22,13 @@
       <div class="pic" />
       <!-- eslint-disable-next-line -->
       <div class="overlay">
-        <div v-html="__('groups.no_groups_nearest_no_location')" class="mt-2 m-md-2" />
+        <div v-html="$trans.site('groups.no_groups_nearest_no_location')" class="mt-2 m-md-2" />
       </div>
     </div>
     <div class="text pr-md-2 pl-md-2 pb-2">
-      <strong>{{ __('dashboard.interested_starting') }}</strong>
+      <strong>{{ $trans.site('dashboard.interested_starting') }}</strong>
       <!-- eslint-disable-next-line -->
-      <div v-html="__('dashboard.interested_details')" />
+      <div v-html="$trans.site('dashboard.interested_details')" />
     </div>
   </div>
 </template>

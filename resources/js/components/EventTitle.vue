@@ -1,7 +1,7 @@
 <template>
   <component :is="component">
     <!-- eslint-disable-next-line -->
-    {{ event.venue ? event.venue : event.location }}<b-badge v-if="event.online" variant="primary" pill class="nounderline">{{ __('events.online') }}</b-badge>
+    {{ event.venue ? event.venue : event.location }}<b-badge v-if="event.online" variant="primary" pill class="nounderline">{{ $trans.site('events.online') }}</b-badge>
   </component>
 </template>
 <script>

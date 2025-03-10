@@ -1,6 +1,6 @@
 <template>
   <b-form-group>
-    <label for="event_group" class="moveright">{{ __('events.field_event_group') }}:</label>
+    <label for="event_group" class="moveright">{{ $trans.site('events.field_event_group') }}:</label>
     <multiselect
         v-model="currentGroupValue"
         :options="groupOptions"
@@ -8,7 +8,7 @@
         label="name"
         :allow-empty="false"
         deselectLabel=""
-        :placeholder="__('partials.please_choose')"
+        :placeholder="$trans.site('partials.please_choose')"
         :class="{ hasError: hasError }"
         :disabled="disabled"
     />

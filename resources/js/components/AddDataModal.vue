@@ -11,35 +11,35 @@
       title-tag="h2"
   >
     <template slot="modal-title">
-      {{ __('devices.add_data_title') }}
+      {{ $trans.site('devices.add_data_title') }}
       <hr class="hr-dashed mb-25 mt-10">
     </template>
     <div>
-      {{ __('devices.add_data_description') }}
+      {{ $trans.site('devices.add_data_description') }}
     </div>
     <b-alert v-if="!groups.length && !fetching" show variant="warning" class="mt-2">
-      {{ __('groups.follow_group_first') }}
+      {{ $trans.site('groups.follow_group_first') }}
     </b-alert>
     <div v-else>
-      <label for="items_cat" class="mt-2">{{ __('devices.add_data_group') }}:</label>
+      <label for="items_cat" class="mt-2">{{ $trans.site('devices.add_data_group') }}:</label>
       <b-select v-model="groupId" :options="groupOptions" id="group_member" />
       <b-alert v-if="groupId && !events.length && !fetching" variant="warning" class="mt-2" show>
-        {{ __('groups.create_event_first') }}
+        {{ $trans.site('groups.create_event_first') }}
       </b-alert>
       <div v-else>
-        <label for="items_cat" class="mt-2">{{ __('devices.add_data_event') }}:</label>
+        <label for="items_cat" class="mt-2">{{ $trans.site('devices.add_data_event') }}:</label>
         <b-select :disabled="fetching" v-model="eventId" :options="eventOptions" id="events" />
       </div>
     </div>
     <template slot="modal-footer">
       <b-button v-if="!groups.length && !fetching" href="/group" variant="primary">
-        {{ __('dashboard.see_all_groups') }}
+        {{ $trans.site('dashboard.see_all_groups') }}
       </b-button>
       <b-button v-else-if="groupId && !events.length && !fetching" variant="primary" size="sm" @click="createEvent" :disabled="!groupId">
-        {{ __('events.create_event') }}
+        {{ $trans.site('events.create_event') }}
       </b-button>
       <b-button v-else variant="primary" size="sm" @click="gotoEvent">
-        {{ __('devices.add_data_action_button') }}
+        {{ $trans.site('devices.add_data_action_button') }}
       </b-button>
     </template>
   </b-modal>

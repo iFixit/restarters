@@ -66,7 +66,7 @@
             <b-img class="icon" src="/icons/delete_ico_red.svg" />
           </span>
         </div>
-        <ConfirmModal :key="'modal-' + id" ref="confirmDelete" @confirm="deleteConfirmed" :message="__('devices.confirm_delete')" />
+        <ConfirmModal :key="'modal-' + id" ref="confirmDelete" @confirm="deleteConfirmed" :message="$trans.site('devices.confirm_delete')" />
       </b-td>
     </b-tr>
     <b-tr v-else :key="'editing-' + id">

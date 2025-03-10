@@ -10,7 +10,7 @@
       }" @click="toggleItems">
         <div class="flex-grow-1">
           <h3 class="text-uppercase header pl-2 mt-3 font-weight-bold text-center">
-            {{ __('devices.item_and_repair_info') }}
+            {{ $trans.site('devices.item_and_repair_info') }}
           </h3>
         </div>
         <b-btn variant="link" class="pr-1 pl-0">
@@ -21,20 +21,20 @@
       <b-collapse id="collapse-item" v-model="expandedItems">
         <b-card no-body>
           <b-card-body class="p-2">
-            <b-form-group :label="__('devices.category')">
+            <b-form-group :label="$trans.site('devices.category')">
               <DeviceCategorySelect :category.sync="current_category" :clusters="clusters" :powered="powered" allow-empty />
             </b-form-group>
-            <b-form-group v-if="powered" :label="__('devices.model')">
+            <b-form-group v-if="powered" :label="$trans.site('devices.model')">
               <DeviceModel :model.sync="current_model" />
             </b-form-group>
-            <b-form-group  v-if="powered" :label="__('devices.brand')">
+            <b-form-group  v-if="powered" :label="$trans.site('devices.brand')">
               <DeviceBrand :brand.sync="current_brand" :brands="brands" allow-empty suppress-brand-warning />
             </b-form-group>
-            <b-form-group v-if="!powered" :label="__('devices.model_or_type')">
+            <b-form-group v-if="!powered" :label="$trans.site('devices.model_or_type')">
               <DeviceModel :model.sync="current_item_type" />
             </b-form-group>
             <div class="w-100 device-select-row">
-              <b-form-group :label="__('devices.status')">
+              <b-form-group :label="$trans.site('devices.status')">
                 <multiselect
                     v-model="current_status"
                     :options="statusOptions"
@@ -45,13 +45,13 @@
                     selectLabel=""
                     deselect-label=""
                     :taggable="false"
-                    :selectedLabel="__('partials.remove')"
+                    :selectedLabel="$trans.site('partials.remove')"
                 />
               </b-form-group>
               <div />
             </div>
             <div class="w-100 device-select-row">
-              <b-form-group :label="__('devices.search_assessment_comments')">
+              <b-form-group :label="$trans.site('devices.search_assessment_comments')">
                 <b-input v-model="current_comments" />
               </b-form-group>
               <div />
@@ -70,7 +70,7 @@
       }" @click="toggleEvents">
         <div class="flex-grow-1">
           <h3 class="text-uppercase header pl-2 mt-3 font-weight-bold text-center">
-            {{ __('devices.event_info') }}
+            {{ $trans.site('devices.event_info') }}
           </h3>
         </div>
         <b-btn variant="link" class="pr-1 pl-0">
@@ -81,13 +81,13 @@
       <b-collapse id="collapse-item" v-model="expandedEvents">
         <b-card no-body>
           <b-card-body class="p-2">
-            <b-form-group :label="__('devices.group')">
+            <b-form-group :label="$trans.site('devices.group')">
               <b-input v-model="current_group" />
             </b-form-group>
-            <b-form-group :label="__('devices.from_date')">
+            <b-form-group :label="$trans.site('devices.from_date')">
               <b-form-datepicker class="datepicker" v-model="current_from_date" :date-format-options="{ year: 'numeric', month: 'numeric', day: 'numeric' }"></b-form-datepicker>
             </b-form-group>
-            <b-form-group :label="__('devices.to_date')">
+            <b-form-group :label="$trans.site('devices.to_date')">
               <b-form-datepicker class="datepicker" v-model="current_to_date" :date-format-options="{ year: 'numeric', month: 'numeric', day: 'numeric' }"></b-form-datepicker>
             </b-form-group>
           </b-card-body>

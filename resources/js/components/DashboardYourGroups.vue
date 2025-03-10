@@ -4,7 +4,7 @@
       <div class="d-flex justify-content-between flex-wrap">
         <div class="d-flex w-100">
           <div class="align-self-center">
-            {{ __('dashboard.your_groups_heading') }}
+            {{ $trans.site('dashboard.your_groups_heading') }}
           </div>
           <b-img class="height ml-4" src="/images/group_doodle_ico.svg" />
         </div>
@@ -26,10 +26,10 @@
           <div class="dyg-layout">
             <div class="group-intro">
               <h3>
-                {{ __('dashboard.groups_heading') }}
+                {{ $trans.site('dashboard.groups_heading') }}
               </h3>
               <p>
-              {{ __('dashboard.catch_up') }}
+              {{ $trans.site('dashboard.catch_up') }}
               </p>
             </div>
             <div class="group-list">
@@ -43,7 +43,7 @@
             <div class="group-seeall">
               <div class="d-flex justify-content-end">
                 <a href="/group" class="mr-1">
-                  {{ __('dashboard.see_all_groups') }}
+                  {{ $trans.site('dashboard.see_all_groups') }}
                 </a>
               </div>
             </div>
@@ -52,18 +52,18 @@
               <div class="d-flex justify-content-between">
                 <div>
                   <h3>
-                    {{ __('dashboard.upcoming_events_title') }}
+                    {{ $trans.site('dashboard.upcoming_events_title') }}
                   </h3>
                   <p v-if="events.length">
-                    {{ __('dashboard.upcoming_events_subtitle') }}
+                    {{ $trans.site('dashboard.upcoming_events_subtitle') }}
                   </p>
                   <p v-else>
-                    {{ __('events.no_upcoming_for_your_groups') }}.
+                    {{ $trans.site('events.no_upcoming_for_your_groups') }}.
                   </p>
                 </div>
                 <div>
                   <b-btn variant="primary" href="/party/create" class="text-nowrap" v-if="amAHost">
-                    {{ __('dashboard.add_event') }}
+                    {{ $trans.site('dashboard.add_event') }}
                   </b-btn>
                 </div>
               </div>
@@ -75,7 +75,7 @@
             <div class="event-seeall">
               <div class="d-flex justify-content-end">
                 <a href="/party" class="mr-1">
-                  {{ __('partials.see_all_events') }}
+                  {{ $trans.site('partials.see_all_events') }}
                 </a>
               </div>
             </div>

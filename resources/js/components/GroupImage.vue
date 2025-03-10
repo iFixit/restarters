@@ -1,6 +1,6 @@
 <template>
   <b-form-group>
-    <label for="dropzone">{{ __('groups.group_image') }}:</label>
+    <label for="dropzone">{{ $trans.site('groups.group_image') }}:</label>
     <div class="layout">
       <vue-dropzone ref="dropzone" id="dropzone" :options="dropzoneOptions"
                     class="ourdropzone" useCustomSlot

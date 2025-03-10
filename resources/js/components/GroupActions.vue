@@ -1,63 +1,63 @@
 <template>
   <div>
     <div v-if="canedit">
-      <b-dropdown variant="primary" :text="__('groups.group_actions')" class="deepnowrap" id="groupactions">
+      <b-dropdown variant="primary" :text="$trans.site('groups.group_actions')" class="deepnowrap" id="groupactions">
         <b-dropdown-item :href="'/group/edit/' + idgroups" v-if="canedit">
-          {{ __('groups.edit_group') }}
+          {{ $trans.site('groups.edit_group') }}
         </b-dropdown-item>
         <b-dropdown-item :href="'/party/create/' + idgroups" v-if="canedit">
-          {{ __('groups.add_event') }}
+          {{ $trans.site('groups.add_event') }}
         </b-dropdown-item>
         <b-dropdown-item  data-toggle="modal" data-target="#invite-to-group" v-if="canedit">
-          {{ __('groups.invite_volunteers') }}
+          {{ $trans.site('groups.invite_volunteers') }}
         </b-dropdown-item>
         <b-dropdown-item :href="'/group/nearby/' + idgroups" v-if="canedit">
-          {{ __('groups.volunteers_nearby') }}
+          {{ $trans.site('groups.volunteers_nearby') }}
         </b-dropdown-item>
         <b-dropdown-item  data-toggle="modal" data-target="#group-share-stats" v-if="canedit">
-          {{ __('groups.share_group_stats') }}
+          {{ $trans.site('groups.share_group_stats') }}
         </b-dropdown-item>
         <b-dropdown-item :href="'/export/devices/group/' + idgroups">
-          {{ __('devices.export_group_data') }}
+          {{ $trans.site('devices.export_group_data') }}
         </b-dropdown-item>
         <b-dropdown-item data-toggle="modal" @click="leaveGroup" v-if="ingroup" class="leavegroup">
-          {{ __('groups.leave_group_button') }}
+          {{ $trans.site('groups.leave_group_button') }}
         </b-dropdown-item>
         <b-dropdown-item :href="'/group/join/' + idgroups" v-else>
-          {{ __('groups.join_group_button') }}
+          {{ $trans.site('groups.join_group_button') }}
         </b-dropdown-item>
         <b-dropdown-item @click="deleteGroup" v-if="canSeeDelete && canPerformDelete">
-          {{ __('groups.delete_group') }}
+          {{ $trans.site('groups.delete_group') }}
         </b-dropdown-item>
         <b-dropdown-item v-if="canSeeDelete && !canPerformDelete" disabled>
-          {{ __('groups.delete_group') }}
+          {{ $trans.site('groups.delete_group') }}
         </b-dropdown-item>
         <b-dropdown-item @click="archiveGroup" v-if="canPerformArchive" :disabled="group.archived_at">
-          {{ __('groups.archive_group') }}
+          {{ $trans.site('groups.archive_group') }}
         </b-dropdown-item>
       </b-dropdown>
     </div>
     <div v-else>
-      <b-dropdown variant="primary" :text="__('groups.group_actions')" class="deepnowrap">
+      <b-dropdown variant="primary" :text="$trans.site('groups.group_actions')" class="deepnowrap">
         <b-dropdown-item data-toggle="modal" data-target="#invite-to-group" v-if="ingroup">
-          {{ __('groups.invite_volunteers') }}
+          {{ $trans.site('groups.invite_volunteers') }}
         </b-dropdown-item>
         <b-dropdown-item :href="'/group/join/' + idgroups" v-else>
-          {{ __('groups.join_group_button') }}
+          {{ $trans.site('groups.join_group_button') }}
         </b-dropdown-item>
         <b-dropdown-item  data-toggle="modal" data-target="#group-share-stats">
-          {{ __('groups.share_group_stats') }}
+          {{ $trans.site('groups.share_group_stats') }}
         </b-dropdown-item>
         <b-dropdown-item data-toggle="modal" @click="leaveGroup" v-if="ingroup">
-          {{ __('groups.leave_group_button') }}
+          {{ $trans.site('groups.leave_group_button') }}
         </b-dropdown-item>
       </b-dropdown>
     </div>
-    <ConfirmModal :key="'leavegroupmodal-' + idgroups" ref="confirmLeave" @confirm="leaveConfirmed" :message="__('groups.leave_group_confirm')" />
-    <ConfirmModal :key="'deletegroupmodal-' + idgroups" ref="confirmDelete" @confirm="deleteConfirmed" :message="__('groups.delete_group_confirm', {
+    <ConfirmModal :key="'leavegroupmodal-' + idgroups" ref="confirmLeave" @confirm="leaveConfirmed" :message="$trans.site('groups.leave_group_confirm')" />
+    <ConfirmModal :key="'deletegroupmodal-' + idgroups" ref="confirmDelete" @confirm="deleteConfirmed" :message="$trans.site('groups.delete_group_confirm', {
       name: group.name
     })" />
-    <ConfirmModal :key="'archivegroupmodal-' + idgroups" ref="confirmArchive" @confirm="archiveConfirmed" :message="__('groups.archive_group_confirm', {
+    <ConfirmModal :key="'archivegroupmodal-' + idgroups" ref="confirmArchive" @confirm="archiveConfirmed" :message="$trans.site('groups.archive_group_confirm', {
       name: group.name
     })" />
   </div>

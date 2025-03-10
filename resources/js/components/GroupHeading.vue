@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="d-flex justify-content-between mb-3">
-      <h1 class="d-block d-md-none">{{ __('groups.groups') }}</h1>
+      <h1 class="d-block d-md-none">{{ $trans.site('groups.groups') }}</h1>
       <GroupActions :idgroups="idgroups" :can-see-delete="canSeeDelete" :can-perform-delete="canPerformDelete"
                     :can-perform-archive="canPerformArchive"
                     class="d-block d-md-none" @left="$emit('left')"/>
@@ -18,7 +18,7 @@
           <div class="d-flex justify-content-between w-100">
             <div class="flex-wrap">
               <b>{{ location }}</b> <br/>
-              <ExternalLink v-if="group.website" :href="group.website">{{ __('groups.website') }}</ExternalLink>
+              <ExternalLink v-if="group.website" :href="group.website">{{ $trans.site('groups.website') }}</ExternalLink>
             </div>
             <GroupActions :idgroups="idgroups" :can-see-delete="canSeeDelete" :can-perform-delete="canPerformDelete"
                           :can-perform-archive="canPerformArchive"

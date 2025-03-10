@@ -4,26 +4,26 @@
       <b-thead>
         <b-tr>
           <b-th>
-            {{ __('devices.item_type_short') }}
+            {{ $trans.site('devices.item_type_short') }}
           </b-th>
           <b-th>
-            {{ __('devices.category') }}
+            {{ $trans.site('devices.category') }}
           </b-th>
           <b-th v-if="powered" class="d-none d-md-table-cell">
-              {{ __('devices.brand') }}
+              {{ $trans.site('devices.brand') }}
           </b-th>
           <b-td v-if="!powered" class="d-table-cell d-md-none" />
           <b-th class="d-none d-md-table-cell">
-            {{ __('devices.age') }}
+            {{ $trans.site('devices.age') }}
           </b-th>
           <b-th class="d-none d-md-table-cell">
-            {{ __('devices.devices_description') }}
+            {{ $trans.site('devices.devices_description') }}
           </b-th>
           <b-th class="d-none d-md-table-cell">
-            {{ __('devices.status') }}
+            {{ $trans.site('devices.status') }}
           </b-th>
           <b-th class="d-none d-md-table-cell">
-            {{ __('devices.spare_parts') }}
+            {{ $trans.site('devices.spare_parts') }}
           </b-th>
           <b-th v-if="canedit">
           </b-th>

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <label for="postcode">{{ __('groups.timezone') }}:</label>
+    <label for="postcode">{{ $trans.site('groups.timezone') }}:</label>
     <vue-typeahead-bootstrap
         v-model="currentValue"
         :maxMatches="3"
@@ -12,7 +12,7 @@
         }"
     />
     <small class="form-text text-muted">
-      {{ __('groups.timezone_placeholder') }}
+      {{ $trans.site('groups.timezone_placeholder') }}
     </small>
     <input type="hidden" name="timezone" :value="currentValue" />
   </div>

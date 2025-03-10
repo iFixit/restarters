@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2 class="mt-2 mb-2">{{ __('events.items_fixed') }}</h2>
+    <h2 class="mt-2 mb-2">{{ $trans.site('events.items_fixed') }}</h2>
     <div class="items-container">
       <StatsValue :count="stats.fixed_devices" icon="fixed" size="sm" variant="primary" class="event-stat-fixed" />
       <div />

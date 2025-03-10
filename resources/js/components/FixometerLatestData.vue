@@ -1,7 +1,7 @@
 <template>
   <div class="fld-layout md-primary-black">
     <div class="title mb-2 ml-3">
-      {{ __('devices.latest_data') }}
+      {{ $trans.site('devices.latest_data') }}
       <span class="icon mt-2 mb-2">
         <b-img src="/images/clap_doodle.svg" class="img" />
       </span>

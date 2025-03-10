@@ -1,7 +1,7 @@
 <template>
   <CollapsibleSection collapsed :count="attendees.length" class="width">
     <template slot="title">
-      {{ __('events.event_attendance') }}
+      {{ $trans.site('events.event_attendance') }}
     </template>
     <template slot="content">
       <div class="mt-2">
@@ -13,14 +13,14 @@
             <div v-if="!upcoming" class="count-participants">
               <b>
                 <b-img src="/icons/group_ico.svg" class="mr-2 icon" />
-                {{ __('events.stat-0') }}
+                {{ $trans.site('events.stat-0') }}
               </b>
               <EventAttendanceCount :count="event.participants" class="mt-2 mb-4" @change="changeParticipants($event)" :canedit="canedit" />
             </div>
             <div v-if="!upcoming" class="count-volunteers">
               <b>
                 <b-img src="/icons/volunteer_ico.svg" class="mr-2 icon" />
-                {{ __('events.stat-2') }}
+                {{ $trans.site('events.stat-2') }}
               </b>
               <EventAttendanceCount :count="event.volunteers" class="mt-2"  @change="changeVolunteers($event)" :canedit="canedit" />
             </div>
@@ -30,19 +30,19 @@
             <b-tabs class="ourtabs attendance-tabs w-100">
               <b-tab active title-item-class="w-50" class="pt-2">
                 <template slot="title">
-                  <b>{{ __('events.confirmed') }}</b> ({{ confirmed.length }})
+                  <b>{{ $trans.site('events.confirmed') }}</b> ({{ confirmed.length }})
                 </template>
                 <div v-if="confirmed.length" class="maxheight" :key="'confirm-' + confirmed.length">
                   <EventAttendee v-for="a in confirmed" :key="'eventattendee-' + a.idevents_users" :attendee="a" :canedit="canedit" />
                 </div>
                 <p v-else>
-                  {{ __('events.confirmed_none') }}
+                  {{ $trans.site('events.confirmed_none') }}
                 </p>
                 <hr />
                 <div>
                   <div class="d-flex justify-content-between" v-if="!upcoming">
                     <b-btn variant="link" @click="addVolunteer">
-                      {{ __('events.add_volunteer_modal_heading') }}
+                      {{ $trans.site('events.add_volunteer_modal_heading') }}
                     </b-btn>
                     <EventAddVolunteerModal :idevents="idevents" ref="addVolunteerModal" @hide="fetchVolunteers" />
                   </div>
@@ -50,19 +50,19 @@
               </b-tab>
               <b-tab title-item-class="w-50" class="pt-2">
                 <template slot="title">
-                  <b>{{ __('events.invited') }}</b> ({{ invited.length }})
+                  <b>{{ $trans.site('events.invited') }}</b> ({{ invited.length }})
                 </template>
                 <div v-if="invited.length" class="maxheight">
                   <EventAttendee v-for="a in invited" :key="'eventattendee-' + a.idevents_users" :attendee="a" />
                 </div>
                 <p v-else>
-                  {{ __('events.invited_none') }}
+                  {{ $trans.site('events.invited_none') }}
                 </p>
                 <hr />
                 <div v-if="upcoming && approved" class="d-flex justify-content-between">
                   <a data-toggle="modal" data-target="#event-invite-to" href="#" class="ml-2">
                     <img class="icon" src="/images/add-icon.svg" />
-                    {{ __('events.invite_to_join') }}
+                    {{ $trans.site('events.invite_to_join') }}
                   </a>
                 </div>
               </b-tab>
