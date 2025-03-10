@@ -26,17 +26,6 @@ return [
             'domain' => '127.0.0.1'
         ]
     ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Debug Mode
-    |--------------------------------------------------------------------------
-    |
-    | When enabled, the translation service provider will log additional debug
-    | information about the translation loading process.
-    |
-    */
-    'debug' => env('TRANSLATION_DEBUG', false),
     
     /*
     |--------------------------------------------------------------------------
