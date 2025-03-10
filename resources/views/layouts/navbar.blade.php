@@ -2,7 +2,7 @@
 <nav class="nav-wrapper pl-0 pr-0">
 
 {{-- Logo --}}
-<a href="{{ route('home') }}" class="icon-brand">
+<a href="{{ route('home') }}" class="icon-brand d-flex align-items-center">
     <div class="d-none d-md-block">
     @include('includes/logo')
     </div>
@@ -40,45 +40,45 @@
   </style>
 @endif
 {{-- Left side of the Navigation --}}
-<ul class="nav-left d-flex justify-content-between w-100 pr-md-3" id="nav-left">
+<ul class="nav-left d-flex align-items-center justify-content-between w-100 pr-md-3" id="nav-left">
     @if(config('restarters.features.discourse_integration'))
-    <li style="flex-basis: 100%;">
+    <li style="flex-basis: 100%;" class="d-flex align-items-center">
 
-        <a href="{{{ env('DISCOURSE_URL')}}}/session/sso?return_path={{{ env('DISCOURSE_URL') }}}" rel="noopener noreferrer">
+        <a href="{{{ env('DISCOURSE_URL')}}}/session/sso?return_path={{{ env('DISCOURSE_URL') }}}" rel="noopener noreferrer" class="d-flex flex-column align-items-center justify-content-center">
         @include('svgs/navigation/talk-icon')
         <span>@lang('general.menu_discourse')</span>
     </a>
     </li>
     @endif
-    <li class="@if(Str::contains(url()->current(), route('devices'))) active @endif" style="flex-basis: 100%;">
-    <a href="{{ route('devices') }}">
+    <li class="@if(Str::contains(url()->current(), route('devices'))) active @endif d-flex align-items-center" style="flex-basis: 100%;">
+    <a href="{{ route('devices') }}" class="d-flex flex-column align-items-center justify-content-center">
         @include('svgs/navigation/drill-icon')
         <span>@lang('general.menu_fixometer')</span>
     </a>
     </li>
 
-    <li class="@if(Str::contains(url()->current(), route('events'))) active @endif" style="flex-basis: 100%;">
-    <a href="{{ route('events') }}">
+    <li class="@if(Str::contains(url()->current(), route('events'))) active @endif d-flex align-items-center" style="flex-basis: 100%;">
+    <a href="{{ route('events') }}" class="d-flex flex-column align-items-center justify-content-center">
         @include('svgs/navigation/events-icon')
         <span>@lang('general.menu_events')</span>
     </a>
     </li>
 
-    <li class="@if(Str::contains(url()->current(), route('groups'))) active @endif" style="flex-basis: 100%;">
-    <a href="{{ route('groups') }}">
+    <li class="@if(Str::contains(url()->current(), route('groups'))) active @endif d-flex align-items-center" style="flex-basis: 100%;">
+    <a href="{{ route('groups') }}" class="d-flex flex-column align-items-center justify-content-center">
         @include('svgs/navigation/groups-icon')
         <span>@lang('general.menu_groups')</span>
     </a>
     </li>
 
-    <li style="flex-basis: 100%;">
+    <li style="flex-basis: 100%;" class="d-flex align-items-center">
         @if(config('restarters.features.wiki_integration'))
-            <a href="{{config('restarters.wiki.base_url') }}" rel="noopener noreferrer">
+            <a href="{{config('restarters.wiki.base_url') }}" rel="noopener noreferrer" class="d-flex flex-column align-items-center justify-content-center">
             @include('svgs/navigation/wiki-icon')
             <span>@lang('general.menu_wiki')</span>
             </a>
         @else
-            <a href="https://www.ifixit.com/Guide" rel="noopener noreferrer">
+            <a href="https://www.ifixit.com/Guide" rel="noopener noreferrer" class="d-flex flex-column align-items-center justify-content-center">
             @include('svgs/navigation/wiki-icon')
             <span>@lang('general.menu_repair_guide')</span>
             </a>
@@ -86,15 +86,15 @@
     </li>
 
     @if(env('FEATURE__WORKBENCH_INTEGRATION'))
-    <li class="@if(Str::contains(url()->current(), route('workbench')) || Str::contains(url()->current(), '/mobifix') || Str::contains(url()->current(), '/misccat') || Str::contains(url()->current(), '/faultcat') || Str::contains(url()->current(), '/printcat')) active @endif" style="flex-basis: 100%;">
-        <a href="{{ route('workbench') }}" rel="noopener noreferrer">
+    <li class="@if(Str::contains(url()->current(), route('workbench')) || Str::contains(url()->current(), '/mobifix') || Str::contains(url()->current(), '/misccat') || Str::contains(url()->current(), '/faultcat') || Str::contains(url()->current(), '/printcat')) active @endif d-flex align-items-center" style="flex-basis: 100%;">
+        <a href="{{ route('workbench') }}" rel="noopener noreferrer" class="d-flex flex-column align-items-center justify-content-center">
             @include('svgs/navigation/workbench-icon')
             <span>@lang('general.menu_workbench')</span>
         </a>
     </li>
     @else
-    <li style="flex-basis: 100%;">
-        <a href="https://www.ifixit.com/Parts" rel="noopener noreferrer">
+    <li style="flex-basis: 100%;" class="d-flex align-items-center">
+        <a href="https://www.ifixit.com/Parts" rel="noopener noreferrer" class="d-flex flex-column align-items-center justify-content-center">
             @include('svgs/navigation/workbench-icon')
             <span>@lang('general.menu_repair_parts')</span>
         </a>
@@ -103,21 +103,21 @@
 </ul>
 
 <!-- Right Side Of Navbar -->
-<ul class="nav-right">
+<ul class="nav-right d-flex align-items-center">
     <!-- Authentication Links -->
     @php( $user = Auth::user() )
     @if (!$user )
-      <li style="width:130px;"><a style="text-transform: initial;  background: white; color: black; margin-bottom: 10px; border: 2px solid black; width: 120px; height: 40px;" href="/login">@lang('login.login_title')</a></li>
-      <li style="width:130px;"><a style="text-transform: initial; background: black; color: white; margin-bottom: 10px; width: 120px; height: 40px;" href="/user/register">@lang('login.join_title_short')</a></li>
+      <li style="width:130px;" class="d-flex align-items-center"><a style="text-transform: initial;  background: white; color: black; margin-bottom: 10px; border: 2px solid black; width: 120px; height: 40px;" href="/login" class="d-flex align-items-center justify-content-center">@lang('login.login_title')</a></li>
+      <li style="width:130px;" class="d-flex align-items-center"><a style="text-transform: initial; background: black; color: white; margin-bottom: 10px; width: 120px; height: 40px;" href="/user/register" class="d-flex align-items-center justify-content-center">@lang('login.join_title_short')</a></li>
     @else
-      <li class="d-flex" style="width: 152px">
+      <li class="d-flex align-items-center" style="width: 152px">
           <div class="vue">
             <Notifications :user-id="{{{ Auth::user()->id }}}" discourse-base-url="{{{ env('DISCOURSE_URL') }}}" discourse-user-name="{{{ Auth::user()->username }}}" :discourse-integration-enabled="{{ config('restarters.features.discourse_integration') ? 'true' : 'false' }}" />
           </div>
       </li>
 
-      <li class="nav-item dropdown @if(Str::contains(url()->current(), route('profile'))) active @endif">
-          <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-target="#account-nav" aria-controls="account-nav" data-toggle="collapse" aria-haspopup="true" aria-expanded="false" aria-label="Toggle account navigation" v-pre>
+      <li class="nav-item dropdown @if(Str::contains(url()->current(), route('profile'))) active @endif d-flex align-items-center">
+          <a id="navbarDropdown" class="nav-link dropdown-toggle d-flex align-items-center justify-content-center" href="#" role="button" data-target="#account-nav" aria-controls="account-nav" data-toggle="collapse" aria-haspopup="true" aria-expanded="false" aria-label="Toggle account navigation" v-pre>
               @if ( $user && isset( $user->getProfile($user->id)->path ) && !is_null( $user->getProfile($user->id)->path ) )
                   <img src="/uploads/thumbnail_{{ $user->getProfile($user->id)->path }}" alt="{{ Auth::user()->name }} Profile Picture" class="avatar">
               @else
@@ -211,10 +211,10 @@
 
     <aside id="notifications" class="notifications collapse">
         <div class="notifications__scroll">
-            <div id="tabs" class="notifications__inner">
+            <div id="tabs" class="notifications__inner d-flex flex-column align-items-center">
 
                 @if( isset($user->notifications) && is_object($user->notifications) && $user->notifications->count() > 0 )
-                <div class="cards">
+                <div class="cards d-flex flex-column align-items-center w-100">
 
                 @foreach ($user->notifications->take(10) as $notification)
                     @include('partials.notification')
@@ -222,12 +222,12 @@
 
                 </div>
             @else
-                <div class="alert alert-secondary" role="alert">
+                <div class="alert alert-secondary d-flex flex-column align-items-center text-center w-100" role="alert">
                     <h3>@lang('general.alert_uptodate')</h3>
                     <p>@lang('general.alert_uptodate_text')</p>
                 </div>
             @endif
-            <a href="{{ route('notifications') }}" class="notifications__older">@lang('notifications.view_all')</a>
+            <a href="{{ route('notifications') }}" class="notifications__older d-flex align-items-center justify-content-center">@lang('notifications.view_all')</a>
         </div>
     </div>
 </aside>

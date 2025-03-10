@@ -39,9 +39,16 @@
       svg {
         min-height: 30px;
         min-width: 30px;
-
         max-width: 30px;
         max-height: 30px;
+        margin-bottom: 4px;
+      }
+
+      span {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
       }
 
       &.dropdown-active {
@@ -111,6 +118,7 @@
   @extend .container;
   @extend .d-flex;
   @extend .flex-row;
+  @extend .align-items-center;
 
   padding-top: 31px;
   padding-bottom: 35px;
@@ -118,6 +126,8 @@
   .icon-brand {
     margin-right: 43px;
     margin-left: 11px;
+    display: flex;
+    align-items: center;
 
     /*&.active::before {
         content: '';
@@ -160,8 +170,16 @@
 
       li {
         margin: auto !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
         a {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          
           span {
             display: none;
           }
@@ -174,6 +192,8 @@
     @extend %nav-items-shared;
 
     margin-left: auto;
+    display: flex;
+    align-items: center;
   }
 }
 
