@@ -36,4 +36,66 @@ class RobustTranslator extends BaseTranslator
 
         return $translation;
     }
+    
+    /**
+     * Get a translation from a site-specific namespace
+     * 
+     * @param string $key The translation key
+     * @param array $replace Values to replace in the translation
+     * @param string|null $locale The locale to use
+     * @param bool $fallback Whether to fallback to the default translation
+     * @return string The translated text
+     */
+    public function site($key, array $replace = [], $locale = null, $fallback = true)
+    {
+        // Get the current site
+        $currentSite = app()->bound('current.site') ? app('current.site') : null;
+        
+        if (!$currentSite) {
+            Log::warning("No current site found when trying to translate key: {$key}");
+            return parent::get($key, $replace, $locale, $fallback);
+        }
+        
+        $siteNamespace = $currentSite['site'];
+        
+        // Split the key to get the group and item separately
+        $parts = explode('.', $key);
+        
+        if (count($parts) !== 2) {
+            Log::warning("Invalid translation key format: {$key}. Expected 'group.key'");
+            return parent::get($key, $replace, $locale, $fallback);
+        }
+        
+        $group = $parts[0];
+        $item = $parts[1];
+        
+        // Try to get the translations for the whole group from the site namespace
+        $siteKey = "{$siteNamespace}::{$group}";
+        $siteTranslations = $this->getLoader()->load($locale ?? $this->locale, $group, $siteNamespace);
+        
+        // If the site-specific translations exist and contain the specific key, use it
+        if ($siteTranslations && isset($siteTranslations[$item])) {
+            Log::debug("Found site-specific translation for key", [
+                'key' => $key,
+                'site' => $siteNamespace,
+                'translation' => $siteTranslations[$item]
+            ]);
+            
+            // Apply replacements and return the site-specific translation
+            return $this->makeReplacements($siteTranslations[$item], $replace);
+        }
+        
+        // If fallback is enabled, get the standard translation for this key
+        if ($fallback) {
+            Log::debug("No site-specific translation found for key, falling back to standard", [
+                'key' => $key,
+                'site' => $siteNamespace
+            ]);
+            
+            return parent::get($key, $replace, $locale, true);
+        }
+        
+        // No translation found and no fallback
+        return $key;
+    }
 }

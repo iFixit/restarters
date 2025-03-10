@@ -33,6 +33,11 @@ import { Integrations } from "@sentry/tracing";
 import Vuelidate from 'vuelidate'
 Vue.use(Vuelidate)
 
+// Import our custom translation plugin
+import { TranslationPlugin } from './translation'
+// Register the translation plugin
+Vue.use(TranslationPlugin)
+
 import LoginPage from './components/LoginPage.vue'
 import DashBoardPage from './components/DashboardPage.vue'
 import EventAddEditPage from './components/EventAddEditPage.vue'

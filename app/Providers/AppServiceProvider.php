@@ -8,6 +8,8 @@ use App\Helpers\RobustTranslator;
 use App\Observers\EventsUsersObserver;
 use Auth;
 use Cache;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Translation\Translator;
 use OwenIt\Auditing\Models\Audit;
@@ -45,6 +47,12 @@ class AppServiceProvider extends ServiceProvider
         \Illuminate\Pagination\Paginator::useBootstrapThree();
 
         EventsUsers::observe(EventsUsersObserver::class);
+        
+        // Add site-specific translation helper
+        $this->registerSiteTranslationHelper();
+        
+        // Share translations with JavaScript
+        $this->shareTranslationsWithJs();
     }
 
     /**
@@ -66,5 +74,67 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->app->register(\L5Swagger\L5SwaggerServiceProvider::class);
+    }
+    
+    /**
+     * Register a site-specific translation helper function
+     */
+    protected function registerSiteTranslationHelper()
+    {
+        // Register a Blade directive for site-specific translations
+        \Illuminate\Support\Facades\Blade::directive('site_trans', function ($expression) {
+            return "<?php echo site_trans($expression); ?>";
+        });
+        
+        // Make the site name available to all views
+        $currentSite = app()->bound('current.site') ? app('current.site') : null;
+        if ($currentSite) {
+            view()->share('current_site', $currentSite['site']);
+        }
+    }
+    
+    /**
+     * Share translations with JavaScript for Vue components
+     */
+    protected function shareTranslationsWithJs()
+    {
+        // Determine which translation groups to load
+        $jsTransGroups = Config::get('translation.js_groups', ['dashboard', 'common', 'auth']);
+        
+        View::composer('*', function ($view) use ($jsTransGroups) {
+            $locale = app()->getLocale();
+            $translations = [];
+            $siteTranslations = [];
+            
+            // Load regular translations
+            foreach ($jsTransGroups as $group) {
+                $translations[$group] = trans($group);
+            }
+            
+            // Load site-specific translations if available
+            if (app()->bound('current.site')) {
+                $currentSite = app('current.site');
+                
+                foreach ($jsTransGroups as $group) {
+                    // Try to get site-specific translations using our helper
+                    $groupTranslations = [];
+                    
+                    // We'll manually build the array to avoid the key prefix in the result
+                    $siteKey = "{$currentSite['site']}::{$group}";
+                    $rawTranslations = app('translator')->get($siteKey, [], $locale, false);
+                    
+                    if (is_array($rawTranslations)) {
+                        $groupTranslations = $rawTranslations;
+                    }
+                    
+                    $siteTranslations[$group] = $groupTranslations;
+                }
+            }
+            
+            // Share with all views
+            $view->with('translations', $translations);
+            $view->with('siteTranslations', $siteTranslations);
+            $view->with('translationsLocale', $locale);
+        });
     }
 }
