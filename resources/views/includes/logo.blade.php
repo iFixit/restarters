@@ -1,4 +1,6 @@
-@if( session('repair_network') == 2 )
+@if( env('APP_LOGO') === 'fixitclinic' )
+    @include('includes/logo-fixitclinic')
+@elseif( session('repair_network') == 2 )
     @include('includes/logo-repairshare')
 @elseif( session('repair_network') == 3 )
     @include('includes/logo-repairtogether')
