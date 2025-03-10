@@ -4,7 +4,7 @@
 
           <template slot="title">
               <div class="mt-2">
-              {{ $trans.site('microtasking.news.title') }}
+              {{ $translate('microtasking.news.title') }}
               </div>
           </template>
 
@@ -16,7 +16,7 @@
               <div class="embed-responsive embed-responsive-16by9 mr-4 w-100 w-lg-50">
                 <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/svnC5QPK9mY"></iframe>
               </div>
-              <div v-html="$trans.site('microtasking.news.content')" class="pt-3 w-100 w-lg-50" />
+              <div v-html="$translate('microtasking.news.content')" class="pt-3 w-100 w-lg-50" />
             </div>
           </template>
       </CollapsibleSection>

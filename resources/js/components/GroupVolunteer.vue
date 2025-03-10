@@ -17,7 +17,7 @@
               {{ volunteer.name }}
             </a>
               <span class="host" v-if="volunteer.host">
-              {{ $trans.site('partials.host') }}
+              {{ $translate('partials.host') }}
             </span>
             </div>
             <div :id="'skills-' + volunteer.user" :class="{
@@ -38,14 +38,14 @@
         </div>
       </div>
       <b-dropdown v-if="canedit" variant="none" ref="dropdown" class="edit-dropdown" no-caret>
-        <b-dropdown-item v-if="volunteer.host && candemote" @click="removeHostRole">{{ $trans.site('groups.remove_host_role') }}</b-dropdown-item>
-        <b-dropdown-item v-if="!volunteer.host" @click="makeVolunteerHost">{{ $trans.site('groups.make_host') }}</b-dropdown-item>
-        <b-dropdown-item @click="removeVolunteer">{{ $trans.site('groups.remove_volunteer') }}</b-dropdown-item>
+        <b-dropdown-item v-if="volunteer.host && candemote" @click="removeHostRole">{{ $translate('groups.remove_host_role') }}</b-dropdown-item>
+        <b-dropdown-item v-if="!volunteer.host" @click="makeVolunteerHost">{{ $translate('groups.make_host') }}</b-dropdown-item>
+        <b-dropdown-item @click="removeVolunteer">{{ $translate('groups.remove_volunteer') }}</b-dropdown-item>
       </b-dropdown>
       <button class="dropdown-toggle d-none" />
     </div>
     <b-alert variant="danger" v-if="error">
-      {{ $trans.site('partials.something_wrong') }}: {{ error }}
+      {{ $translate('partials.something_wrong') }}: {{ error }}
     </b-alert>
     <ConfirmModal @confirm="remove" ref="confirm" />
     <ConfirmModal @confirm="removeVolunteerConfirmed" ref="removeVolunteerConfirm" />

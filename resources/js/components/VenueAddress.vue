@@ -2,12 +2,12 @@
   <b-row>
     <b-col md="7">
       <div class="form-group">
-        <label :for="$id('address-autocomplete')">{{ $trans.site('events.field_event_venue') }}:</label>
+        <label :for="$id('address-autocomplete')">{{ $translate('events.field_event_venue') }}:</label>
         <vue-google-autocomplete
             :id="$id('address-autocomplete')"
             name="location"
             classname="form-control"
-            :placeholder="$trans.site('events.field_venue_placeholder')"
+            :placeholder="$translate('events.field_venue_placeholder')"
             @placechanged="placeChanged"
             @change="resetValues"
             aria-describedby="locationHelpBlock"
@@ -17,14 +17,14 @@
         />
         <small id="locationHelpBlock">
           <span class="form-text text-danger" v-if="hasError">
-            {{ $trans.site('events.address_error') }}
+            {{ $translate('events.address_error') }}
           </span>
           <span v-else>
-          {{ $trans.site('events.field_venue_helper') }}
+          {{ $translate('events.field_venue_helper') }}
           </span>
         </small>
         <b-btn variant="primary" size="sm" v-if="groupLocation && !online" @click="useGroup" class="mt-2">
-          {{ $trans.site('events.field_venue_use_group') }}
+          {{ $translate('events.field_venue_use_group') }}
         </b-btn>
       </div>
     </b-col>

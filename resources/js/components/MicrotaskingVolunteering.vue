@@ -1,16 +1,16 @@
 <template>
     <CollapsibleSection border-shadow class="p-4 lineheight volunteering" :show-horizontal-rule="false">
         <template slot="title">
-            {{ $trans.site('microtasking.volunteering.title') }}
+            {{ $translate('microtasking.volunteering.title') }}
         </template>
 
         <template slot="content">
-            <div v-html="$trans.site('microtasking.volunteering.content')" class="content pt-3">
+            <div v-html="$translate('microtasking.volunteering.content')" class="content pt-3">
             </div>
             <hr>
 
             <div v-if="openQuests.length">
-            <h2>{{ $trans.site('microtasking.volunteering.open_quests') }}</h2>
+            <h2>{{ $translate('microtasking.volunteering.open_quests') }}</h2>
 
             <div class="open-quests">
                 <div class="open-quest" v-for="quest in openQuests">
@@ -18,7 +18,7 @@
                     <div class="open-quest-body">
                         <p>{{ quest.shortintro }}</p>
                         <div class="try-open-quest">
-                            <a :href="quest.slug" class="btn btn-primary btn-open-quest" >{{$trans.site('microtasking.volunteering.try_quest', { questname: quest.name })}}</a>
+                            <a :href="quest.slug" class="btn btn-primary btn-open-quest" >{{$translate('microtasking.volunteering.try_quest', { questname: quest.name })}}</a>
                         </div>
                     </div>
                 </div>
@@ -33,10 +33,10 @@
                     <b-th> </b-th>
                     <b-th> </b-th>
                     <b-th class="d-table-cell">
-                        <b-img class="icon" src="/images/gauge_ico.svg" :title="$trans.site('microtasking.volunteering.number_of_tasks')" />
+                        <b-img class="icon" src="/images/gauge_ico.svg" :title="$translate('microtasking.volunteering.number_of_tasks')" />
                     </b-th>
                     <b-th class="d-table-cell">
-                        <b-img class="icon" src="/images/thumbs-up_ico.svg" :title="$trans.site('microtasking.volunteering.number_of_quests')" />
+                        <b-img class="icon" src="/images/thumbs-up_ico.svg" :title="$translate('microtasking.volunteering.number_of_quests')" />
                     </b-th>
                     </b-tr>
                 </b-thead>
@@ -47,24 +47,24 @@
                             <b-img class="icon" src="/images/participants.svg" />
                         </b-td>
                         <b-td>
-                            {{ $trans.site('microtasking.volunteering.all_volunteer_contributions') }}
+                            {{ $translate('microtasking.volunteering.all_volunteer_contributions') }}
                         </b-td>
                         <b-td class="text-center">{{ totalContributions.toLocaleString() }}</b-td>
-                        <b-td class="text-center">{{ $trans.site('microtasking.volunteering.all_quests', { value: totalQuests }) }}</b-td>
+                        <b-td class="text-center">{{ $translate('microtasking.volunteering.all_quests', { value: totalQuests }) }}</b-td>
                     </b-tr>
                     <b-tr>
                         <b-td class="text-center">
-                        <b-img class="icon" src="/images/user_ico.svg" :title="$trans.site('groups.volunteers_confirmed')" />
+                        <b-img class="icon" src="/images/user_ico.svg" :title="$translate('groups.volunteers_confirmed')" />
                         </b-td>
                         <b-td>
-                        {{ $trans.site('microtasking.volunteering.my_contributions') }}
+                        {{ $translate('microtasking.volunteering.my_contributions') }}
                         </b-td>
                         <template v-if="isLoggedIn">
                             <b-td class="text-center">{{ currentUserContributions }}</b-td>
-                            <b-td class="text-center">{{ $trans.site('microtasking.volunteering.my_quests', { value: currentUserQuests }) }}</b-td>
+                            <b-td class="text-center">{{ $translate('microtasking.volunteering.my_quests', { value: currentUserQuests }) }}</b-td>
                         </template>
                         <template v-else>
-                            <b-td class="text-center" colspan="2"><a class="btn btn-primary" href="/user/register">{{ $trans.site('microtasking.volunteering.join') }}</a></b-td>
+                            <b-td class="text-center" colspan="2"><a class="btn btn-primary" href="/user/register">{{ $translate('microtasking.volunteering.join') }}</a></b-td>
                         </template>
                     </b-tr>
                 </b-tbody>

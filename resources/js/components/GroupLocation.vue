@@ -1,12 +1,12 @@
 <template>
   <div>
     <b-form-group>
-      <label :for="$id('address-autocomplete')">{{ $trans.site('groups.location') }}:</label>
+      <label :for="$id('address-autocomplete')">{{ $translate('groups.location') }}:</label>
       <vue-google-autocomplete
           :id="$id('address-autocomplete')"
           name="location"
           classname="form-control group-location"
-          :placeholder="$trans.site('groups.groups_location_placeholder')"
+          :placeholder="$translate('groups.groups_location_placeholder')"
           @placechanged="placeChanged"
           @change="resetValues"
           aria-describedby="locationHelpBlock"
@@ -16,17 +16,17 @@
       />
       <small id="locationHelpBlock">
       <span class="form-text text-danger" v-if="hasError">
-        {{ $trans.site('groups.geocode_failed') }}
+        {{ $translate('groups.geocode_failed') }}
       </span>
         <span v-else>
-      {{ $trans.site('groups.groups_location_small') }}
+      {{ $translate('groups.groups_location_small') }}
       </span>
       </small>
     </b-form-group>
     <b-form-group>
-      <label for="group_postcode">{{ $trans.site('groups.postcode') }}:</label>
+      <label for="group_postcode">{{ $translate('groups.postcode') }}:</label>
       <b-input id="group_postcode" name="postcode" v-model="currentPostcode" :class="{ hasError: hasError }" :readonly="!canEditPostcode" />
-      <small>{{ $trans.site('groups.groups_postcode_small') }}</small>
+      <small>{{ $translate('groups.groups_postcode_small') }}</small>
     </b-form-group>
   </div>
 </template>

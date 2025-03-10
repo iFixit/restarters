@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2 class="mt-2 mb-2">{{ $trans.site('groups.group_facts') }}</h2>
+    <h2 class="mt-2 mb-2">{{ $translate('groups.group_facts') }}</h2>
     <div class="items-container">
       <StatsValue :count="stats.parties" icon="coffee" size="md" variant="primary" title="groups.events" class="group-stat-events" />
       <div />

@@ -116,30 +116,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Translation Site Configuration
-    |--------------------------------------------------------------------------
-    |
-    | This array maps domains to their corresponding translation site folders.
-    | Each site should have a matching folder in the lang directory.
-    |
-    */
-    'translation_sites' => [
-        [
-            'site' => 'ifixit',
-            'domain' => 'restarters-dev.cominor.com'
-        ],
-        [
-            'site' => 'ifixit',
-            'domain' => 'localhost'
-        ],
-        [
-            'site' => 'ifixit',
-            'domain' => '127.0.0.1'
-        ]
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
     | Maintenance Mode Driver
     |--------------------------------------------------------------------------
     |

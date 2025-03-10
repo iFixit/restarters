@@ -11,35 +11,35 @@
       title-tag="h2"
   >
     <template slot="modal-title">
-      {{ $trans.site('devices.add_data_title') }}
+      {{ $translate('devices.add_data_title') }}
       <hr class="hr-dashed mb-25 mt-10">
     </template>
     <div>
-      {{ $trans.site('devices.add_data_description') }}
+      {{ $translate('devices.add_data_description') }}
     </div>
     <b-alert v-if="!groups.length && !fetching" show variant="warning" class="mt-2">
-      {{ $trans.site('groups.follow_group_first') }}
+      {{ $translate('groups.follow_group_first') }}
     </b-alert>
     <div v-else>
-      <label for="items_cat" class="mt-2">{{ $trans.site('devices.add_data_group') }}:</label>
+      <label for="items_cat" class="mt-2">{{ $translate('devices.add_data_group') }}:</label>
       <b-select v-model="groupId" :options="groupOptions" id="group_member" />
       <b-alert v-if="groupId && !events.length && !fetching" variant="warning" class="mt-2" show>
-        {{ $trans.site('groups.create_event_first') }}
+        {{ $translate('groups.create_event_first') }}
       </b-alert>
       <div v-else>
-        <label for="items_cat" class="mt-2">{{ $trans.site('devices.add_data_event') }}:</label>
+        <label for="items_cat" class="mt-2">{{ $translate('devices.add_data_event') }}:</label>
         <b-select :disabled="fetching" v-model="eventId" :options="eventOptions" id="events" />
       </div>
     </div>
     <template slot="modal-footer">
       <b-button v-if="!groups.length && !fetching" href="/group" variant="primary">
-        {{ $trans.site('dashboard.see_all_groups') }}
+        {{ $translate('dashboard.see_all_groups') }}
       </b-button>
       <b-button v-else-if="groupId && !events.length && !fetching" variant="primary" size="sm" @click="createEvent" :disabled="!groupId">
-        {{ $trans.site('events.create_event') }}
+        {{ $translate('events.create_event') }}
       </b-button>
       <b-button v-else variant="primary" size="sm" @click="gotoEvent">
-        {{ $trans.site('devices.add_data_action_button') }}
+        {{ $translate('devices.add_data_action_button') }}
       </b-button>
     </template>
   </b-modal>

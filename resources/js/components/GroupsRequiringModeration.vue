@@ -1,6 +1,6 @@
 <template>
   <div v-if="loaded && groups.length">
-    <h2 class="mt-4">{{ $trans.site('groups.groups_title_admin') }}</h2>
+    <h2 class="mt-4">{{ $translate('groups.groups_title_admin') }}</h2>
     <section class="table-section" id="groups-1">
       <GroupsTable :groups="groups" approve />
     </section>

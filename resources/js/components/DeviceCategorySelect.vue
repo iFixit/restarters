@@ -3,7 +3,7 @@
     <multiselect
       :disabled="disabled"
       v-model="categoryValue"
-      :placeholder="$trans.site('devices.category')"
+      :placeholder="$translate('devices.category')"
       :options="categoryOptions"
       track-by="value"
       label="name"
@@ -11,17 +11,17 @@
       group-values="categories"
       :multiple="false"
       :allow-empty="allowEmpty"
-      :deselect-label="allowEmpty ? $trans.site('partials.remove') : null"
+      :deselect-label="allowEmpty ? $translate('partials.remove') : null"
       :group-select="false"
       :taggable="false"
       selectLabel=""
       ref="multiselect"
       @select=""
-      :selectedLabel="allowEmpty ? $trans.site('partials.remove') : null"
+      :selectedLabel="allowEmpty ? $translate('partials.remove') : null"
       @open="onOpen"
     >
     </multiselect>
-    <div v-b-popover.html.left="$trans.site('devices.tooltip_category')" class="ml-3 mt-2">
+    <div v-b-popover.html.left="$translate('devices.tooltip_category')" class="ml-3 mt-2">
       <b-img class="icon clickable" src="/icons/info_ico_black.svg" v-if="iconVariant === 'black'" />
       <b-img class="icon clickable" src="/icons/info_ico_green.svg" v-else="iconVariant === 'brand'" />
     </div>

@@ -7,15 +7,15 @@
 
     <div class="d-flex justify-content-between">
       <h2 class>
-        {{ $trans.site('devices.repair_records') }}
+        {{ $translate('devices.repair_records') }}
       </h2>
       <div v-if="isAdmin">
         <b-btn variant="primary" href="/export/devices/?">
-          {{ $trans.site('devices.export_device_data') }}
+          {{ $translate('devices.export_device_data') }}
         </b-btn>
       </div>
     </div>
-    <p>{{ $trans.site('devices.search_text') }}</p>
+    <p>{{ $translate('devices.search_text') }}</p>
     <div class="fp-layout">
       <FixometerFilters
           v-show="tabIndex === 0"
@@ -61,11 +61,11 @@
         <b-tab active title-item-class="w-50" title-link-class="smallpad" class="pt-2">
           <template slot="title">
             <div>
-              <b>{{ $trans.site('devices.title_powered') }}</b>
+              <b>{{ $translate('devices.title_powered') }}</b>
               ({{ total_powered.toLocaleString() }})
             </div>
           </template>
-          <p class="pl-3" v-html="$trans.site('devices.description_powered')" />
+          <p class="pl-3" v-html="$translate('devices.description_powered')" />
           <FixometerRecordsTable
               :is-admin="isAdmin"
               :powered="true"
@@ -87,11 +87,11 @@
         <b-tab title-item-class="w-50" title-link-class="smallpad" class="pt-2">
           <template slot="title">
             <div>
-              <b>{{ $trans.site('devices.title_unpowered') }}</b>
+              <b>{{ $translate('devices.title_unpowered') }}</b>
               ({{ total_unpowered.toLocaleString() }})
             </div>
           </template>
-          <p class="pl-3" v-html="$trans.site('devices.description_unpowered')" />
+          <p class="pl-3" v-html="$translate('devices.description_unpowered')" />
           <FixometerRecordsTable
               :is-admin="isAdmin"
               :powered="false"
@@ -115,7 +115,7 @@
     <div class="d-block d-md-none">
       <CollapsibleSection collapsed :count="impactData.total_powered" heading-level="h6" count-class="small">
         <template slot="title">
-          {{ $trans.site('devices.title_powered') }}
+          {{ $translate('devices.title_powered') }}
         </template>
         <template slot="content">
           <FixometerRecordsTable
@@ -140,7 +140,7 @@
       </CollapsibleSection>
       <CollapsibleSection collapsed :count="impactData.total_unpowered" heading-level="h6" count-class="small">
         <template slot="title">
-          {{ $trans.site('devices.title_unpowered') }}
+          {{ $translate('devices.title_unpowered') }}
         </template>
         <template slot="content">
           <FixometerRecordsTable

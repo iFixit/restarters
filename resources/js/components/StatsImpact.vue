@@ -1,8 +1,8 @@
 <template>
   <div>
     <h2 class="mt-2 mb-2">
-      {{ $trans.site('events.environmental_impact') }}
-      <span v-b-popover.html="$trans.site('events.impact_calculation')">
+      {{ $translate('events.environmental_impact') }}
+      <span v-b-popover.html="$translate('events.impact_calculation')">
         <b-img class="ml-2 icon-info clickable" src="/icons/info_ico_green.svg" />
       </span>
     </h2>

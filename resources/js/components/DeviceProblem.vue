@@ -1,7 +1,7 @@
 <template>
   <div class="w-100 device-select-row">
-    <b-textarea rows="6" @change="$emit('update:problem', $event)" :placeholder="$trans.site('devices.devices_description')" :value="problem" :disabled="disabled" />
-    <div v-b-popover.html.left="$trans.site('devices.tooltip_problem')" class="ml-3 mt-2">
+    <b-textarea rows="6" @change="$emit('update:problem', $event)" :placeholder="$translate('devices.devices_description')" :value="problem" :disabled="disabled" />
+    <div v-b-popover.html.left="$translate('devices.tooltip_problem')" class="ml-3 mt-2">
       <b-img class="icon clickable" src="/icons/info_ico_black.svg" v-if="iconVariant === 'black'" />
       <b-img class="icon clickable" src="/icons/info_ico_green.svg" v-else="iconVariant === 'brand'" />
     </div>

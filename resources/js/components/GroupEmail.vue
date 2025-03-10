@@ -1,8 +1,8 @@
 <template>
   <b-form-group>
-    <label for="group_email">{{ $trans.site('groups.groups_email') }}:</label>
+    <label for="group_email">{{ $translate('groups.groups_email') }}:</label>
     <b-input type="url" id="group_email" name="email" v-model="currentemail" :class="{ hasError: hasError }"/>
-    <small>{{ $trans.site('groups.groups_email_small') }}</small>
+    <small>{{ $translate('groups.groups_email_small') }}</small>
   </b-form-group>
 </template>
 <script>

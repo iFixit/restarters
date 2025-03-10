@@ -20,25 +20,25 @@
     </b-input-group>
     <b-alert v-if="failed" show variant="danger" class="mt-2 mb-2">
       <p class="m-0">
-        {{ $trans.site('partials.something_wrong') }}
+        {{ $translate('partials.something_wrong') }}
       </p>
     </b-alert>
     <b-alert v-if="copied" show variant="info" class="mt-2 mb-2">
       <p class="m-0">
-        {{ $trans.site('partials.copied_to_clipboard') }}
+        {{ $translate('partials.copied_to_clipboard') }}
       </p>
     </b-alert>
     <div class="d-flex justify-content-between flex-wrap mt-4 mb-4">
       <b-btn variant="link" href="https://talk.restarters.net/t/fixometer-how-to-add-repair-events-to-your-calendar-application/1770">
-        {{ $trans.site('calendars.find_out_more')}}
+        {{ $translate('calendars.find_out_more')}}
       </b-btn>
       <b-btn variant="link" :href="editUrl">
-        {{ $trans.site('calendars.see_all_calendars') }}
+        {{ $translate('calendars.see_all_calendars') }}
       </b-btn>
     </div>
     <template slot="modal-footer" slot-scope="{ cancel }">
       <b-button variant="primary" @click="cancel">
-        {{ $trans.site('partials.close') }}
+        {{ $translate('partials.close') }}
       </b-button>
     </template>
   </b-modal>

@@ -39,15 +39,16 @@ class LanguageSwitcher
         // Determine current site based on domain
         $this->currentSite = $this->getCurrentSite($request->getHost());
         
-        // Log site determination for debugging
-        Log::debug('LanguageSwitcher: Site determination', [
-            'domain' => $request->getHost(),
-            'site' => $this->currentSite ? $this->currentSite['site'] : 'none'
-        ]);
-        
         // Store current site in the app container for use elsewhere
         if ($this->currentSite) {
             app()->instance('current.site', $this->currentSite);
+            
+            if (Config::get('translation.debug', false)) {
+                Log::debug('Current site determined', [
+                    'domain' => $request->getHost(),
+                    'site' => $this->currentSite['site']
+                ]);
+            }
         }
 
         // A query string parameter of locale overrides all other places to attempt to determine the locale.
@@ -82,11 +83,6 @@ class LanguageSwitcher
             }
         }
 
-        // Make translation path available to views
-        if ($this->currentSite) {
-            view()->share('site_translation_path', $this->currentSite['site']);
-        }
-
         return $next($request);
     }
 
@@ -107,12 +103,6 @@ class LanguageSwitcher
                 'language' => $locale,
             ]);
         }
-        
-        // Log locale settings for debugging
-        Log::debug('LanguageSwitcher: Locale set', [
-            'locale' => $locale,
-            'site' => $this->currentSite ? $this->currentSite['site'] : 'none'
-        ]);
     }
 
     /**

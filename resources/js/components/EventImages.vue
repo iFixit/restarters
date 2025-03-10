@@ -1,7 +1,7 @@
 <template>
   <CollapsibleSection :count="images.length" collapsed>
     <template slot="title">
-      {{ $trans.site('events.event_photos') }}
+      {{ $translate('events.event_photos') }}
     </template>
     <template slot="content">
       <div class="d-flex flex-wrap">

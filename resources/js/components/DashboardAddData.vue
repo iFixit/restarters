@@ -4,7 +4,7 @@
       <template slot="title">
         <div class="d-flex">
           <div class="align-self-center">
-            {{ $trans.site('dashboard.add_data_heading') }}
+            {{ $translate('dashboard.add_data_heading') }}
           </div>
           <b-img src="/images/fixometer_doodle.svg" class="ml-4 d-none d-md-block" />
         </div>
@@ -12,7 +12,7 @@
       <template slot="content">
         <div class="content">
           <p>
-            {{ $trans.site('dashboard.see_your_impact') }}:
+            {{ $translate('dashboard.see_your_impact') }}:
           </p>
           <div class="dad-layout">
             <multiselect
@@ -38,7 +38,7 @@
             <div class="addbutton d-flex justify-content-md-end">
               <div>
                 <b-btn variant="primary" :href="'/party/view/' + eventValue.idevents + '#devices-section'">
-                  {{ $trans.site('dashboard.add_data_add') }}
+                  {{ $translate('dashboard.add_data_add') }}
                 </b-btn>
               </div>
             </div>

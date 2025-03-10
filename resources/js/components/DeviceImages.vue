@@ -2,7 +2,7 @@
   <div>
     <div class="device-photo-layout">
       <label>
-        {{ $trans.site('devices.images') }}
+        {{ $translate('devices.images') }}
       </label>
       <div class="d-flex flex-wrap device-photos dropzone-previews">
         <FileUploader :url="uploadURL" v-if="(edit || add) && !disabled && images.length < maxFiles" previews-container=".device-photos" @uploaded="uploaded($event)" :max-files="maxFiles" />

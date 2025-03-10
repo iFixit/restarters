@@ -15,14 +15,14 @@
       <template slot="title-right">
         <div class="d-flex flex-wrap w-100 justify-content-end mt-1 mt-md-0">
           <b-btn variant="primary" :href="'/export/groups/' + idgroups + '/events'" class="d-none d-md-block align-self-center text-nowrap mr-2" v-if="addButton">
-            {{ $trans.site('groups.export_event_list') }}
+            {{ $translate('groups.export_event_list') }}
           </b-btn>
           <b-btn variant="primary" href="/party/create" class="align-self-center text-nowrap mr-2 mr-md-0" v-if="addButton">
             <span class="d-none d-md-block">
-              {{ $trans.site('events.add_new_event') }}
+              {{ $translate('events.add_new_event') }}
             </span>
             <span class="d-block d-md-none">
-              {{ $trans.site('dashboard.add_event') }}
+              {{ $translate('dashboard.add_event') }}
             </span>
           </b-btn>
         </div>
@@ -38,7 +38,7 @@
       <template slot="title">
         <div class="d-flex justify-content-between w-100">
           <div>
-            <span v-if="group">{{ group.name }}</span> {{ $trans.site('events.other_events') }}
+            <span v-if="group">{{ group.name }}</span> {{ $translate('events.other_events') }}
           </div>
         </div>
       </template>

@@ -1,28 +1,28 @@
 <template>
   <div>
-    <h2 class="mt-4">{{ $trans.site('groups.device_breakdown') }}</h2>
+    <h2 class="mt-4">{{ $translate('groups.device_breakdown') }}</h2>
     <b-tabs class="ourtabs w-100 mt-4 d-none d-md-block" justified>
       <b-tab active class="pt-2">
         <template slot="title">
-          <b>{{ $trans.site('strings.Computers and Home Office') }}</b>
+          <b>{{ $translate('strings.Computers and Home Office') }}</b>
         </template>
         <GroupDevicesBreakdownCluster :stats="clusterStats[1]" />
       </b-tab>
       <b-tab class="pt-2">
         <template slot="title">
-          <b>{{ $trans.site('strings.Electronic Gadgets') }}</b>
+          <b>{{ $translate('strings.Electronic Gadgets') }}</b>
         </template>
         <GroupDevicesBreakdownCluster :stats="clusterStats[2]" />
       </b-tab>
       <b-tab class="pt-2">
         <template slot="title">
-          <b>{{ $trans.site('strings.Home Entertainment') }}</b>
+          <b>{{ $translate('strings.Home Entertainment') }}</b>
         </template>
         <GroupDevicesBreakdownCluster :stats="clusterStats[3]" />
       </b-tab>
       <b-tab class="pt-2">
         <template slot="title">
-          <b>{{ $trans.site('strings.Kitchen and Household Items') }}</b>
+          <b>{{ $translate('strings.Kitchen and Household Items') }}</b>
         </template>
         <GroupDevicesBreakdownCluster :stats="clusterStats[4]" />
       </b-tab>
@@ -31,7 +31,7 @@
       <CollapsibleSection heading-level="h3">
         <template slot="title">
           <span class="mobtitle">
-            {{ $trans.site('strings.Computers and Home Office') }}
+            {{ $translate('strings.Computers and Home Office') }}
           </span>
         </template>
         <template slot="content">
@@ -41,7 +41,7 @@
       <CollapsibleSection collapsed heading-level="h3">
         <template slot="title">
           <span class="mobtitle">
-            {{ $trans.site('strings.Electronic Gadgets') }}
+            {{ $translate('strings.Electronic Gadgets') }}
           </span>
         </template>
         <template slot="content">
@@ -51,7 +51,7 @@
       <CollapsibleSection collapsed heading-level="h3">
         <template slot="title">
           <span class="mobtitle">
-            {{ $trans.site('strings.Home Entertainment') }}
+            {{ $translate('strings.Home Entertainment') }}
           </span>
         </template>
         <template slot="content">
@@ -61,7 +61,7 @@
       <CollapsibleSection collapsed heading-level="h3">
         <template slot="title">
           <span class="mobtitle">
-            {{ $trans.site('strings.Kitchen and Household Items') }}
+            {{ $translate('strings.Kitchen and Household Items') }}
           </span>
         </template>
         <template slot="content">
@@ -71,7 +71,7 @@
     </div>
     <div class="small mt-3">
       <p class="small text-brand">
-        {{ $trans.site('groups.no_unpowered_stats') }}
+        {{ $translate('groups.no_unpowered_stats') }}
       </p>
     </div>
   </div>

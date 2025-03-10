@@ -1,11 +1,11 @@
 <template>
   <div class="w-100 align-items-center device-field-row">
     <label class="text-bold">
-      {{ $trans.site('devices.age') }}
+      {{ $translate('devices.age') }}
     </label>
     <b-input type="number" size="lg" class="marg p-1 text-center device-age-edit"  min="0" step="0.5" max="500" autocomplete="off" v-model="value" :disabled="disabled" />
     <span class="text-right mb-1">
-      {{ $trans.site('devices.age_approx') }}
+      {{ $translate('devices.age_approx') }}
     </span>
   </div>
 </template>

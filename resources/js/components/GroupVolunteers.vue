@@ -2,7 +2,7 @@
   <CollapsibleSection collapsed :count="volunteers.length">
     <template slot="title">
       <span>
-        {{ $trans.site('groups.volunteers') }}
+        {{ $translate('groups.volunteers') }}
         <span v-if="volunteers.length" class="font-weight-normal d-none d-md-inline">
           ({{ volunteers.length}})
         </span>
@@ -16,12 +16,12 @@
           </div>
           <div class="d-flex justify-content-between">
             <a class="justify-content-end" href="#" data-toggle="modal" data-target="#invite-to-group">
-              {{ $trans.site('groups.invite_to_group') }}
+              {{ $translate('groups.invite_to_group') }}
             </a>
           </div>
         </div>
         <p v-else>
-          {{ $trans.site('groups.no_volunteers') }}.
+          {{ $translate('groups.no_volunteers') }}.
         </p>
       </div>
     </template>

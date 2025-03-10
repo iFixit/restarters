@@ -58,7 +58,7 @@
 
       <template slot="head(invited)">
         <div class="hidecell text-center">
-          <b-img class="icon mt-3" src="/images/mail_ico.svg" :title="$trans.site('groups.volunteers_invited')" />
+          <b-img class="icon mt-3" src="/images/mail_ico.svg" :title="$translate('groups.volunteers_invited')" />
         </div>
       </template>
       <template slot="cell(invited)" slot-scope="data">
@@ -67,7 +67,7 @@
 
       <template slot="head(volunteers)">
         <div class="hidecell text-center">
-          <b-img class="icon mt-3" src="/images/participants.svg" :title="$trans.site('groups.volunteers_confirmed')" />
+          <b-img class="icon mt-3" src="/images/participants.svg" :title="$translate('groups.volunteers_confirmed')" />
         </div>
       </template>
       <template slot="cell(volunteers)" slot-scope="data">
@@ -83,7 +83,7 @@
 
       <template slot="head(participants_count)">
         <div class="hidecell text-center">
-          <b-img class="icon mt-3" src="/images/participants.svg" :title="$trans.site('groups.participants_attended')" />
+          <b-img class="icon mt-3" src="/images/participants.svg" :title="$translate('groups.participants_attended')" />
         </div>
       </template>
       <template slot="cell(participants_count)" slot-scope="data">
@@ -92,7 +92,7 @@
 
       <template slot="head(volunteers_count)">
         <div class="hidecell text-center">
-          <b-img class="icon mt-3" src="/icons/volunteer_ico-thick.svg" :title="$trans.site('groups.volunteers_attended')" />
+          <b-img class="icon mt-3" src="/icons/volunteer_ico-thick.svg" :title="$translate('groups.volunteers_attended')" />
         </div>
       </template>
       <template slot="cell(volunteers_count)" slot-scope="data">
@@ -101,14 +101,14 @@
 
       <template slot="head(waste)">
         <div class="hidecell text-center">
-          <b-img class="icon mt-3" src="/images/trash.svg" :title="$trans.site('groups.waste_prevented')" />
+          <b-img class="icon mt-3" src="/images/trash.svg" :title="$translate('groups.waste_prevented')" />
         </div>
       </template>
       <template slot="cell(waste)" slot-scope="data" v-bind="stats">
         <div v-if="noDevices(data.item.waste)" class="d-none d-md-block">
-          {{ $trans.site('partials.no_devices_added') }}
+          {{ $translate('partials.no_devices_added') }}
           <a :href="'/party/view/' + data.item.waste.idevents">
-            {{ $trans.site('partials.add_a_device') }}
+            {{ $translate('partials.add_a_device') }}
           </a>
         </div>
         <GroupEventsScrollTableNumber v-else :value="Math.round(stats(data.item.waste).waste_total)" units="kg" />
@@ -116,7 +116,7 @@
 
       <template slot="head(co2)">
         <div class="hidecell text-center">
-          <b-img class="icon mt-3" src="/images/cloud_empty.svg" :title="$trans.site('groups.co2_emissions_prevented')" />
+          <b-img class="icon mt-3" src="/images/cloud_empty.svg" :title="$translate('groups.co2_emissions_prevented')" />
         </div>
       </template>
       <template slot="cell(co2)" slot-scope="data" v-bind="stats">
@@ -125,7 +125,7 @@
 
       <template slot="head(fixed_devices)">
         <div class="hidecell text-center">
-          <b-img class="icon mt-3" src="/images/fixed.svg" :title="$trans.site('groups.fixed_items')" />
+          <b-img class="icon mt-3" src="/images/fixed.svg" :title="$translate('groups.fixed_items')" />
         </div>
       </template>
       <template slot="cell(fixed_devices)" slot-scope="data" v-bind="stats">
@@ -134,7 +134,7 @@
 
       <template slot="head(repairable_devices)">
         <div class="hidecell text-center">
-          <b-img class="icon mt-3" src="/images/repairable_ico.svg" :title="$trans.site('groups.repairable_items')" />
+          <b-img class="icon mt-3" src="/images/repairable_ico.svg" :title="$translate('groups.repairable_items')" />
         </div>
       </template>
       <template slot="cell(repairable_devices)" slot-scope="data" v-bind="stats">
@@ -143,7 +143,7 @@
 
       <template slot="head(dead_devices)">
         <div class="hidecell text-center">
-          <b-img class="icon mt-3" src="/images/dead_ico.svg" :title="$trans.site('groups.end_of_life_items')" />
+          <b-img class="icon mt-3" src="/images/dead_ico.svg" :title="$translate('groups.end_of_life_items')" />
         </div>
       </template>
       <template slot="cell(dead_devices)" slot-scope="data" v-bind="stats">

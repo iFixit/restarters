@@ -9,7 +9,7 @@
     </template>
     <template slot="modal-footer" slot-scope="{ cancel }">
       <b-button variant="primary" @click="cancel">
-        {{ $trans.site('partials.close') }}
+        {{ $translate('partials.close') }}
       </b-button>
     </template>
   </b-modal>

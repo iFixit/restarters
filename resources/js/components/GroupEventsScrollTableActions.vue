@@ -3,28 +3,28 @@
     <div class="d-flex justify-content-around">
       <div v-if="event.requiresModeration" class="cell-warning d-flex justify-content-around p-2">
         <span v-if="event.canModerate">
-          <a :href="'/party/edit/' + idevents">{{ $trans.site('partials.event_requires_moderation') }}</a>
+          <a :href="'/party/edit/' + idevents">{{ $translate('partials.event_requires_moderation') }}</a>
         </span>
         <span v-else>
-        {{ $trans.site('partials.event_requires_moderation_by_an_admin') }}
+        {{ $translate('partials.event_requires_moderation_by_an_admin') }}
       </span>
       </div>
       <div v-else-if="upcoming" class="hidecell">
         <div v-if="attending" class="text-black font-weight-bold d-flex justify-content-around">
         <span>
-          {{ $trans.site('events.youre_going') }}
+          {{ $translate('events.youre_going') }}
         </span>
         </div>
         <!-- "all" or "nearby" events are for ones where we're not a member, so show a join button. -->
         <b-btn variant="primary" :href="'/group/join/' + event.group.idgroups" v-else-if="event.all || event.nearby">
-          {{ $trans.site('groups.join_group_button') }}
+          {{ $translate('groups.join_group_button') }}
         </b-btn>
         <!-- We can't RSVP if the event is starting soon. -->
         <b-btn variant="primary" :href="event.invitation" :disabled="startingSoon" v-else-if="event.invitation">
-          {{ $trans.site('events.RSVP') }}
+          {{ $translate('events.RSVP') }}
         </b-btn>
         <b-btn variant="primary" :href="'/party/join/' + idevents" :disabled="startingSoon" v-else>
-          {{ $trans.site('events.RSVP') }}
+          {{ $translate('events.RSVP') }}
         </b-btn>
       </div>
     </div>

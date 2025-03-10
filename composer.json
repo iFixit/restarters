@@ -63,8 +63,7 @@
     "autoload": {
         "files": [
             "app/Helpers/Fixometer.php",
-            "app/Helpers/FixometerFile.php",
-            "app/helpers.php"
+            "app/Helpers/FixometerFile.php"
         ],
         "psr-4": {
             "App\\": "app/",

@@ -9,13 +9,13 @@
           size="lg"
           inputClass="marg form-control-lg fontsize"
           :disabled="disabled"
-          :placeholder="$trans.site('devices.brand_if_known')"
+          :placeholder="$translate('devices.brand_if_known')"
           @input="input"
       />
       <div />
     </div>
     <p v-if="!suppressBrandWarning && notASuggestion" class="pl-1 form-text">
-      {{ $trans.site('devices.unknown_brand' )}}
+      {{ $translate('devices.unknown_brand' )}}
     </p>
   </div>
 </template>

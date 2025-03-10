@@ -1,7 +1,7 @@
 <template>
   <CollapsibleSection>
     <template slot="title">
-      {{ $trans.site('events.event_details') }}
+      {{ $translate('events.event_details') }}
     </template>
     <template slot="content">
       <div class="border-top-thick d-flex pt-1 pb-1">
@@ -13,11 +13,11 @@
             {{ date }}
           </div>
           <div v-if="upcoming">
-            <b-dropdown v-if="upcoming && calendarLinks" id="event-calendar-dropdown" :text="$trans.site('calendars.add_to_calendar')" variant="white" class="linkdrop" no-caret>
-              <b-dropdown-item target="_blank" rel="noopener" :href="calendarLinks.google">{{ $trans.site('events.calendar_google') }}</b-dropdown-item>
-              <b-dropdown-item target="_blank" rel="noopener" :href="calendarLinks.webOutlook">{{ $trans.site('events.calendar_outlook') }}</b-dropdown-item>
-              <b-dropdown-item target="_blank" rel="noopener" :href="calendarLinks.ics">{{ $trans.site('events.calendar_ical') }}</b-dropdown-item>
-              <b-dropdown-item target="_blank" rel="noopener" :href="calendarLinks.yahoo">{{ $trans.site('events.calendar_yahoo') }}</b-dropdown-item>
+            <b-dropdown v-if="upcoming && calendarLinks" id="event-calendar-dropdown" :text="$translate('calendars.add_to_calendar')" variant="white" class="linkdrop" no-caret>
+              <b-dropdown-item target="_blank" rel="noopener" :href="calendarLinks.google">{{ $translate('events.calendar_google') }}</b-dropdown-item>
+              <b-dropdown-item target="_blank" rel="noopener" :href="calendarLinks.webOutlook">{{ $translate('events.calendar_outlook') }}</b-dropdown-item>
+              <b-dropdown-item target="_blank" rel="noopener" :href="calendarLinks.ics">{{ $translate('events.calendar_ical') }}</b-dropdown-item>
+              <b-dropdown-item target="_blank" rel="noopener" :href="calendarLinks.yahoo">{{ $translate('events.calendar_yahoo') }}</b-dropdown-item>
             </b-dropdown>
           </div>
         </div>
@@ -35,7 +35,7 @@
           <b-img-lazy src="/icons/talk_ico.svg" class="icon" />
         </div>
         <div>
-          <a :href="discourseThread">{{ $trans.site('events.talk_thread') }}</a>
+          <a :href="discourseThread">{{ $translate('events.talk_thread') }}</a>
         </div>
       </div>
       <div class="border-top-thin d-flex pt-1 pb-1">
@@ -65,7 +65,7 @@
             {{ event.location}}
           </div>
           <ExternalLink v-if="event.latitude + event.longitude" :href="'https://www.openstreetmap.org/?mlat=' + event.latitude + '&mlon=' + event.longitude + '#map=20/' + event.latitude + '/' + event.longitude" class="text-nowrap">
-            {{ $trans.site('events.view_map') }}
+            {{ $translate('events.view_map') }}
           </ExternalLink>
         </div>
       </div>

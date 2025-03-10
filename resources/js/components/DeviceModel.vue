@@ -1,7 +1,7 @@
 <template>
   <div class="w-100 device-select-row">
-    <b-input v-model="mValue" :placeholder="$trans.site('devices.model_if_known')" size="lg" class="marg" :disabled="disabled" />
-    <div v-b-popover.html.left="$trans.site('devices.tooltip_model')" class="ml-3 mt-2">
+    <b-input v-model="mValue" :placeholder="$translate('devices.model_if_known')" size="lg" class="marg" :disabled="disabled" />
+    <div v-b-popover.html.left="$translate('devices.tooltip_model')" class="ml-3 mt-2">
       <b-img class="icon clickable" src="/icons/info_ico_black.svg" v-if="iconVariant === 'black'" />
       <b-img class="icon clickable" src="/icons/info_ico_green.svg" v-else="iconVariant === 'brand'" />
     </div>

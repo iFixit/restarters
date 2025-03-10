@@ -27,7 +27,6 @@
     <!-- Translation data for JavaScript/Vue components -->
     <script>
         window.translations = @json($translations ?? []);
-        window.siteTranslations = @json($siteTranslations ?? []);
         window.translationsLocale = "{{ app()->getLocale() }}";
     </script>
 

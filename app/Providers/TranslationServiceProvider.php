@@ -54,7 +54,10 @@ class TranslationServiceProvider extends ServiceProvider implements DeferrablePr
                 $sitePath = base_path("lang/{$site['site']}");
                 if (File::isDirectory($sitePath)) {
                     $loader->addNamespace($site['site'], $sitePath);
-                    Log::debug("Registered translation namespace: {$site['site']}", ['path' => $sitePath]);
+                    
+                    if (Config::get('translation.debug', false)) {
+                        Log::debug("Registered translation namespace: {$site['site']}", ['path' => $sitePath]);
+                    }
                 }
             }
             
@@ -69,50 +72,18 @@ class TranslationServiceProvider extends ServiceProvider implements DeferrablePr
 
     public function boot()
     {
-        Log::info('TranslationServiceProvider boot method called');
-        
         // Use the site determined by the LanguageSwitcher middleware if available
         $site = app()->bound('current.site') ? app('current.site') : $this->getCurrentSite();
         
-        Log::info('Current site determination result', ['site' => $site]);
-        
         if (!$site) {
-            Log::warning('No matching site configuration found for domain: ' . request()->getHost());
             return;
         }
 
         $locale = app()->getLocale();
-        Log::info('Current locale', ['locale' => $locale]);
-        
-        // Log more directory information
-        $basePath = base_path();
-        Log::info('Base path', ['path' => $basePath]);
-        
-        $langPath = base_path("lang");
-        Log::info('Lang directory', ['path' => $langPath, 'exists' => File::isDirectory($langPath)]);
-        
         $sitePath = base_path("lang/{$site['site']}");
-        Log::info('Site lang directory', ['path' => $sitePath, 'exists' => File::isDirectory($sitePath)]);
         
-        $localePath = base_path("lang/{$site['site']}/{$locale}");
-        Log::info('Locale lang directory', ['path' => $localePath, 'exists' => File::isDirectory($localePath)]);
-        
-        // Debug: List files in lang directory
-        if (File::isDirectory($langPath)) {
-            $langContents = File::directories($langPath);
-            Log::info('Lang directory contents', ['contents' => $langContents]);
-        }
-        
-        // Debug: List files in site directory if it exists
-        if (File::isDirectory($sitePath)) {
-            $siteContents = File::directories($sitePath);
-            Log::info('Site directory contents', ['contents' => $siteContents]);
-            
-            // Also list directly in the site directory for flat structure
-            $siteFiles = File::files($sitePath);
-            Log::info('Files directly in site directory', [
-                'files' => array_map(fn($file) => $file->getFilename(), $siteFiles)
-            ]);
+        if (!File::isDirectory($sitePath)) {
+            return;
         }
         
         $translator = app('translator');
@@ -139,17 +110,19 @@ class TranslationServiceProvider extends ServiceProvider implements DeferrablePr
     {
         // Check if directory exists
         if (!File::isDirectory($path)) {
-            Log::warning("Translation directory does not exist: {$path}");
             return;
         }
         
         $translationFiles = File::glob("{$path}/*.php");
-        Log::info('Found translation files', ['path' => $path, 'files' => $translationFiles]);
+        $debug = Config::get('translation.debug', false);
+        
+        if ($debug) {
+            Log::info('Found translation files', ['path' => $path, 'count' => count($translationFiles)]);
+        }
         
         // Load and merge all override files
         foreach ($translationFiles as $file) {
             $group = basename($file, '.php');
-            Log::info('Loading translation group', ['group' => $group, 'file' => $file]);
             
             try {
                 // Get base translations
@@ -162,13 +135,6 @@ class TranslationServiceProvider extends ServiceProvider implements DeferrablePr
                 // but preserving base translations for keys that don't exist in the override
                 $mergedTranslations = array_merge($baseTranslations, $overrideTranslations);
                 
-                Log::debug('Translation data', [
-                    'base_count' => count($baseTranslations),
-                    'override_count' => count($overrideTranslations),
-                    'merged_count' => count($mergedTranslations),
-                    'group' => $group
-                ]);
-                
                 // Add the translations to the translator with the correct group prefix
                 $translator->addLines(
                     collect($mergedTranslations)
@@ -177,11 +143,17 @@ class TranslationServiceProvider extends ServiceProvider implements DeferrablePr
                     $locale
                 );
                 
-                Log::info("Successfully loaded translations for group: {$group}");
+                if ($debug) {
+                    Log::debug('Translation data', [
+                        'group' => $group,
+                        'base_count' => count($baseTranslations),
+                        'override_count' => count($overrideTranslations),
+                        'merged_count' => count($mergedTranslations)
+                    ]);
+                }
             } catch (\Exception $e) {
                 Log::error("Error loading translations for {$group}", [
-                    'error' => $e->getMessage(),
-                    'trace' => $e->getTraceAsString()
+                    'error' => $e->getMessage()
                 ]);
             }
         }
@@ -196,16 +168,12 @@ class TranslationServiceProvider extends ServiceProvider implements DeferrablePr
     {
         $currentDomain = request()->getHost();
         
-        Log::info('Current domain: ' . $currentDomain);
-        Log::debug('Available site configurations', ['sites' => $this->siteTranslations]);
-
         foreach ($this->siteTranslations as $site) {
             if ($site['domain'] === $currentDomain) {
-                Log::info('Matched site configuration', ['site' => $site]);
                 return $site;
             }
         }
-        // No match is found
+        
         return null;
     }
 } 

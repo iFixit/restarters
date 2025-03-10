@@ -6,7 +6,7 @@
     <div class="device-info">
       <div class="br d-flex flex-column botwhite">
         <b-card no-body class="p-3 flex-grow-1 border-0">
-          <h3 class="mt-2 mb-4">{{ $trans.site('devices.title_items') }}</h3>
+          <h3 class="mt-2 mb-4">{{ $translate('devices.title_items') }}</h3>
           <DeviceType class="mb-2" :type.sync="currentDevice.item_type"
                       :icon-variant="add ? 'black' : 'brand'" :disabled="disabled"
                       :suppress-type-warning="suppressTypeWarning" :powered="powered"
@@ -34,7 +34,7 @@
       </div>
       <div class="d-flex flex-column botwhite">
         <b-card no-body class="p-3 flex-grow-1 border-0">
-          <h3 class="mt-2 mb-4">{{ $trans.site('devices.title_repair') }}</h3>
+          <h3 class="mt-2 mb-4">{{ $translate('devices.title_repair') }}</h3>
           <DeviceRepairStatus :status.sync="currentDevice.repair_status" :steps.sync="currentDevice.next_steps"
                               :parts.sync="currentDevice.spare_parts" :barrier.sync="currentDevice.barrier"
                               :barrierList="barrierList" :disabled="disabled"/>
@@ -42,7 +42,7 @@
       </div>
       <div class="bl d-flex flex-column botwhite">
         <b-card no-body class="p-3 flex-grow-1 border-0">
-          <h3 class="mt-2 mb-4">{{ $trans.site('devices.title_assessment') }}</h3>
+          <h3 class="mt-2 mb-4">{{ $translate('devices.title_assessment') }}</h3>
           <DeviceProblem :problem.sync="currentDevice.problem" class="mb-4" :icon-variant="add ? 'black' : 'brand'"
                          :disabled="disabled"/>
           <DeviceNotes :notes.sync="currentDevice.notes" class="mb-4" :icon-variant="add ? 'black' : 'brand'"
@@ -51,7 +51,7 @@
       </div>
     </div>
     <b-alert :show="missingCategory" variant="danger">
-      <p>{{ $trans.site('events.form_error') }}</p>
+      <p>{{ $translate('events.form_error') }}</p>
     </b-alert>
     <b-alert :show="axiosError !== null" variant="danger">
       <p>
@@ -60,17 +60,17 @@
     </b-alert>
     <div class="d-flex justify-content-center flex-wrap pt-4 pb-4">
       <b-btn variant="primary" class="mr-2" v-if="add" @click="addDevice">
-        {{ $trans.site('partials.add_device') }}
+        {{ $translate('partials.add_device') }}
       </b-btn>
       <b-btn variant="primary" class="mr-2" v-if="edit" @click="saveDevice">
-        {{ $trans.site('partials.save') }}
+        {{ $translate('partials.save') }}
       </b-btn>
       <b-btn variant="primary" class="mr-2" v-if="edit && deleteButton" @click="confirmDeleteDevice">
-        {{ $trans.site('devices.delete_device') }}
+        {{ $translate('devices.delete_device') }}
       </b-btn>
       <DeviceQuantity v-if="add" :quantity.sync="currentDevice.quantity" class="flex-md-shrink-1 ml-2 mr-2"/>
       <b-btn variant="tertiary" class="ml-2 cancel" @click="cancel" v-if="cancelButton">
-        {{ $trans.site('partials.cancel') }}
+        {{ $translate('partials.cancel') }}
       </b-btn>
     </div>
     <ConfirmModal @confirm="deleteDevice" ref="confirm"/>

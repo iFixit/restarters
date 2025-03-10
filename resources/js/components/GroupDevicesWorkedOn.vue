@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2 class="mt-2 mb-2">{{ $trans.site('groups.total_devices') }}</h2>
+    <h2 class="mt-2 mb-2">{{ $translate('groups.total_devices') }}</h2>
     <div class="items-container text-lowercase">
       <StatsValue :count="stats.fixed + stats.repairable + stats.dead" icon="drill" :icon-width="50" size="md" variant="brand" title="partials.total" class="group-stat-total height" />
       <div />

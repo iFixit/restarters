@@ -1,12 +1,12 @@
 <template>
   <CollapsibleSection class="lineheight no-explict-width" collapsed hide-title>
     <template slot="title">
-      {{ $trans.site('events.event_description') }}
+      {{ $translate('events.event_description') }}
     </template>
     <template slot="content">
-      <read-more :html="event.free_text" class="mt-2 readmore small" :max-chars="440" :more-str="$trans.site('events.read_more')" :less-str="$trans.site('events.read_less')" />
+      <read-more :html="event.free_text" class="mt-2 readmore small" :max-chars="440" :more-str="$translate('events.read_more')" :less-str="$translate('events.read_less')" />
       <p v-if="!event.approved" class="small text-muted">
-        {{ $trans.site('partials.event_requires_moderation_by_an_admin') }}.
+        {{ $translate('partials.event_requires_moderation_by_an_admin') }}.
       </p>
     </template>
   </CollapsibleSection>

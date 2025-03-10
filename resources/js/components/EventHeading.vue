@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="d-flex justify-content-between mb-3">
-      <h1 class="d-block d-md-none">{{ $trans.site('events.events') }}</h1>
+      <h1 class="d-block d-md-none">{{ $translate('events.events') }}</h1>
       <EventActions :idevents="idevents" :canedit="canedit" :candelete="candelete" :is-admin="isAdmin" :in-group="inGroup" :is-attending="isAttending" class="d-block d-md-none" />
     </div>
     <div class="border-top-very-thick border-bottom-thin mb-3">

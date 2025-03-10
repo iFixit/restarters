@@ -24,7 +24,7 @@
     </div>
     <div class="d-flex justify-content-end" v-if="share">
       <b-btn href="#" variant="link" @click="shareThis" class="text-brand">
-        {{ $trans.site('partials.share_this') }}
+        {{ $translate('partials.share_this') }}
       </b-btn>
     </div>
   </div>

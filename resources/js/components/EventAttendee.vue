@@ -17,7 +17,7 @@
               {{ name }}
             </a>
               <span class="host" v-if="host">
-              {{ $trans.site('partials.host') }}
+              {{ $translate('partials.host') }}
             </span>
             </div>
           <div :id="'skills-' + attendee.idevents_users" data-toggle="popover" data-placement="top" :data-content="skillList" :class="{
@@ -40,7 +40,7 @@
       </b-btn>
     </div>
     <b-alert variant="danger" v-if="error">
-      {{ $trans.site('partials.something_wrong') }}: {{ error }}
+      {{ $translate('partials.something_wrong') }}: {{ error }}
     </b-alert>
     <ConfirmModal @confirm="remove" ref="confirm" />
   </div>

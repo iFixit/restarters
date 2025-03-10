@@ -1,7 +1,7 @@
 <template>
   <div>
     <h1>
-      <span v-if="!currentid">{{ $trans.site('events.add_new_event') }}</span>
+      <span v-if="!currentid">{{ $translate('events.add_new_event') }}</span>
       <span v-html="editTitle" />
     </h1>
     <b-card no-body class="box mt-4">

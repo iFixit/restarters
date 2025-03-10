@@ -3,13 +3,13 @@
     <b-form-input
         v-model="searchName"
         type="search"
-        :placeholder="$trans.site('groups.search_name_placeholder')"
+        :placeholder="$translate('groups.search_name_placeholder')"
         class="mb-1 mb-md-0"
     />
     <multiselect
         v-if="showTags"
         v-model="searchTags"
-        :placeholder="$trans.site('groups.search_tags_placeholder')"
+        :placeholder="$translate('groups.search_tags_placeholder')"
         :options="allGroupTags"
         track-by="id"
         label="tag_name"
@@ -20,18 +20,18 @@
         selectLabel=""
         class="m-0 mb-1 mb-md-0"
         allow-empty
-        :selectedLabel="$trans.site('partials.remove')"
+        :selectedLabel="$translate('partials.remove')"
         open-direction="bottom"
     />
     <b-form-input
         v-model="searchLocation"
         type="search"
-        :placeholder="$trans.site('groups.search_location_placeholder')"
+        :placeholder="$translate('groups.search_location_placeholder')"
         class="mb-1 mb-md-0"
     />
     <multiselect
         v-model="searchCountry"
-        :placeholder="$trans.site('groups.search_country_placeholder')"
+        :placeholder="$translate('groups.search_country_placeholder')"
         :options="countryOptions"
         track-by="country"
         label="country"
@@ -42,12 +42,12 @@
         selectLabel=""
         class="m-0 mb-1 mb-md-0"
         allow-empty
-        :selectedLabel="$trans.site('partials.remove')"
+        :selectedLabel="$translate('partials.remove')"
         open-direction="bottom"
     />
     <multiselect
         v-model="searchNetwork"
-        :placeholder="$trans.site('networks.network')"
+        :placeholder="$translate('networks.network')"
         :options="networkOptions"
         track-by="id"
         label="name"
@@ -58,7 +58,7 @@
         selectLabel=""
         class="m-0 mb-1 mb-md-0"
         allow-empty
-        :selectedLabel="$trans.site('partials.remove')"
+        :selectedLabel="$translate('partials.remove')"
         open-direction="bottom"
     />
   </div>

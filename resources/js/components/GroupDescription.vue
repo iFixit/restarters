@@ -1,19 +1,19 @@
 <template>
   <CollapsibleSection class="no-explict-width" collapsed>
     <template slot="title">
-      {{ $trans.site('groups.about') }}
+      {{ $translate('groups.about') }}
     </template>
     <template slot="content">
       <GroupArchivedBadge :idgroups="idgroups" v-if="idgroups" />
       <div class="d-flex flex-column justify-content-between">
         <div>
           <p v-if="!group.free_text" class="text-muted">
-            {{ $trans.site('groups.about_none') }}
+            {{ $translate('groups.about_none') }}
           </p>
-          <read-more v-else :html="group.free_text" class="mt-2" :max-chars="440" :more-str="$trans.site('groups.read_more')" :less-str="$trans.site('groups.read_less')" />
+          <read-more v-else :html="group.free_text" class="mt-2" :max-chars="440" :more-str="$translate('groups.read_more')" :less-str="$translate('groups.read_less')" />
         </div>
         <p v-if="group.phone" class="font-weight-bold">
-          {{ $trans.site('groups.field_phone') }}:
+          {{ $translate('groups.field_phone') }}:
           <a :href="'tel:' +  group.phone">
             {{ group.phone }}
           </a>
@@ -31,7 +31,7 @@
             <b-img-lazy src="/icons/talk_ico.svg" class="icon" />
           </div>
           <div>
-            <a :href="discourseGroup">{{ $trans.site('groups.talk_group') }}</a>
+            <a :href="discourseGroup">{{ $translate('groups.talk_group') }}</a>
           </div>
         </div>
       </div>
