@@ -43,9 +43,9 @@ export default {
   computed: {
     info() {
       if (this.required) {
-        return this.$lang.get('devices.required_impact')
+        return this.$translate('devices.required_impact')
       } else {
-        return this.$lang.get('devices.optional_impact')
+        return this.$translate('devices.optional_impact')
       }
     }
   }

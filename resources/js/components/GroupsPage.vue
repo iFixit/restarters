@@ -159,7 +159,7 @@ export default {
       })
     },
     nearestGroups() {
-      return this.$lang.get('groups.nearest_groups', {
+      return this.$translate('groups.nearest_groups', {
         location: this.yourArea
       })
     }

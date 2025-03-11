@@ -33,16 +33,16 @@ export default {
   },
   computed: {
     translatedTitle() {
-      return this.$lang.get('microtasking.cta.' + this.activeQuest + '.title')
+      return this.$translate('microtasking.cta.' + this.activeQuest + '.title')
     },
     translatedDescription() {
-      return this.$lang.get('microtasking.cta.' + this.activeQuest + '.description')
+      return this.$translate('microtasking.cta.' + this.activeQuest + '.description')
     },
     translatedShortDescription() {
-      return this.$lang.get('microtasking.cta.' + this.activeQuest + '.short_description')
+      return this.$translate('microtasking.cta.' + this.activeQuest + '.short_description')
     },
     translatedGetInvolved() {
-      return this.$lang.get('microtasking.cta.' + this.activeQuest + '.get_involved')
+      return this.$translate('microtasking.cta.' + this.activeQuest + '.get_involved')
     },
   }
 }

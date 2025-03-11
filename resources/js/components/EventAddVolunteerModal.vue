@@ -83,31 +83,31 @@ export default {
       return this.user === null || (this.user === 'not-registered' && !this.volunteerEmailAddress && !this.fullName)
     },
     translatedOptionDefault() {
-      return this.$lang.get('events.option_default')
+      return this.$translate('events.option_default')
     },
     translatedAddVolunteerModalHeading() {
-      return this.$lang.get('events.add_volunteer_modal_heading')
+      return this.$translate('events.add_volunteer_modal_heading')
     },
     translatedGroupMember() {
-      return this.$lang.get('events.group_member')
+      return this.$translate('events.group_member')
     },
     translatedVolunteerAttended() {
-      return this.$lang.get('events.volunteer_attended_button')
+      return this.$translate('events.volunteer_attended_button')
     },
     translatedOptionNotRegistered() {
-      return this.$lang.get('events.option_not_registered')
+      return this.$translate('events.option_not_registered')
     },
     translatedFullName() {
-      return this.$lang.get('events.full_name')
+      return this.$translate('events.full_name')
     },
     translatedFullNameHelper() {
-      return this.$lang.get('events.full_name_helper')
+      return this.$translate('events.full_name_helper')
     },
     translatedVolunteerEmailAddress() {
-      return this.$lang.get('events.volunteer_email_address')
+      return this.$translate('events.volunteer_email_address')
     },
     translatedMessageVolunteerEmailAddress() {
-      return this.$lang.get('events.message_volunteer_email_address')
+      return this.$translate('events.message_volunteer_email_address')
     }
   },
   methods: {

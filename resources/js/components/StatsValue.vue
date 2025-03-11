@@ -128,10 +128,10 @@ export default {
       return this.translate ? this.$lang.choice(this.title, this.roundedCount) : this.title
     },
     translatedSubtitle() {
-      return this.translate ? this.$lang.get(this.subtitle) : this.subtitle
+      return this.translate ? this.$translate(this.subtitle) : this.subtitle
     },
     translatedDescription() {
-      return this.translate ? this.$lang.get(this.description) : this.description
+      return this.translate ? this.$translate(this.description) : this.description
     },
     roundedCount() {
       return this.countIsNumber ? Math.round(this.count) : this.count

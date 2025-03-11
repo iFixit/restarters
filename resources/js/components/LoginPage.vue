@@ -11,46 +11,46 @@
             <input name="my_time" type="text" :value="time">
           </div>
 
-          <legend>{{ translatedLoginTitle }}</legend>
+          <legend>{{ $translate('login.login_title') }}</legend>
 
           <div class="form-group">
-            <label for="fp_email">{{ translatedEmailAddress }}:</label>
+            <label for="fp_email">{{ $translate('auth.email_address') }}:</label>
             <b-form-input type="email" name="email" id="fp_email" :value="email" required autofocus />
           </div>
 
           <div class="form-group">
-            <label for="password">{{ translatedPassword }}:</label>
+            <label for="password">{{ $translate('auth.password') }}:</label>
             <b-form-input type="password" name="password" id="password" required />
           </div>
 
           <div v-if="error">
             <div class="alert alert-danger" role="alert">
-              {{ translatedAuthFailed }}
+              {{ $translate('auth.failed') }}
             </div>
           </div>
           <div class="row entry-panel__actions">
             <div class="col-6 col-md-8 align-content-center flex-column d-flex">
               <div class="row">
                 <div class="col-12">
-                  <a class="entry-panel__link" href="/user/recover">{{ translatedForgotPassword }}</a>
+                  <a class="entry-panel__link" href="/user/recover">{{ $translate('auth.forgot_password') }}</a>
                 </div>
                 <div class="col-12">
-                  <a class="entry-panel__link" href="/user/register">{{ translatedCreateAccount}}</a>
+                  <a class="entry-panel__link" href="/user/register">{{ $translate('auth.create_account') }}</a>
                 </div>
               </div>
             </div>
             <div class="col-6 col-md-4 align-content-center flex-column justify-content-end d-flex">
-              <b-button id="login-form-submit" type="submit" variant="primary" @click="login" :disabled="disabled">{{ translatedLogin }}</b-button>
+              <b-button id="login-form-submit" type="submit" variant="primary" @click="login" :disabled="disabled">{{ $translate('auth.login') }}</b-button>
             </div>
           </div>
         </form>
       </div>
       <div class="col-lg-6">
         <div class="card card__content col-12 panel panel__orange">
-          <h3 style="font-weight:700">{{ translatedWhatIs }}</h3>
+          <h3 style="font-weight:700">{{ $translate('login.whatis') }}</h3>
           <!-- eslint-disable-next-line -->
-          <div v-html="translatedWhatIsContent" />
-          <a href="/about" class="card__link">{{ translatedMore }}</a>
+          <div v-html="$translate('login.whatis_content')" />
+          <a href="/about" class="card__link">{{ $translate('login.more') }}</a>
         </div>
       </div>
     </div>
@@ -84,36 +84,6 @@ export default {
   computed: {
     CSRF() {
       return this.$store.getters['auth/CSRF']
-    },
-    translatedLoginTitle() {
-      return this.$lang.get('login.login_title')
-    },
-    translatedEmailAddress() {
-      return this.$lang.get('auth.email_address')
-    },
-    translatedPassword() {
-      return this.$lang.get('auth.password')
-    },
-    translatedForgotPassword() {
-      return this.$lang.get('auth.forgot_password')
-    },
-    translatedCreateAccount() {
-      return this.$lang.get('auth.create_account')
-    },
-    translatedLogin() {
-      return this.$lang.get('auth.login')
-    },
-    translatedWhatIs() {
-      return this.$lang.get('login.whatis')
-    },
-    translatedWhatIsContent() {
-      return this.$lang.get('login.whatis_content')
-    },
-    translatedMore() {
-      return this.$lang.get('login.more')
-    },
-    translatedAuthFailed() {
-      return this.$lang.get('auth.failed')
     }
   },
   methods: {

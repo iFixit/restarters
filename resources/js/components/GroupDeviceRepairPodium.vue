@@ -44,7 +44,7 @@ export default {
   },
   computed: {
     translatedName() {
-      return this.$lang.get('strings.' + this.device.name)
+      return this.$translate('strings.' + this.device.name)
     }
   }
 }

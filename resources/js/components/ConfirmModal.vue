@@ -13,9 +13,9 @@
     </template>
     <template slot="modal-footer" slot-scope="{ ok, cancel }">
       <!-- eslint-disable-next-line -->
-      <b-button variant="white" @click="cancel" v-html="translatedCancel" />
+      <b-button variant="white" @click="cancel" v-html="$translate('partials.cancel')" />
       <!-- eslint-disable-next-line -->
-      <b-button variant="primary" @click="confirm" v-html="translatedConfirm" />
+      <b-button variant="primary" @click="confirm" v-html="$translate('partials.confirm')" />
     </template>
   </b-modal>
 </template>
@@ -39,17 +39,11 @@ export default {
     }
   },
   computed: {
-    translatedCancel() {
-      return this.$lang.get('partials.cancel')
-    },
-    translatedConfirm() {
-      return this.$lang.get('partials.confirm')
-    },
     translatedAreYouSure() {
-      return this.title ? this.title : this.$lang.get('partials.are_you_sure')
+      return this.title ? this.title : this.$translate('partials.are_you_sure')
     },
     translatedPleaseConfirm() {
-      return this.message ? this.message : this.$lang.get('partials.please_confirm')
+      return this.message ? this.message : this.$translate('partials.please_confirm')
     }
   },
   methods: {

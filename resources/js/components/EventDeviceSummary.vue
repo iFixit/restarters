@@ -132,16 +132,16 @@ export default {
       return this.id ? this.$store.getters['devices/byId'](this.id) : null
     },
     translatedCategoryName() {
-      return this.$lang.get('strings.' + this.device.category.name)
+      return this.$translate('strings.' + this.device.category.name)
     },
     powered() {
       return this.device.category && this.device.category.powered
     },
     status() {
       switch (this.device.repair_status) {
-        case FIXED: return this.$lang.get('partials.fixed');
-        case REPAIRABLE: return this.$lang.get('partials.repairable');
-        case END_OF_LIFE: return this.$lang.get('partials.end');
+        case FIXED: return this.$translate('partials.fixed');
+        case REPAIRABLE: return this.$translate('partials.repairable');
+        case END_OF_LIFE: return this.$translate('partials.end');
         default: return null
       }
     },

@@ -29,7 +29,7 @@ export default {
         key = 'partials.emissions_equivalent_consume_low_explanation'
       }
 
-      return this.$lang.get(key)
+      return this.$translate(key)
     }
   }
 }

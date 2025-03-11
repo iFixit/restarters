@@ -169,7 +169,7 @@ export default {
       return this.$store.getters['groups/get'](this.idgroups)
     },
     translatedHaveLeft() {
-      return this.$lang.get('groups.now_unfollowed', {
+      return this.$translate('groups.now_unfollowed', {
         name: this.group.name,
         link: '/group/view/' + this.group.id
       })

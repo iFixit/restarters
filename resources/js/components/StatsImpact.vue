@@ -92,7 +92,7 @@ export default {
         const first = ret.slice(0, -1)
         const last = ret[ret.length - 1]
 
-        return intro + ' ' + first.join(', ') + ' ' + this.$lang.get('and') + ' ' + last + '.'
+        return intro + ' ' + first.join(', ') + ' ' + this.$translate('and') + ' ' + last + '.'
       }
     }
   },

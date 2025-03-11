@@ -257,7 +257,7 @@ export default {
       return this.group ? this.group.auto_approve : false
     },
     creationMessage() {
-      return this.$lang.get(this.autoApprove ? 'events.created_success_message_autoapproved' : 'events.created_success_message')
+      return this.$translate(this.autoApprove ? 'events.created_success_message_autoapproved' : 'events.created_success_message')
     },
     // The server expects the UTC versions of the data, but without milliseconds.
     eventStartUtc() {
