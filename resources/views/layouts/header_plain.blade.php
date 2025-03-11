@@ -43,6 +43,12 @@
         <meta data-hid="twitter:card" name="twitter:card" content="summary_large_image">
         <meta data-hid="twitter:site" name="twitter:site" content="RestartProject">
 
+        <!-- Translation data for JavaScript/Vue components -->
+        <script>
+            window.translations = @json($translations ?? []);
+            window.translationsLocale = "{{ app()->getLocale() }}";
+        </script>
+
         <!-- Cookie banner with fine-grained opt-in -->
         <script src="{{ asset('js/gdpr-cookie-notice.js') }}"></script>
         <!-- Check to see if visitor has opted in to analytics cookies -->
