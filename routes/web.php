@@ -110,115 +110,117 @@ Route::middleware('ensureAPIToken')->group(function () {
         Route::get('workbench', [MicrotaskingController::class, 'index'])->name('workbench');
     }
 
-    Route::prefix('FaultCat')->group(function () {
-        Route::get('/', [FaultcatController::class, 'index']);
-        Route::post('/', [FaultcatController::class, 'index']);
-        Route::get('/status', [FaultcatController::class, 'status']);
-        Route::get('/demographics', [FaultcatController::class, 'demographics']);
-        Route::post('/demographics', [FaultcatController::class, 'storeDemographics']);
-    });
+    if (env('FEATURE_ADDITIONAL_STATS_PAGES')) {
+        Route::prefix('FaultCat')->group(function () {
+            Route::get('/', [FaultcatController::class, 'index']);
+            Route::post('/', [FaultcatController::class, 'index']);
+            Route::get('/status', [FaultcatController::class, 'status']);
+            Route::get('/demographics', [FaultcatController::class, 'demographics']);
+            Route::post('/demographics', [FaultcatController::class, 'storeDemographics']);
+        });
 
-    Route::prefix('faultcat')->group(function () {
-        Route::get('/', [FaultcatController::class, 'index']);
-        Route::post('/', [FaultcatController::class, 'index']);
-        Route::get('/status', [FaultcatController::class, 'status']);
-        Route::get('/demographics', [FaultcatController::class, 'demographics']);
-        Route::post('/demographics', [FaultcatController::class, 'storeDemographics']);
-    });
+        Route::prefix('faultcat')->group(function () {
+            Route::get('/', [FaultcatController::class, 'index']);
+            Route::post('/', [FaultcatController::class, 'index']);
+            Route::get('/status', [FaultcatController::class, 'status']);
+            Route::get('/demographics', [FaultcatController::class, 'demographics']);
+            Route::post('/demographics', [FaultcatController::class, 'storeDemographics']);
+        });
 
-    Route::prefix('MiscCat')->group(function () {
-        Route::get('/', [MisccatController::class, 'index']);
-        Route::post('/', [MisccatController::class, 'index']);
-        Route::get('/cta', [MisccatController::class, 'cta']);
-        Route::get('/status', [MisccatController::class, 'status']);
-    });
+        Route::prefix('MiscCat')->group(function () {
+            Route::get('/', [MisccatController::class, 'index']);
+            Route::post('/', [MisccatController::class, 'index']);
+            Route::get('/cta', [MisccatController::class, 'cta']);
+            Route::get('/status', [MisccatController::class, 'status']);
+        });
 
-    Route::prefix('misccat')->group(function () {
-        Route::get('/', [MisccatController::class, 'index']);
-        Route::post('/', [MisccatController::class, 'index']);
-        Route::get('/cta', [MisccatController::class, 'cta']);
-        Route::get('/status', [MisccatController::class, 'status']);
-    });
+        Route::prefix('misccat')->group(function () {
+            Route::get('/', [MisccatController::class, 'index']);
+            Route::post('/', [MisccatController::class, 'index']);
+            Route::get('/cta', [MisccatController::class, 'cta']);
+            Route::get('/status', [MisccatController::class, 'status']);
+        });
 
-    Route::prefix('MobiFix')->group(function () {
-        Route::get('/', [MobifixController::class, 'index']);
-        Route::post('/', [MobifixController::class, 'index']);
-        Route::get('/cta', [MobifixController::class, 'cta']);
-        Route::get('/status', [MobifixController::class, 'status']);
-    });
-    Route::prefix('mobifix')->group(function () {
-        Route::get('/', [MobifixController::class, 'index']);
-        Route::post('/', [MobifixController::class, 'index']);
-        Route::get('/cta', [MobifixController::class, 'cta']);
-        Route::get('/status', [MobifixController::class, 'status']);
-    });
+        Route::prefix('MobiFix')->group(function () {
+            Route::get('/', [MobifixController::class, 'index']);
+            Route::post('/', [MobifixController::class, 'index']);
+            Route::get('/cta', [MobifixController::class, 'cta']);
+            Route::get('/status', [MobifixController::class, 'status']);
+        });
+        Route::prefix('mobifix')->group(function () {
+            Route::get('/', [MobifixController::class, 'index']);
+            Route::post('/', [MobifixController::class, 'index']);
+            Route::get('/cta', [MobifixController::class, 'cta']);
+            Route::get('/status', [MobifixController::class, 'status']);
+        });
 
-    Route::prefix('MobiFixOra')->group(function () {
-        Route::get('/', [MobifixOraController::class, 'index']);
-        Route::post('/', [MobifixOraController::class, 'index']);
-        Route::get('/cta', [MobifixOraController::class, 'cta']);
-        Route::get('/status', [MobifixOraController::class, 'status']);
-    });
-    Route::prefix('mobifixora')->group(function () {
-        Route::get('/', [MobifixOraController::class, 'index']);
-        Route::post('/', [MobifixOraController::class, 'index']);
-        Route::get('/cta', [MobifixOraController::class, 'cta']);
-        Route::get('/status', [MobifixOraController::class, 'status']);
-    });
+        Route::prefix('MobiFixOra')->group(function () {
+            Route::get('/', [MobifixOraController::class, 'index']);
+            Route::post('/', [MobifixOraController::class, 'index']);
+            Route::get('/cta', [MobifixOraController::class, 'cta']);
+            Route::get('/status', [MobifixOraController::class, 'status']);
+        });
+        Route::prefix('mobifixora')->group(function () {
+            Route::get('/', [MobifixOraController::class, 'index']);
+            Route::post('/', [MobifixOraController::class, 'index']);
+            Route::get('/cta', [MobifixOraController::class, 'cta']);
+            Route::get('/status', [MobifixOraController::class, 'status']);
+        });
 
-    Route::prefix('TabiCat')->group(function () {
-        Route::get('/', [TabicatOraController::class, 'index']);
-        Route::post('/', [TabicatOraController::class, 'index']);
-        Route::get('/cta', [TabicatOraController::class, 'cta']);
-        Route::get('/status', [TabicatOraController::class, 'status']);
-        Route::get('/survey', [TabicatOraController::class, 'survey']);
-    });
-    Route::prefix('tabicat')->group(function () {
-        Route::get('/', [TabicatOraController::class, 'index']);
-        Route::post('/', [TabicatOraController::class, 'index']);
-        Route::get('/cta', [TabicatOraController::class, 'cta']);
-        Route::get('/status', [TabicatOraController::class, 'status']);
-        Route::get('/survey', [TabicatOraController::class, 'survey']);
-    });
+        Route::prefix('TabiCat')->group(function () {
+            Route::get('/', [TabicatOraController::class, 'index']);
+            Route::post('/', [TabicatOraController::class, 'index']);
+            Route::get('/cta', [TabicatOraController::class, 'cta']);
+            Route::get('/status', [TabicatOraController::class, 'status']);
+            Route::get('/survey', [TabicatOraController::class, 'survey']);
+        });
+        Route::prefix('tabicat')->group(function () {
+            Route::get('/', [TabicatOraController::class, 'index']);
+            Route::post('/', [TabicatOraController::class, 'index']);
+            Route::get('/cta', [TabicatOraController::class, 'cta']);
+            Route::get('/status', [TabicatOraController::class, 'status']);
+            Route::get('/survey', [TabicatOraController::class, 'survey']);
+        });
 
-    Route::prefix('PrintCat')->group(function () {
-        Route::get('/', [PrintcatOraController::class, 'index']);
-        Route::post('/', [PrintcatOraController::class, 'index']);
-        Route::get('/cta', [PrintcatOraController::class, 'cta']);
-        Route::get('/status', [PrintcatOraController::class, 'status']);
-    });
-    Route::prefix('printcat')->group(function () {
-        Route::get('/', [PrintcatOraController::class, 'index']);
-        Route::post('/', [PrintcatOraController::class, 'index']);
-        Route::get('/cta', [PrintcatOraController::class, 'cta']);
-        Route::get('/status', [PrintcatOraController::class, 'status']);
-    });
+        Route::prefix('PrintCat')->group(function () {
+            Route::get('/', [PrintcatOraController::class, 'index']);
+            Route::post('/', [PrintcatOraController::class, 'index']);
+            Route::get('/cta', [PrintcatOraController::class, 'cta']);
+            Route::get('/status', [PrintcatOraController::class, 'status']);
+        });
+        Route::prefix('printcat')->group(function () {
+            Route::get('/', [PrintcatOraController::class, 'index']);
+            Route::post('/', [PrintcatOraController::class, 'index']);
+            Route::get('/cta', [PrintcatOraController::class, 'cta']);
+            Route::get('/status', [PrintcatOraController::class, 'status']);
+        });
 
-    Route::prefix('BattCat')->group(function () {
-        Route::get('/', [BattcatOraController::class, 'index']);
-        Route::post('/', [BattcatOraController::class, 'index']);
-        Route::get('/survey', [BattcatOraController::class, 'survey']);
-        Route::get('/status', [BattcatOraController::class, 'status']);
-    });
-    Route::prefix('battcat')->group(function () {
-        Route::get('/', [BattcatOraController::class, 'index']);
-        Route::post('/', [BattcatOraController::class, 'index']);
-        Route::get('/survey', [BattcatOraController::class, 'survey']);
-        Route::get('/status', [BattcatOraController::class, 'status']);
-    });
+        Route::prefix('BattCat')->group(function () {
+            Route::get('/', [BattcatOraController::class, 'index']);
+            Route::post('/', [BattcatOraController::class, 'index']);
+            Route::get('/survey', [BattcatOraController::class, 'survey']);
+            Route::get('/status', [BattcatOraController::class, 'status']);
+        });
+        Route::prefix('battcat')->group(function () {
+            Route::get('/', [BattcatOraController::class, 'index']);
+            Route::post('/', [BattcatOraController::class, 'index']);
+            Route::get('/survey', [BattcatOraController::class, 'survey']);
+            Route::get('/status', [BattcatOraController::class, 'status']);
+        });
 
-    Route::prefix('DustUp')->group(function () {
-        Route::get('/', [DustupOraController::class, 'index']);
-        Route::post('/', [DustupOraController::class, 'index']);
-        Route::get('/cta', [DustupOraController::class, 'cta']);
-        Route::get('/status', [DustupOraController::class, 'status']);
-    });
-    Route::prefix('dustup')->group(function () {
-        Route::get('/', [DustupOraController::class, 'index']);
-        Route::post('/', [DustupOraController::class, 'index']);
-        Route::get('/cta', [DustupOraController::class, 'cta']);
-        Route::get('/status', [DustupOraController::class, 'status']);
-    });
+        Route::prefix('DustUp')->group(function () {
+            Route::get('/', [DustupOraController::class, 'index']);
+            Route::post('/', [DustupOraController::class, 'index']);
+            Route::get('/cta', [DustupOraController::class, 'cta']);
+            Route::get('/status', [DustupOraController::class, 'status']);
+        });
+        Route::prefix('dustup')->group(function () {
+            Route::get('/', [DustupOraController::class, 'index']);
+            Route::post('/', [DustupOraController::class, 'index']);
+            Route::get('/cta', [DustupOraController::class, 'cta']);
+            Route::get('/status', [DustupOraController::class, 'status']);
+        });
+    }
 
     Route::middleware('guest')->group(function () {
         Route::get('/', [HomeController::class, 'index'])->name('home');
