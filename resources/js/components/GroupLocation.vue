@@ -2,7 +2,7 @@
   <div>
     <b-form-group>
       <label :for="$id('address-autocomplete')">{{ $translate('groups.location') }}:</label>
-      <open-street-map-autocomplete
+      <location-autocomplete
           :id="$id('address-autocomplete')"
           name="location"
           classname="form-control group-location"
@@ -31,7 +31,7 @@
 </template>
 <script>
 import Vue from 'vue'
-import OpenStreetMapAutocomplete from './OpenStreetMapAutocomplete'
+import LocationAutocomplete from './LocationAutocomplete'
 import UniqueId from 'vue-unique-id';
 
 Vue.use(UniqueId);
@@ -75,7 +75,7 @@ export default {
     }
   },
   components: {
-    OpenStreetMapAutocomplete
+    LocationAutocomplete
   },
   data () {
     return {
@@ -161,12 +161,6 @@ export default {
       // Log the type of location selected to help with debugging
       if (addressData.type) {
         console.log('Selected location type:', addressData.type);
-      }
-      if (addressData.osm_type) {
-        console.log('OSM type:', addressData.osm_type);
-      }
-      if (addressData.osm_value) {
-        console.log('OSM value:', addressData.osm_value);
       }
       
       // Ensure we have the minimum required data for the API

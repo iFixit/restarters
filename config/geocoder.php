@@ -3,6 +3,7 @@
 use Geocoder\Provider\Chain\Chain;
 use Geocoder\Provider\GeoPlugin\GeoPlugin;
 use Geocoder\Provider\Mapbox\Mapbox;
+use Geocoder\Provider\Nominatim\Nominatim;
 use Http\Client\Curl\Client;
 
 return [
@@ -46,22 +47,40 @@ return [
     | Here you may specify any number of providers that should be used to
     | perform geocaching operations. The `chain` provider is special,
     | in that it can contain multiple providers that will be run in
-    | the sequence listed, should the previous provider fail. By
-    | default the first provider listed will be used, but you
-    | can explicitly call subsequently listed providers by
-    | alias: `app('geocoder')->using('google_maps')`.
+    | the sequence listed, should the previous provider fail.
+    |
+    | This configuration now respects the MAP_SERVICE environment variable.
+    | If MAP_SERVICE is set to 'mapbox', the Mapbox provider will be used first.
+    | If MAP_SERVICE is set to 'openstreetmap', the Nominatim provider will be used first.
     |
     | Please consult the official Geocoder documentation for more info.
     | https://github.com/geocoder-php/Geocoder#providers
     |
     */
     'providers' => [
-        Chain::class => [
-            Mapbox::class => [
-                env('MAPBOX_TOKEN'),
-            ],
-            GeoPlugin::class  => [],
-        ],
+        Chain::class => function() {
+            $mapService = env('MAP_SERVICE', 'openstreetmap');
+            $providers = [];
+            
+            // Configure providers based on the selected map service
+            if ($mapService === 'mapbox') {
+                // Mapbox as primary provider
+                $providers[Mapbox::class] = [
+                    env('MAPBOX_ACCESS_TOKEN'),
+                ];
+            } else {
+                // OpenStreetMap/Nominatim as primary provider
+                $providers[Nominatim::class] = [
+                    'https://nominatim.openstreetmap.org',
+                    'Restarters.net/1.0', // User-Agent required by Nominatim
+                ];
+            }
+            
+            // Always add GeoPlugin as fallback
+            $providers[GeoPlugin::class] = [];
+            
+            return $providers;
+        },
     ],
 
     /*

@@ -17,7 +17,13 @@ mix.webpackConfig({
             resourceRegExp: /^codemirror$/
         }),
         // Build a JS translation file that corresponds to our PHP lang/ folder.
-        new WebpackShellPlugin({onBuildStart:['php artisan lang:js --no-lib resources/js/translations.js'], onBuildEnd:['php artisan translations:check']})
+        new WebpackShellPlugin({onBuildStart:['php artisan lang:js --no-lib resources/js/translations.js'], onBuildEnd:['php artisan translations:check']}),
+        // Expose environment variables to the frontend
+        new webpack.DefinePlugin({
+            'process.env.MIX_MAP_SERVICE': JSON.stringify(process.env.MAP_SERVICE || 'openstreetmap'),
+            'process.env.MIX_MAPBOX_ACCESS_TOKEN': JSON.stringify(process.env.MAPBOX_ACCESS_TOKEN || ''),
+            'process.env.MIX_MAPBOX_STYLE': JSON.stringify(process.env.MAPBOX_STYLE || 'mapbox://styles/mapbox/streets-v11')
+        })
     ]
 });
 /*

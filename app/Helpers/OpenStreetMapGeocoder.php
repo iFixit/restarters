@@ -2,7 +2,7 @@
 
 namespace App\Helpers;
 
-class OpenStreetMapGeocoder
+class OpenStreetMapGeocoder implements GeocoderInterface
 {
     /**
      * Geocode an address using OpenStreetMap's Nominatim service

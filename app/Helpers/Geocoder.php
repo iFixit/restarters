@@ -4,11 +4,12 @@ namespace App\Helpers;
 
 class Geocoder
 {
-    private $osmGeocoder;
-    
+    private $geocoder;
+
     public function __construct()
     {
-        $this->osmGeocoder = new OpenStreetMapGeocoder();
+        // Use the factory to get the appropriate geocoder implementation
+        $this->geocoder = GeocoderFactory::create();
     }
 
     private function googleKey()
@@ -19,11 +20,11 @@ class Geocoder
 
     public function geocode($location)
     {
-        return $this->osmGeocoder->geocode($location);
+        return $this->geocoder->geocode($location);
     }
 
     public function reverseGeocode($lat, $lng)
     {
-        return $this->osmGeocoder->reverseGeocode($lat, $lng);
+        return $this->geocoder->reverseGeocode($lat, $lng);
     }
 }
