@@ -2,32 +2,38 @@ var map;
 var infowindows = Array();
 var markers = Array();
 function initHomeMap() {
-    var centerLatLng = new google.maps.LatLng(20, 0); 
-    var mapOptions = {
-        zoom: 2,
-        center: centerLatLng,
-        mapTypeId: google.maps.MapTypeId.ROADMAP
+    // Only initialize if the map element exists
+    if (!document.getElementById('groupWorldMap')) {
+        return;
     }
     
-    map = new google.maps.Map(document.getElementById('groupWorldMap'), mapOptions);
+    // Initialize Leaflet map with a center point and zoom level
+    map = L.map('groupWorldMap').setView([20, 0], 2);
+    
+    // Add the tile layer (OpenStreetMap)
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/attribution">CARTO</a>'
+    }).addTo(map);
     
     /** get & set markers **/
     $.getJSON('/ajax/group_locations', {}, function(data){
         data.forEach(function(g){
-            infowindows[g.id] = new google.maps.InfoWindow({
-                content: '<h4>' + g.name + '</h4><p>' + g.location + ', ' + g.area + '</p>'      
-            });
+            // Create popup content
+            var popupContent = '<h4>' + g.name + '</h4><p>' + g.location + ', ' + g.area + '</p>';
             
-            markers[g.id] = new google.maps.Marker({
-                        position: new google.maps.LatLng( g.latitude, g.longitude),
-                        map: map,
-                        title: g.name
-            });
+            // Create marker
+            markers[g.id] = L.marker([g.latitude, g.longitude], {
+                title: g.name
+            }).addTo(map);
             
-            google.maps.event.addListener(markers[g.id], 'click', function() {
-                infowindows[g.id].open(map,markers[g.id]);
-            });
+            // Bind popup to marker
+            markers[g.id].bindPopup(popupContent);
+            
+            // Store popup in infowindows array for potential later use
+            infowindows[g.id] = popupContent;
         });
     });
 }
-google.maps.event.addDomListener(window, 'load', initHomeMap);
+
+// Initialize map when DOM is loaded
+document.addEventListener('DOMContentLoaded', initHomeMap);

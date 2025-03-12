@@ -386,6 +386,21 @@ export default {
           // It's not.
           this.validationFocusFirstError()
         } else {
+          // Additional validation for location
+          // The backend expects a location with at least a street and city
+          const locationParts = this.location ? this.location.split(',').map(part => part.trim()) : [];
+          const hasValidLocation = locationParts.length >= 2;
+          
+          if (!hasValidLocation) {
+            console.error('Invalid location format:', this.location);
+            // Mark location as invalid
+            this.$v.location.$invalid = true;
+            this.$v.location.$error = true;
+            this.validationFocusFirstError();
+            callback(false);
+            return;
+          }
+          
           if (this.creating) {
             const id = await this.$store.dispatch('groups/create', {
               name: this.name,

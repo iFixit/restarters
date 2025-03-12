@@ -302,180 +302,400 @@ var componentForm = {
 };
 
 function initAutocomplete() {
-  // Create the autocomplete object, restricting the search to geographical
-  // location types.
-  autocomplete = new google.maps.places.Autocomplete(
-    /** @type {!HTMLInputElement} */(document.getElementById('autocomplete')),
-    { types: ['geocode'] });
+  // This function is now handled by the OpenStreetMapAutocomplete Vue component
+  // No need to initialize Google Maps Places Autocomplete
+  console.log('Using OpenStreetMap autocomplete instead of Google Maps');
+}
 
-    // When the user selects an address from the dropdown, populate the address
-    // fields in the form.
-    autocomplete.addListener('place_changed', fillInAddress);
-  }
+function fillInAddress() {
+  // This function is now handled by the OpenStreetMapAutocomplete Vue component
+  console.log('Address filling is now handled by OpenStreetMapAutocomplete component');
+}
 
-  function fillInAddress() {
-    // Get the place details from the autocomplete object.
-    var place = autocomplete.getPlace();
-
-    for (var component in componentForm) {
-      document.getElementById(component).value = '';
-      document.getElementById(component).disabled = false;
-    }
-
-    // Get each component of the address from the place details
-    // and fill the corresponding field on the form.
-    for (var i = 0; i < place.address_components.length; i++) {
-      var addressType = place.address_components[i].types[0];
-      if (componentForm[addressType]) {
-        var val = place.address_components[i][componentForm[addressType]];
-        document.getElementById(addressType).value = val;
-
-        if (addressType === 'postal_code') {
-          // We have a postcode field which is editable.  If we have no existing postcode and we've just geocoded, then
-          // set up any postcode we have returned as a sensible default.
-          var postcode = document.getElementById('postcode')
-          if (val && !postcode.value) {
-            postcode.value = val;
-          }
-        }
-      }
-    }
-
-    // Initialise map
-    var map = new google.maps.Map(document.getElementById('map-plugin'), {
-      center: { lat: -33.8688, lng: 151.2195 },
-      zoom: 13,
-      disableDefaultUI: true
-    });
-
-    // Bind the map's bounds (viewport) property to the autocomplete object,
-    // so that the autocomplete requests use the current map bounds for the
-    // bounds option in the request.
-    autocomplete.bindTo('bounds', map);
-
-    var marker = new google.maps.Marker({
-      map: map,
-      anchorPoint: new google.maps.Point(0, -29)
-    });
-
-    marker.setVisible(false);
-
-    if (!place.geometry) {
-      // User entered the name of a Place that was not suggested and
-      // pressed the Enter key, or the Place Details request failed.
-      window.alert("No details available for input: '" + place.name + "'");
-      return;
-    }
-
-    if (place.geometry.viewport) {
-      map.fitBounds(place.geometry.viewport);
-    } else {
-      map.setCenter(place.geometry.location);
-      map.setZoom(17);
-    }
-    marker.setPosition(place.geometry.location);
-    marker.setVisible(true);
-
-    var address = '';
-    if (place.address_components) {
-      address = [
-        (place.address_components[0] && place.address_components[0].short_name || ''),
-        (place.address_components[1] && place.address_components[1].short_name || ''),
-        (place.address_components[2] && place.address_components[2].short_name || '')
-      ].join(' ');
-    }
-
-
-  }
-
-  function geolocate() {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(function (position) {
-        var geolocation = {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude
+function geolocate() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function (position) {
+      var geolocation = {
+        lat: position.coords.latitude,
+        lng: position.coords.longitude
+      };
+      
+      // If we have an autocomplete component, update its bounds
+      if (typeof autocomplete !== 'undefined' && autocomplete.setBounds) {
+        // Calculate a rough bounding box (approximately 10km radius)
+        const latDelta = 0.1;  // Roughly 10km in latitude
+        const lngDelta = 0.1;  // Roughly 10km in longitude at equator, more at higher latitudes
+        
+        const bounds = {
+          north: geolocation.lat + latDelta,
+          south: geolocation.lat - latDelta,
+          east: geolocation.lng + lngDelta,
+          west: geolocation.lng - lngDelta
         };
-        var circle = new google.maps.Circle({
-          center: geolocation,
-          radius: position.coords.accuracy
-        });
-        autocomplete.setBounds(circle.getBounds());
-      });
-    }
-  }
-
-  function groupsMap() {
-    if (jQuery('.field-geolocate').length > 0 ) {
-      initAutocomplete();
-    }
-  }
-
-  function truncate() {
-
-    if (jQuery('.truncate').length > 0) {
-      jQuery('.truncate').each(function () {
-        jQuery(this).parent().addClass('truncated');
-      });
-    }
-
-    var button = jQuery('.truncate__button');
-    button.on('click', function (e) {
-      e.preventDefault();
-
-      if (jQuery(this).parent().hasClass('truncated')) {
-        jQuery(this).parent().removeClass('truncated');
-        jQuery(this).find('span').text('Show less');
-      } else {
-        jQuery(this).parent().addClass('truncated');
-        jQuery(this).find('span').text('Read more');
+        
+        autocomplete.setBounds(bounds);
       }
     });
   }
+}
 
-  function eventsMap() {
-    if ( jQuery('#event-map').length > 0 ) {
+function groupsMap() {
+  if (jQuery('.field-geolocate').length > 0 ) {
+    // Initialize any location-related functionality
+    // This is a placeholder for any initialization needed
+  }
+}
 
-      const mapObject = document.querySelector('#event-map');
+function truncate() {
 
-      let latitude = parseFloat(mapObject.dataset.latitude);
-      let longitude = parseFloat(mapObject.dataset.longitude);
-      let zoom = parseFloat(mapObject.dataset.zoom);
-
-      if( latitude && longitude ){
-          let map = L.map('event-map').setView([latitude, longitude], zoom);
-
-          L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png', {
-              attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/attribution">CARTO</a>'
-          }).addTo(map);
-
-          var icon = new L.Icon.Default();
-          icon.options.shadowSize = [0,0];
-          L.marker([latitude, longitude], {icon:icon}).addTo(map);
-      }
-    }
+  if (jQuery('.truncate').length > 0) {
+    jQuery('.truncate').each(function () {
+      jQuery(this).parent().addClass('truncated');
+    });
   }
 
-  function updateParticipants() {
+  var button = jQuery('.truncate__button');
+  button.on('click', function (e) {
+    e.preventDefault();
 
-    var quantity = $('#participants_qty').val();
-    var event_id = $('#event_id').val();
+    if (jQuery(this).parent().hasClass('truncated')) {
+      jQuery(this).parent().removeClass('truncated');
+      jQuery(this).find('span').text('Show less');
+    } else {
+      jQuery(this).parent().addClass('truncated');
+      jQuery(this).find('span').text('Read more');
+    }
+  });
+}
+
+function eventsMap() {
+  if ( jQuery('#event-map').length > 0 ) {
+    const mapObject = document.querySelector('#event-map');
+
+    let latitude = parseFloat(mapObject.dataset.latitude);
+    let longitude = parseFloat(mapObject.dataset.longitude);
+    let zoom = parseFloat(mapObject.dataset.zoom);
+
+    if( latitude && longitude ){
+        let map = L.map('event-map').setView([latitude, longitude], zoom);
+
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/attribution">CARTO</a>'
+        }).addTo(map);
+
+        var icon = new L.Icon.Default();
+        icon.options.shadowSize = [0,0];
+        L.marker([latitude, longitude], {icon:icon}).addTo(map);
+    }
+  }
+}
+
+function updateParticipants() {
+
+  var quantity = $('#participants_qty').val();
+  var event_id = $('#event_id').val();
+
+  $.ajax({
+    headers: {
+      'X-CSRF-TOKEN': $("input[name='_token']").val()
+    },
+    type: 'post',
+    url: '/party/update-quantity',
+    data: {
+      quantity : quantity,
+      event_id : event_id
+    },
+    datatype: 'json',
+    success: function(json) {
+      if( json.success ){
+        console.log('quantity updated');
+      } else {
+        alert('You are not a host of this event');
+      }
+    },
+    error: function(error) {
+      alert('Something has gone wrong');
+    }
+  });
+
+}
+
+function nestedTable() {
+
+  jQuery('.table-row-details').each(function(){
+
+    jQuery(this).on('show.bs.collapse', function () {
+      jQuery(this).prev('tr').addClass('active-row');
+      //jQuery(this).prev('tr').find('.row-button')
+    })
+    jQuery(this).on('hide.bs.collapse', function () {
+      jQuery(this).prev('tr').removeClass('active-row');
+    })
+
+  });
+
+
+}
+
+function loadDropzones() {
+  if (jQuery(".dropzoneEl").length > 0 ) {
+    var field1 = jQuery('.dropzone').data('field1');
+    var field2 = jQuery('.dropzone').data('field2');
+
+    var preview = ".uploads";
+    var dropzone_id = ".dropzoneEl";
+    var prefix = '';
+
+    $(".dropzoneEl").each(function( index ) {
+
+      var $dropzone = $(this);
+
+      if ($(this).data('deviceid') !== undefined) {
+        prefix = '-'+$(this).data('deviceid');
+      } else {
+        prefix = '';
+      }
+
+      // console.log($('#dropzoneEl-' + $(this).data('deviceid'))["0"].dropzone);
+      if (typeof $('#dropzoneEl-' + $(this).data('deviceid'))["0"].dropzone != "undefined") {
+        // Do nothing
+        // console.log('nothing');
+      } else {
+
+        var instanceDropzone = new Dropzone('#dropzoneEl-' + $(this).data('deviceid'), {
+          paramName: "file", // The name that will be used to transfer the file
+          maxFilesize: 2,
+          dictDefaultMessage: '',
+          parallelUploads: 100,
+          uploadMultiple: true,
+          createImageThumbnails: true,
+          thumbnailWidth: 120,
+          thumbnailHeight: 120,
+          addRemoveLinks: true,
+          previewsContainer: ".uploads-" + $(this).data('deviceid'),
+          init: function () {
+              this.on("success", function(file) { alert("Image added!"); });
+              this.on("error", function(file, errorMessage) {
+                  this.removeFile(file);
+                  alert("Error: " + errorMessage);
+              });
+              $dropzone.find(".dz-message").append('<span>' + field1 + '</span><small>' + field2 + '</small>');
+          }
+        });
+      }
+    });
+
+  }
+
+  if (jQuery("#dropzoneSingleEl").length > 0) {
+
+    var field1 = jQuery('#dropzoneSingleEl').data('field1');
+    var field2 = jQuery('#dropzoneSingleEl').data('field2');
+
+    var instanceDropzone = new Dropzone("#dropzoneSingleEl", {
+      init: function () {
+        jQuery(".dz-message").find('span').text(field1);
+        jQuery(".dz-message").append('<small>'+field2+'</small>');
+      },
+      paramName: "file", // The name that will be used to transfer the file
+      // maxFilesize: 4,
+      maxFiles: 1,
+      uploadMultiple: false,
+      createImageThumbnails: true,
+      addRemoveLinks: true,
+      thumbnailWidth: 60,
+      thumbnailHeight: 60,
+      thumbnailMethod: "contain",
+      previewsContainer: ".uploads-" + $("#dropzoneSingleEl").data('deviceid'),
+    });
+
+  }
+
+  if (jQuery("#dropzoneSingleEl-create").length > 0) {
+
+    var field1 = jQuery('#dropzoneSingleEl-create').data('field1');
+    var field2 = jQuery('#dropzoneSingleEl-create').data('field2');
+
+    var instanceDropzone = new Dropzone("#dropzoneSingleEl-create", {
+      init: function () {
+        jQuery(".dz-message").find('span').text(field1);
+        jQuery(".dz-message").append('<small>'+field2+'</small>');
+      },
+      paramName: "file", // The name that will be used to transfer the file
+      // maxFilesize: 4,
+      autoProcessQueue: false,
+      maxFiles: 1,
+      uploadMultiple: false,
+      createImageThumbnails: true,
+      addRemoveLinks: true,
+      thumbnailWidth: 60,
+      thumbnailHeight: 60,
+      thumbnailMethod: "contain",
+      previewsContainer: ".uploads",
+    });
+
+  }
+}
+
+function resetForm (e) {
+  e.preventDefault();
+  var attr = jQuery(this).data('form');
+  var form = jQuery('#' + attr);
+  form[0].reset();
+
+  if (form.find('select').length > 0 ) {
+    form.find('select').val('').trigger('change');
+  }
+
+}
+
+var tag_options = {
+  tags: true,
+  createTag: function (params) {
+    return null;
+  }
+}
+
+var repair_barrier_options = {
+  placeholder: "Choose barriers to repair"
+}
+
+var tag_options_with_input = {
+  tags: true,
+  formatInputTooShort: "Type a brand name",
+  language: {
+    inputTooShort: function inputTooShort() {
+      return 'Type a brand name';
+    }
+  },
+  minimumInputLength: 2,
+  createTag: function (params) {
+    return {
+      id: params.term,
+      text: params.term,
+      newOption: true
+    }
+  }
+}
+
+function select2Fields($target = false) {
+
+
+  if( $target === false ){
+
+    jQuery('.select2').select2();
+    jQuery('.select2-repair-barrier').select2(repair_barrier_options);
+    jQuery('.select2-tags').select2(tag_options);
+    jQuery(".select2-with-input").select2(tag_options_with_input);
+    jQuery(".select2-with-input-group").select2({
+      width: 'auto',
+      dropdownAutoWidth: true,
+      allowClear: true,
+    });
+
+    jQuery('.select2[data-placeholder]').each(function() {
+      $(this).select2({
+        placeholder: $(this).data('placeholder')
+      })
+    })
+
+  } else {
+
+    $target.find('.select2').select2();
+    $target.find('.select2-repair-barrier').select2(repair_barrier_options);
+    $target.find('.select2-tags').select2(tag_options);
+    $target.find(".select2-with-input").select2(tag_options_with_input);
+    $target.find(".select2-with-input-group").select2({
+      width: 'auto',
+      dropdownAutoWidth: true,
+      allowClear: true,
+    });
+
+
+    $target.find('.select2[data-placeholder]').each(function() {
+      $(this).select2({
+        placeholder: $(this).data('placeholder')
+      })
+    })
+  }
+
+
+  // $(document).on('focus', '.select2.select2-container', function (e) {
+  //   // only open on original attempt - close focus event should not fire open
+  //   if (e.originalEvent && $(this).find(".select2-selection--single").length > 0) {
+  //     $(this).siblings('select').select2('open');
+  //   }
+  // });
+
+}
+
+Dropzone.autoDiscover = false;
+registration();
+onboarding();
+eventsMap();
+truncate();
+nestedTable();
+select2Fields();
+
+jQuery(function () {
+
+
+  jQuery('.users-list').find('[data-toggle="popover"]').popover();
+
+  jQuery('.users-list').find('[data-toggle="popover"]').on('click', function (e) {
+    jQuery('.users-list').find('[data-toggle="popover"]').not(this).popover('hide');
+  });
+
+  jQuery('.table:not(.table-devices)').find('[data-toggle="popover"]').popover({
+    template: '<div class="popover popover__table" role="tooltip"><div class="arrow"></div><h3 class="popover-header"></h3><div class="popover-body"></div></div>',
+    placement:'top'
+  })
+
+  jQuery('.table-devices').find('[data-toggle="popover"]').popover();
+
+  jQuery('.table').find('[data-toggle="popover"]').on('click', function (e) {
+    jQuery('.table').find('[data-toggle="popover"]').not(this).popover('hide');
+  });
+
+  jQuery(document).on('change', '.category', function (e) {
+    var $value = parseInt(jQuery(this).val());
+    var $field = jQuery(this).parents('td').find('.weight');
+
+    if (!$field.length) {
+      // At present this global JS is used in both old and new designs which have different DOM structure, so we
+      // need to cope with both.
+      $field = jQuery(this).parents('.card-body').find('.weight')
+    }
+    if( $value === 46 || $value === '' ){
+      $field.prop('disabled', false);
+      $field.parents('.display-weight').removeClass('d-none');
+    } else {
+      $field.val('');
+      $field.trigger('change');
+      $field.prop('disabled', true);
+      $field.parents('.display-weight').addClass('d-none');
+    }
+  });
+
+  function removeUser() {
+
+    var id = jQuery(this).data('remove-volunteer');
 
     $.ajax({
       headers: {
         'X-CSRF-TOKEN': $("input[name='_token']").val()
       },
       type: 'post',
-      url: '/party/update-quantity',
+      url: '/party/remove-volunteer',
       data: {
-        quantity : quantity,
-        event_id : event_id
+        id : id,
       },
       datatype: 'json',
       success: function(json) {
         if( json.success ){
-          console.log('quantity updated');
+          jQuery('.volunteer-' + id).fadeOut();
         } else {
-          alert('You are not a host of this event');
+          alert('Something has gone wrong');
         }
       },
       error: function(error) {
@@ -485,750 +705,117 @@ function initAutocomplete() {
 
   }
 
-  function nestedTable() {
-
-    jQuery('.table-row-details').each(function(){
-
-      jQuery(this).on('show.bs.collapse', function () {
-        jQuery(this).prev('tr').addClass('active-row');
-        //jQuery(this).prev('tr').find('.row-button')
-      })
-      jQuery(this).on('hide.bs.collapse', function () {
-        jQuery(this).prev('tr').removeClass('active-row');
-      })
-
-    });
-
-
-  }
-
-  function loadDropzones() {
-    if (jQuery(".dropzoneEl").length > 0 ) {
-      var field1 = jQuery('.dropzone').data('field1');
-      var field2 = jQuery('.dropzone').data('field2');
-
-      var preview = ".uploads";
-      var dropzone_id = ".dropzoneEl";
-      var prefix = '';
-
-      $(".dropzoneEl").each(function( index ) {
-
-        var $dropzone = $(this);
-
-        if ($(this).data('deviceid') !== undefined) {
-          prefix = '-'+$(this).data('deviceid');
-        } else {
-          prefix = '';
-        }
-
-        // console.log($('#dropzoneEl-' + $(this).data('deviceid'))["0"].dropzone);
-        if (typeof $('#dropzoneEl-' + $(this).data('deviceid'))["0"].dropzone != "undefined") {
-          // Do nothing
-          // console.log('nothing');
-        } else {
-
-          var instanceDropzone = new Dropzone('#dropzoneEl-' + $(this).data('deviceid'), {
-            paramName: "file", // The name that will be used to transfer the file
-            maxFilesize: 2,
-            dictDefaultMessage: '',
-            parallelUploads: 100,
-            uploadMultiple: true,
-            createImageThumbnails: true,
-            thumbnailWidth: 120,
-            thumbnailHeight: 120,
-            addRemoveLinks: true,
-            previewsContainer: ".uploads-" + $(this).data('deviceid'),
-            init: function () {
-                this.on("success", function(file) { alert("Image added!"); });
-                this.on("error", function(file, errorMessage) {
-                    this.removeFile(file);
-                    alert("Error: " + errorMessage);
-                });
-                $dropzone.find(".dz-message").append('<span>' + field1 + '</span><small>' + field2 + '</small>');
-            }
-          });
-        }
-      });
-
-    }
-
-    if (jQuery("#dropzoneSingleEl").length > 0) {
-
-      var field1 = jQuery('#dropzoneSingleEl').data('field1');
-      var field2 = jQuery('#dropzoneSingleEl').data('field2');
-
-      var instanceDropzone = new Dropzone("#dropzoneSingleEl", {
-        init: function () {
-          jQuery(".dz-message").find('span').text(field1);
-          jQuery(".dz-message").append('<small>'+field2+'</small>');
-        },
-        paramName: "file", // The name that will be used to transfer the file
-        // maxFilesize: 4,
-        maxFiles: 1,
-        uploadMultiple: false,
-        createImageThumbnails: true,
-        addRemoveLinks: true,
-        thumbnailWidth: 60,
-        thumbnailHeight: 60,
-        thumbnailMethod: "contain",
-        previewsContainer: ".uploads-" + $("#dropzoneSingleEl").data('deviceid'),
-      });
-
-    }
-
-    if (jQuery("#dropzoneSingleEl-create").length > 0) {
-
-      var field1 = jQuery('#dropzoneSingleEl-create').data('field1');
-      var field2 = jQuery('#dropzoneSingleEl-create').data('field2');
-
-      var instanceDropzone = new Dropzone("#dropzoneSingleEl-create", {
-        init: function () {
-          jQuery(".dz-message").find('span').text(field1);
-          jQuery(".dz-message").append('<small>'+field2+'</small>');
-        },
-        paramName: "file", // The name that will be used to transfer the file
-        // maxFilesize: 4,
-        autoProcessQueue: false,
-        maxFiles: 1,
-        uploadMultiple: false,
-        createImageThumbnails: true,
-        addRemoveLinks: true,
-        thumbnailWidth: 60,
-        thumbnailHeight: 60,
-        thumbnailMethod: "contain",
-        previewsContainer: ".uploads",
-      });
-
-    }
-  }
-
-  function resetForm (e) {
-    e.preventDefault();
-    var attr = jQuery(this).data('form');
-    var form = jQuery('#' + attr);
-    form[0].reset();
-
-    if (form.find('select').length > 0 ) {
-      form.find('select').val('').trigger('change');
-    }
-
-  }
-
-  var tag_options = {
-    tags: true,
-    createTag: function (params) {
-      return null;
-    }
-  }
-
-  var repair_barrier_options = {
-    placeholder: "Choose barriers to repair"
-  }
-
-  var tag_options_with_input = {
-    tags: true,
-    formatInputTooShort: "Type a brand name",
-    language: {
-      inputTooShort: function inputTooShort() {
-        return 'Type a brand name';
-      }
-    },
-    minimumInputLength: 2,
-    createTag: function (params) {
-      return {
-        id: params.term,
-        text: params.term,
-        newOption: true
-      }
-    }
-  }
-
-  function select2Fields($target = false) {
-
-
-    if( $target === false ){
-
-      jQuery('.select2').select2();
-      jQuery('.select2-repair-barrier').select2(repair_barrier_options);
-      jQuery('.select2-tags').select2(tag_options);
-      jQuery(".select2-with-input").select2(tag_options_with_input);
-      jQuery(".select2-with-input-group").select2({
-        width: 'auto',
-    		dropdownAutoWidth: true,
-    		allowClear: true,
-      });
-
-      jQuery('.select2[data-placeholder]').each(function() {
-        $(this).select2({
-          placeholder: $(this).data('placeholder')
-        })
-      })
-
-    } else {
-
-      $target.find('.select2').select2();
-      $target.find('.select2-repair-barrier').select2(repair_barrier_options);
-      $target.find('.select2-tags').select2(tag_options);
-      $target.find(".select2-with-input").select2(tag_options_with_input);
-      $target.find(".select2-with-input-group").select2({
-        width: 'auto',
-    		dropdownAutoWidth: true,
-    		allowClear: true,
-      });
-
-
-      $target.find('.select2[data-placeholder]').each(function() {
-        $(this).select2({
-          placeholder: $(this).data('placeholder')
-        })
-      })
-    }
-
-
-    // $(document).on('focus', '.select2.select2-container', function (e) {
-    //   // only open on original attempt - close focus event should not fire open
-    //   if (e.originalEvent && $(this).find(".select2-selection--single").length > 0) {
-    //     $(this).siblings('select').select2('open');
-    //   }
-    // });
-
-  }
-
-  Dropzone.autoDiscover = false;
-  registration();
-  onboarding();
-  eventsMap();
-  truncate();
-  nestedTable();
-  select2Fields();
-
-  jQuery(function () {
-
-
-    jQuery('.users-list').find('[data-toggle="popover"]').popover();
-
-    jQuery('.users-list').find('[data-toggle="popover"]').on('click', function (e) {
-      jQuery('.users-list').find('[data-toggle="popover"]').not(this).popover('hide');
-    });
-
-    jQuery('.table:not(.table-devices)').find('[data-toggle="popover"]').popover({
-      template: '<div class="popover popover__table" role="tooltip"><div class="arrow"></div><h3 class="popover-header"></h3><div class="popover-body"></div></div>',
-      placement:'top'
-    })
-
-    jQuery('.table-devices').find('[data-toggle="popover"]').popover();
-
-    jQuery('.table').find('[data-toggle="popover"]').on('click', function (e) {
-      jQuery('.table').find('[data-toggle="popover"]').not(this).popover('hide');
-    });
-
-    jQuery(document).on('change', '.category', function (e) {
-      var $value = parseInt(jQuery(this).val());
-      var $field = jQuery(this).parents('td').find('.weight');
-
-      if (!$field.length) {
-        // At present this global JS is used in both old and new designs which have different DOM structure, so we
-        // need to cope with both.
-        $field = jQuery(this).parents('.card-body').find('.weight')
-      }
-      if( $value === 46 || $value === '' ){
-        $field.prop('disabled', false);
-        $field.parents('.display-weight').removeClass('d-none');
-      } else {
-        $field.val('');
-        $field.trigger('change');
-        $field.prop('disabled', true);
-        $field.parents('.display-weight').addClass('d-none');
-      }
-    });
-
-    function removeUser() {
-
-      var id = jQuery(this).data('remove-volunteer');
-
-      $.ajax({
-        headers: {
-          'X-CSRF-TOKEN': $("input[name='_token']").val()
-        },
-        type: 'post',
-        url: '/party/remove-volunteer',
-        data: {
-          id : id,
-        },
-        datatype: 'json',
-        success: function(json) {
-          if( json.success ){
-            jQuery('.volunteer-' + id).fadeOut();
-          } else {
-            alert('Something has gone wrong');
-          }
-        },
-        error: function(error) {
-          alert('Something has gone wrong');
-        }
-      });
-
-    }
-
-    jQuery('.js-remove').on('click', removeUser);
-    jQuery(document).on('click', '[data-toggle="lightbox"]', function (event) {
-      event.preventDefault();
-      jQuery(this).ekkoLightbox();
-    });
-
-    jQuery('.reset').on('click', resetForm);
-
-    loadDropzones();
-
-    if (window.location.hash === '#change-password' && jQuery('#list-account').length > 0) {
-      jQuery('#list-account-list').tab('show');
-    }
-  })
-
-  jQuery(document).ready(function () {
-    groupsMap();
-
-    if (window.gdprCookieNotice && !window.noCookieNotice) {
-      gdprCookieNotice({
-        locale: 'en',
-        timeout: 500, //Time until the cookie bar appears
-        expiration: 30, //This is the default value, in days
-        domain: restarters.cookie_domain, //If you run the same cookie notice on all subdomains, define the main domain starting with a .
-        implicit: false, //Accept cookies on page scroll automatically
-        statement: '/about/cookie-policy', //Link to your cookie statement page
-        performace: ['DYNSRV'], //Cookies in the performance category.
-        analytics: ['_ga','_gat', '_gid'], //Cookies in the analytics category.
-        marketing: [] //Cookies in the marketing category.
-      });
-    }
-
-      let hash = document.location.hash;
-      if (hash) {
-          $('a[href=\"'+hash).tab('show');
-      }
+  jQuery('.js-remove').on('click', removeUser);
+  jQuery(document).on('click', '[data-toggle="lightbox"]', function (event) {
+    event.preventDefault();
+    jQuery(this).ekkoLightbox();
   });
 
-  jQuery(document).ready(function () {
-    // Enable popovers - Bootstrap doesn't enable these by default.
-    $('[data-toggle="popover"]').popover()
-  });
+  jQuery('.reset').on('click', resetForm);
 
-  $('#register-form-submit').on('click', function(e) {
-    e.preventDefault();
+  loadDropzones();
 
-    if ( $('#consent_gdpr')["0"].checked && $('#consent_future_data')["0"].checked ) {
-      $('#register-form').submit();
-    } else {
-      alert('You must consent to the use of your data in order to register');
-    }
-  });
+  if (window.location.hash === '#change-password' && jQuery('#list-account').length > 0) {
+    jQuery('#list-account-list').tab('show');
+  }
+})
 
-  // On toggling between multi collapable invite modal content
-  // Then also toggle the link to change the text (show a different link -
-  // that has the same functionality)
-  $('.multi-collapse-invite-modal').on('show.bs.collapse', function () {
-      $('.toggle-modal-link').toggleClass('d-none');
-  })
+jQuery(document).ready(function () {
+  groupsMap();
 
-  $('#delete-form-submit').on('click', function(e) {
-    e.preventDefault();
-
-    if (confirm('You are about to delete your account! Are you sure you wish to continue?')) {
-      $('#delete-form').submit();
-    }
-
-  });
-
-  $('#reg_email').on('change', function() {
-    $('#email-update').text($(this).val());
-  });
-
-  $(".select2-dropdown").select2({
-    placeholder: 'Select an country',
-  });
-
-  $( document ).ready(function() {
-
-    $(function () {
-      $('.btn-calendar-feed').popover({
-        html: true,
-        title: '',
-        trigger: 'click',
-        placement: 'bottom',
-        sanitize: false,
-        delay: { "show": 0, "hide": 0 },
-        template: '<div class="popover popover-calendar-feed" role="tooltip"><div class="arrow"></div><div class="popover-body"></div></div>',
-        content: $('#calendar-feed').html()
-      });
+  if (window.gdprCookieNotice && !window.noCookieNotice) {
+    gdprCookieNotice({
+      locale: 'en',
+      timeout: 500, //Time until the cookie bar appears
+      expiration: 30, //This is the default value, in days
+      domain: restarters.cookie_domain, //If you run the same cookie notice on all subdomains, define the main domain starting with a .
+      implicit: false, //Accept cookies on page scroll automatically
+      statement: '/about/cookie-policy', //Link to your cookie statement page
+      performace: ['DYNSRV'], //Cookies in the performance category.
+      analytics: ['_ga','_gat', '_gid'], //Cookies in the analytics category.
+      marketing: [] //Cookies in the marketing category.
     });
-
-    // Dismissable Alert copy link action
-    $('.btn-action').on('click', function () {
-      var $copy_link = $(this).attr('data-copy-link');
-      copyLink($copy_link);
-    });
-
-    // Copy Calendar Feed link
-    $('#btn-copy').on('click', function () {
-      var $link = $(this).parents('div').parents('div').find('input[type=text]');
-      copyLink($link.val());
-    });
-
-    // User Profile Settings - Calendar copy links
-    $('.btn-copy-input-text').on('click', function () {
-      var $link = $(this).parent('div').parent('div').find('input[type=text]');
-      copyLink($link.val());
-    });
-
-    function copyLink($copy_link) {
-      var $temp = $("<input>");
-      $("body").append($temp);
-      $temp.val($copy_link).select();
-
-      document.execCommand("copy");
-      $temp.remove();
-
-      alert("Copied the link: " + $copy_link);
-    }
-
-
-    $('.information-alert').on('closed.bs.alert', function () {
-      var $dismissable_id = $(this).attr('id');
-      $.ajax({
-        headers: {
-          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        },
-        type: 'POST',
-        url: '/set-cookie',
-        datatype: 'json',
-        data: {
-          'dismissable_id': $dismissable_id,
-        },
-        success: function(data) {
-          console.log(true);
-        }
-      });
-    });
-
-    $('.tokenfield').tokenfield();
-
-    var $current_column = $('input[name=sort_column]:checked').val();
-
-    $('input[name=sort_column]').on('click', function(e) {
-        var $form = $('#device-search');
-        var $sort_direction = $form.find('input[name=sort_direction]');
-            if( $sort_direction.val() === 'DESC' ){
-                $sort_direction.val('ASC');
-            } else {
-                $sort_direction.val('DESC');
-            }
-        $form.submit();
-    });
-
-    $('.filter-columns').on('click', function(e) {
-
-      var $table = $('#sort-table');
-
-      var hide_columns = $table.find('.'+$(this).data('id'));
-      $(hide_columns).toggle();
-
-      var preferences = [];
-      $.each($('.filter-columns:checked'), function() {
-         preferences.push($(this).val());
-      });
-
-      $('.device-colspan').attr('colspan', preferences.length + 3);
-
-      $.ajax({
-        headers: {
-          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        },
-        type: 'post',
-        url: '/device/column-preferences',
-        data: {
-          column_preferences: preferences,
-        }
-      });
-
-    });
-
-    $("#invites_to_volunteers").on("click", function(){
-      if (this.checked){
-        var event_id = $('#event_id').val();
-
-        $.ajax({
-          headers: {
-            'X-CSRF-TOKEN': $("input[name='_token']").val()
-          },
-          type: 'get',
-          url: '/party/get-group-emails-with-names/'+event_id,
-          datatype: 'json',
-          success: function(data) {
-            var current_items = $('#manual_invite_box').tokenfield('getTokens');
-            var new_items = data;
-
-            var pop_arr = [];
-
-            // Keep all the items that were already there.
-            current_items.forEach(function(current_item) {
-                var manual_email = {
-                    value: current_item.value,
-                    label: current_item.value
-                };
-                pop_arr.push(manual_email);
-            });
-
-            // Add the new items - i.e. existing volunteers for the group.
-            new_items.forEach(function(new_item) {
-                var label = '';
-                if (! new_item.invites)
-                    label += '\u{26A0} ';
-                label += new_item.name;
-
-                var volunteer = {
-                    value: new_item.email,
-                    label: label
-                };
-                pop_arr.push(volunteer);
-            });
-
-            $('#manual_invite_box').tokenfield('setTokens', pop_arr);
-          },
-            error: function(xhr, status, error) {
-                var err = JSON.parse(xhr.responseText);
-                console.log(err);
-          }
-        });
-      }
-    });
-
-    $('#start-time').on('change', function() {
-      var time = $(this).val().split(':');
-      var hours = (parseInt(time[0]) + 3).toString();
-
-      if (hours.length < 2) {
-        hours = '0' + hours;
-      }
-
-      var mins = time[1];
-
-      $('#end-time').val(hours+':'+mins);
-
-    });
-
-    // Copy to clipboard
-    // Grab any text in the attribute 'data-copy' and pass it to the
-    // copy function
-    // ---------------------------------------------------------------------
-    $('.js-copy').click(function() {
-      var text = $(this).attr('data-copy');
-      var el = $(this);
-      copyToClipboard(text, el);
-    });
-
-    // Set current locale.  Passed via DOM element from languages.blade.php.
-    const locale = $('#language-current').html() ? $('#language-current').html() : 'en'
-    Lang.setLocale(locale)
-  });
-
-  // COPY TO CLIPBOARD
-  // Attempts to use .execCommand('copy') on a created text field
-  // Copy command
-  // boolen if successful then show message
-  // After show append original email again
-  // Fallback if browser doesn't support .execCommand('copy')
-  // ---------------------------------------------------------------------
-  function copyToClipboard(content_to_copy, element) {
-
-    var copyTest = document.queryCommandSupported('copy');
-
-    if (copyTest === true) {
-
-      // Create Textarea and Copy Content
-      var copyTextArea = document.createElement("textarea");
-      copyTextArea.value = content_to_copy;
-      document.body.appendChild(copyTextArea);
-      copyTextArea.select();
-
-      var $original_popover_text = element.attr('data-content');
-
-      try {
-        var successful = document.execCommand('copy');
-        var message = successful ? 'Copied!' : 'Whoops, not copied!';
-        var $set_success_message_in_popover = element.attr('data-content', message);
-        var $show_popover = element.popover('show');
-
-      } catch (err) {
-        console.log('Oops, unable to copy');
-      }
-
-      document.body.removeChild(copyTextArea);
-      var $set_original_popover_message = element.attr('data-content', $original_popover_text);
-
-    } else {
-      // Fallback if browser doesn't support .execCommand('copy')
-      window.prompt("Copy to clipboard: Ctrl+C or Command+C, Enter", content_to_copy);
-    }
   }
 
-
-  function tokenFieldCheck(){
-    setTimeout(function(){
-      var count_tokens = document.getElementById("manual_invite_box").value.split(",");
-      var disabled = false
-
-      if( $('#manual_invite_box').val() === '' ) {
-        disabled = true
-      } else if( count_tokens.length === 0 ) {
-        disabled = true
-      } else {
-        for (var i = 0; i < count_tokens.length; i++) {
-          if (!count_tokens[i] || count_tokens[i].indexOf('@') == -1 ) {
-            disabled = true
-          }
-        }
-      }
-
-      $('#event-invite-to button, #invite-to-group button').prop('disabled', disabled);
-    }, 500);
-  }
-
-
-  $('#manual_invite_box').on('tokenfield:createtoken', function (event) {
-    var existingTokens = $(this).tokenfield('getTokens');
-    var newval = event.attrs.value
-
-    $.each(existingTokens, function(index, token) {
-      if (token.value === newval)
-      event.preventDefault();
-    });
-
-    if (!newval || newval.indexOf('@') == -1) {
-      // This is a very basic check that we're putting in something which looks like an email.  Email regexp validation
-      // is a bit of a fool's errand, and in the longer term this code will be replaced by Vue and/or a different
-      // invitation model.
-      $(event.target).closest('div.tokenfield').css('border', '2px solid red')
-    } else {
-      $(event.target).closest('div.tokenfield').css('border', '')
+    let hash = document.location.hash;
+    if (hash) {
+        $('a[href=\"'+hash).tab('show');
     }
+});
 
-      tokenFieldCheck();
-  });
+jQuery(document).ready(function () {
+  // Enable popovers - Bootstrap doesn't enable these by default.
+  $('[data-toggle="popover"]').popover()
+});
 
-  $('#manual_invite_box').on('tokenfield:removedtoken', function (event) {
-    tokenFieldCheck();
-  });
+$('#register-form-submit').on('click', function(e) {
+  e.preventDefault();
 
-  function deviceFormCollect($form) {
-    var formdata = $form.serializeArray()
+  if ( $('#consent_gdpr')["0"].checked && $('#consent_future_data')["0"].checked ) {
+    $('#register-form').submit();
+  } else {
+    alert('You must consent to the use of your data in order to register');
+  }
+});
 
-    // The event id is not held in the form itself.
-    formdata.push({
-      'name': 'event_id',
-      'value': $('#event_id').val()
-    })
+// On toggling between multi collapable invite modal content
+// Then also toggle the link to change the text (show a different link -
+// that has the same functionality)
+$('.multi-collapse-invite-modal').on('show.bs.collapse', function () {
+    $('.toggle-modal-link').toggleClass('d-none');
+})
 
-    // The wiki flag is passed as 0/1 not true/false.
-    formdata = formdata.map((v) => {
-      if (v.name === 'wiki') {
-        return v.value ? 1 : 0
-      } else {
-        return v
-      }
-    })
+$('#delete-form-submit').on('click', function(e) {
+  e.preventDefault();
 
-    return formdata
+  if (confirm('You are about to delete your account! Are you sure you wish to continue?')) {
+    $('#delete-form').submit();
   }
 
-  function deviceFormEnableDisable(form, disabled) {
-    form.find(':input').attr("disabled", disabled);
-  }
+});
 
-  $( document ).ready(function() {
+$('#reg_email').on('change', function() {
+  $('#email-update').text($(this).val());
+});
 
-    $("textarea#message_to_restarters[name=message_to_restarters]").on("keydown", function(event){
-      if (event.which == 13) {
-        event.preventDefault();
-        this.value = this.value + "\n";
-      }
+$(".select2-dropdown").select2({
+  placeholder: 'Select an country',
+});
+
+$( document ).ready(function() {
+
+  $(function () {
+    $('.btn-calendar-feed').popover({
+      html: true,
+      title: '',
+      trigger: 'click',
+      placement: 'bottom',
+      sanitize: false,
+      delay: { "show": 0, "hide": 0 },
+      template: '<div class="popover popover-calendar-feed" role="tooltip"><div class="arrow"></div><div class="popover-body"></div></div>',
+      content: $('#calendar-feed').html()
     });
+  });
 
-    $('.ajax-delete-image').on('click', function (e) {
-      e.preventDefault();
-
-      if (window.confirm("Are you sure? This cannot be undone.")) {
-        var $this = jQuery(this);
-        var $device = jQuery(this).data('device-id');
-        var $href = $(this).attr('href');
-        $.ajax({
-          type: 'get',
-          url: $href,
-          success: function(data) {
-            $this.parent().fadeOut(1000);
-          },
-          error: function(error) {
-            alert(error);
-          }
-        });
-      }
-    });
-
-    $("#registeremail").blur(function() {
-
-      if ( $(this).val().length > 0 ){
-
-        var email = $('#registeremail').val();
-
-        $.ajax({
-          headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-          },
-          type:'POST',
-          url:'/user/register/check-valid-email',
-          data: {
-            email : email
-          },
-          dataType : 'json',
-          success: function(response){
-            $('div.emailtest > .invalid-feedback').text(response['message']).show();
-          },
-          error: function(){
-            $('.invalid-feedback').hide();
-          }
-        });
-
-      }
-    });
-
-    // Set min height so the language menu sits just under the overall height of the browser window
-    $('body > .container:not(.container-nav)').css('min-height', ( $(window).height() - $('nav.navbar').height() ) +'px');
-
-    $(".toggle-invite-modals").click(function (e) {
-
-      $('#invite-to-group').modal('toggle');
-      $('#event-invite-to').modal('toggle');
-
-      $('#shareable-modal').modal('toggle');
-    });
-
-    $('.select2-with-input-group').on("select2:select", function(e) {
-      var $input_field = $(this).parents('.input-group-select2').find('input[type=text]');
-
-      var $current_url = $input_field.val();
-
-      var $remove_current_area = $current_url.lastIndexOf('/') + 1;
-      var $creating_new_url =  $current_url.substring( 0, $remove_current_area );
-      var $new_url = $creating_new_url.concat( $(this).val() );
-
-      $input_field.val($new_url);
-    });
-
+  // Dismissable Alert copy link action
+  $('.btn-action').on('click', function () {
+    var $copy_link = $(this).attr('data-copy-link');
+    copyLink($copy_link);
   });
 
   // Copy Calendar Feed link
-  $(document).on("click", "#btn-copy", function () {
-    var $copy_link = $(this).parents('div').parents('div').find('input[type=text]').val();
+  $('#btn-copy').on('click', function () {
+    var $link = $(this).parents('div').parents('div').find('input[type=text]');
+    copyLink($link.val());
+  });
 
+  // User Profile Settings - Calendar copy links
+  $('.btn-copy-input-text').on('click', function () {
+    var $link = $(this).parent('div').parent('div').find('input[type=text]');
+    copyLink($link.val());
+  });
+
+  function copyLink($copy_link) {
     var $temp = $("<input>");
     $("body").append($temp);
     $temp.val($copy_link).select();
@@ -1237,7 +824,355 @@ function initAutocomplete() {
     $temp.remove();
 
     alert("Copied the link: " + $copy_link);
+  }
+
+
+  $('.information-alert').on('closed.bs.alert', function () {
+    var $dismissable_id = $(this).attr('id');
+    $.ajax({
+      headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      },
+      type: 'POST',
+      url: '/set-cookie',
+      datatype: 'json',
+      data: {
+        'dismissable_id': $dismissable_id,
+      },
+      success: function(data) {
+        console.log(true);
+      }
+    });
   });
+
+  $('.tokenfield').tokenfield();
+
+  var $current_column = $('input[name=sort_column]:checked').val();
+
+  $('input[name=sort_column]').on('click', function(e) {
+      var $form = $('#device-search');
+      var $sort_direction = $form.find('input[name=sort_direction]');
+          if( $sort_direction.val() === 'DESC' ){
+              $sort_direction.val('ASC');
+          } else {
+              $sort_direction.val('DESC');
+          }
+      $form.submit();
+  });
+
+  $('.filter-columns').on('click', function(e) {
+
+    var $table = $('#sort-table');
+
+    var hide_columns = $table.find('.'+$(this).data('id'));
+    $(hide_columns).toggle();
+
+    var preferences = [];
+    $.each($('.filter-columns:checked'), function() {
+       preferences.push($(this).val());
+    });
+
+    $('.device-colspan').attr('colspan', preferences.length + 3);
+
+    $.ajax({
+      headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      },
+      type: 'post',
+      url: '/device/column-preferences',
+      data: {
+        column_preferences: preferences,
+      }
+    });
+
+  });
+
+  $("#invites_to_volunteers").on("click", function(){
+    if (this.checked){
+      var event_id = $('#event_id').val();
+
+      $.ajax({
+        headers: {
+          'X-CSRF-TOKEN': $("input[name='_token']").val()
+        },
+        type: 'get',
+        url: '/party/get-group-emails-with-names/'+event_id,
+        datatype: 'json',
+        success: function(data) {
+          var current_items = $('#manual_invite_box').tokenfield('getTokens');
+          var new_items = data;
+
+          var pop_arr = [];
+
+          // Keep all the items that were already there.
+          current_items.forEach(function(current_item) {
+              var manual_email = {
+                  value: current_item.value,
+                  label: current_item.value
+              };
+              pop_arr.push(manual_email);
+          });
+
+          // Add the new items - i.e. existing volunteers for the group.
+          new_items.forEach(function(new_item) {
+              var label = '';
+              if (! new_item.invites)
+                  label += '\u{26A0} ';
+              label += new_item.name;
+
+              var volunteer = {
+                  value: new_item.email,
+                  label: label
+              };
+              pop_arr.push(volunteer);
+          });
+
+          $('#manual_invite_box').tokenfield('setTokens', pop_arr);
+        },
+          error: function(xhr, status, error) {
+              var err = JSON.parse(xhr.responseText);
+              console.log(err);
+        }
+      });
+    }
+  });
+
+  $('#start-time').on('change', function() {
+    var time = $(this).val().split(':');
+    var hours = (parseInt(time[0]) + 3).toString();
+
+    if (hours.length < 2) {
+      hours = '0' + hours;
+    }
+
+    var mins = time[1];
+
+    $('#end-time').val(hours+':'+mins);
+
+  });
+
+  // Copy to clipboard
+  // Grab any text in the attribute 'data-copy' and pass it to the
+  // copy function
+  // ---------------------------------------------------------------------
+  $('.js-copy').click(function() {
+    var text = $(this).attr('data-copy');
+    var el = $(this);
+    copyToClipboard(text, el);
+  });
+
+  // Set current locale.  Passed via DOM element from languages.blade.php.
+  const locale = $('#language-current').html() ? $('#language-current').html() : 'en'
+  Lang.setLocale(locale)
+});
+
+// COPY TO CLIPBOARD
+// Attempts to use .execCommand('copy') on a created text field
+// Copy command
+// boolen if successful then show message
+// After show append original email again
+// Fallback if browser doesn't support .execCommand('copy')
+// ---------------------------------------------------------------------
+function copyToClipboard(content_to_copy, element) {
+
+  var copyTest = document.queryCommandSupported('copy');
+
+  if (copyTest === true) {
+
+    // Create Textarea and Copy Content
+    var copyTextArea = document.createElement("textarea");
+    copyTextArea.value = content_to_copy;
+    document.body.appendChild(copyTextArea);
+    copyTextArea.select();
+
+    var $original_popover_text = element.attr('data-content');
+
+    try {
+      var successful = document.execCommand('copy');
+      var message = successful ? 'Copied!' : 'Whoops, not copied!';
+      var $set_success_message_in_popover = element.attr('data-content', message);
+      var $show_popover = element.popover('show');
+
+    } catch (err) {
+      console.log('Oops, unable to copy');
+    }
+
+    document.body.removeChild(copyTextArea);
+    var $set_original_popover_message = element.attr('data-content', $original_popover_text);
+
+  } else {
+    // Fallback if browser doesn't support .execCommand('copy')
+    window.prompt("Copy to clipboard: Ctrl+C or Command+C, Enter", content_to_copy);
+  }
+}
+
+
+function tokenFieldCheck(){
+  setTimeout(function(){
+    var count_tokens = document.getElementById("manual_invite_box").value.split(",");
+    var disabled = false
+
+    if( $('#manual_invite_box').val() === '' ) {
+      disabled = true
+    } else if( count_tokens.length === 0 ) {
+      disabled = true
+    } else {
+      for (var i = 0; i < count_tokens.length; i++) {
+        if (!count_tokens[i] || count_tokens[i].indexOf('@') == -1 ) {
+          disabled = true
+        }
+      }
+    }
+
+    $('#event-invite-to button, #invite-to-group button').prop('disabled', disabled);
+  }, 500);
+}
+
+
+$('#manual_invite_box').on('tokenfield:createtoken', function (event) {
+  var existingTokens = $(this).tokenfield('getTokens');
+  var newval = event.attrs.value
+
+  $.each(existingTokens, function(index, token) {
+    if (token.value === newval)
+    event.preventDefault();
+  });
+
+  if (!newval || newval.indexOf('@') == -1) {
+    // This is a very basic check that we're putting in something which looks like an email.  Email regexp validation
+    // is a bit of a fool's errand, and in the longer term this code will be replaced by Vue and/or a different
+    // invitation model.
+    $(event.target).closest('div.tokenfield').css('border', '2px solid red')
+  } else {
+    $(event.target).closest('div.tokenfield').css('border', '')
+  }
+
+    tokenFieldCheck();
+});
+
+$('#manual_invite_box').on('tokenfield:removedtoken', function (event) {
+  tokenFieldCheck();
+});
+
+function deviceFormCollect($form) {
+  var formdata = $form.serializeArray()
+
+  // The event id is not held in the form itself.
+  formdata.push({
+    'name': 'event_id',
+    'value': $('#event_id').val()
+  })
+
+  // The wiki flag is passed as 0/1 not true/false.
+  formdata = formdata.map((v) => {
+    if (v.name === 'wiki') {
+      return v.value ? 1 : 0
+    } else {
+      return v
+    }
+  })
+
+  return formdata
+}
+
+function deviceFormEnableDisable(form, disabled) {
+  form.find(':input').attr("disabled", disabled);
+}
+
+$( document ).ready(function() {
+
+  $("textarea#message_to_restarters[name=message_to_restarters]").on("keydown", function(event){
+    if (event.which == 13) {
+      event.preventDefault();
+      this.value = this.value + "\n";
+    }
+  });
+
+  $('.ajax-delete-image').on('click', function (e) {
+    e.preventDefault();
+
+    if (window.confirm("Are you sure? This cannot be undone.")) {
+      var $this = jQuery(this);
+      var $device = jQuery(this).data('device-id');
+      var $href = $(this).attr('href');
+      $.ajax({
+        type: 'get',
+        url: $href,
+        success: function(data) {
+          $this.parent().fadeOut(1000);
+        },
+        error: function(error) {
+          alert(error);
+        }
+      });
+    }
+  });
+
+  $("#registeremail").blur(function() {
+
+    if ( $(this).val().length > 0 ){
+
+      var email = $('#registeremail').val();
+
+      $.ajax({
+        headers: {
+          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        type:'POST',
+        url:'/user/register/check-valid-email',
+        data: {
+          email : email
+        },
+        dataType : 'json',
+        success: function(response){
+          $('div.emailtest > .invalid-feedback').text(response['message']).show();
+        },
+        error: function(){
+          $('.invalid-feedback').hide();
+        }
+      });
+
+    }
+  });
+
+  // Set min height so the language menu sits just under the overall height of the browser window
+  $('body > .container:not(.container-nav)').css('min-height', ( $(window).height() - $('nav.navbar').height() ) +'px');
+
+  $(".toggle-invite-modals").click(function (e) {
+
+    $('#invite-to-group').modal('toggle');
+    $('#event-invite-to').modal('toggle');
+
+    $('#shareable-modal').modal('toggle');
+  });
+
+  $('.select2-with-input-group').on("select2:select", function(e) {
+    var $input_field = $(this).parents('.input-group-select2').find('input[type=text]');
+
+    var $current_url = $input_field.val();
+
+    var $remove_current_area = $current_url.lastIndexOf('/') + 1;
+    var $creating_new_url =  $current_url.substring( 0, $remove_current_area );
+    var $new_url = $creating_new_url.concat( $(this).val() );
+
+    $input_field.val($new_url);
+  });
+
+});
+
+// Copy Calendar Feed link
+$(document).on("click", "#btn-copy", function () {
+  var $copy_link = $(this).parents('div').parents('div').find('input[type=text]').val();
+
+  var $temp = $("<input>");
+  $("body").append($temp);
+  $temp.val($copy_link).select();
+
+  document.execCommand("copy");
+  $temp.remove();
+
+  alert("Copied the link: " + $copy_link);
+});
 
 jQuery(document).ready(function () {
   // Make navbar hide on mobile scroll.

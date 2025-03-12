@@ -3,15 +3,14 @@
     <b-col md="7">
       <div class="form-group">
         <label :for="$id('address-autocomplete')">{{ $translate('events.field_event_venue') }}:</label>
-        <vue-google-autocomplete
+        <open-street-map-autocomplete
             :id="$id('address-autocomplete')"
             name="location"
             classname="form-control"
             :placeholder="$translate('events.field_venue_placeholder')"
             @placechanged="placeChanged"
             @change="resetValues"
-            aria-describedby="locationHelpBlock"
-            types="geocode"
+            :aria-describedby="'locationHelpBlock'"
             ref="autocomplete"
             :class="{ hasError: hasError, 'm-0': true }"
         />
@@ -44,7 +43,7 @@
 </template>
 <script>
 import Vue from 'vue'
-import VueGoogleAutocomplete from 'vue-google-autocomplete'
+import OpenStreetMapAutocomplete from './OpenStreetMapAutocomplete'
 import UniqueId from 'vue-unique-id';
 import map from '../mixins/map'
 
@@ -90,7 +89,7 @@ export default {
     }
   },
   components: {
-    VueGoogleAutocomplete
+    OpenStreetMapAutocomplete
   },
   data () {
     return {
@@ -201,7 +200,6 @@ export default {
         this.timer = null
       }
     }
-
   }
 }
 </script>
