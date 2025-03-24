@@ -1,0 +1,43 @@
+version: '3'
+
+# Includes the main Taskfile
+includes:
+  root: 
+    taskfile: ../Taskfile.yml
+    dir: ..
+
+tasks:
+  # Build tasks
+  build:
+    desc: Build for production
+    cmds:
+      - npm run production
+  
+  dev:
+    desc: Build for development
+    cmds:
+      - npm run dev
+  
+  watch:
+    desc: Watch for changes in development
+    cmds:
+      - npm run watch
+  
+  # Environment tasks
+  generate-env:
+    desc: Generate environment variables for webpack
+    cmds:
+      - php ../config/generate-webpack-env.php
+  
+  # Feature flag tasks
+  update-features:
+    desc: Update feature flags in webpack environment
+    deps: [generate-env]
+    cmds:
+      - echo "Updated features for webpack"
+  
+  # Default task
+  default:
+    desc: List webpack tasks
+    cmds:
+      - task --list 

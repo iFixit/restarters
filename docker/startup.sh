@@ -6,27 +6,46 @@ source "$(dirname "$0")/bash_utils.sh"
 
 log_info "Starting Restarters initialization..."
 
-# Check if environment directory exists and build the .env file
-ENV_DIR="./config/environments"
-if [ -d "$ENV_DIR" ]; then
-    log_info "Building .env file from environment configuration..."
-    if [ -f ./docker/build-env.sh ]; then
-        bash ./docker/build-env.sh local
-        log_info ".env file built successfully"
+# Set up environment using Task if available
+if command -v task >/dev/null 2>&1; then
+    log_info "Task runner found, setting up environment..."
+    # Use environment variable or default to docker environment
+    ENV_TYPE=${DOCKER_ENV:-docker}
+    task env:setup ENV=$ENV_TYPE
+    if [ $? -ne 0 ]; then
+        log_warn "Task env:setup failed, falling back to traditional method"
+        # Fall back to traditional method
+        ENV_DIR="./config/environments"
+        if [ -d "$ENV_DIR" ] && [ -f ./docker/build-env.sh ]; then
+            bash ./docker/build-env.sh $ENV_TYPE
+        elif [ ! -f .env ]; then
+            cp .env.example .env
+        fi
+    fi
+else
+    log_warn "Task runner not found, using traditional environment setup"
+    # Traditional environment setup
+    ENV_DIR="./config/environments"
+    if [ -d "$ENV_DIR" ]; then
+        log_info "Building .env file from environment configuration..."
+        if [ -f ./docker/build-env.sh ]; then
+            bash ./docker/build-env.sh ${DOCKER_ENV:-docker}
+            log_info ".env file built successfully"
+        else
+            log_warn "build-env.sh not found, using fallback method"
+            # Fallback to copying .env.example
+            if [ ! -f .env ]; then
+                cp .env.example .env
+                log_info "Created .env file from .env.example"
+            fi
+        fi
     else
-        log_warn "build-env.sh not found, using fallback method"
+        log_warn "Environment directory not found, using fallback method"
         # Fallback to copying .env.example
         if [ ! -f .env ]; then
             cp .env.example .env
             log_info "Created .env file from .env.example"
         fi
-    fi
-else
-    log_warn "Environment directory not found, using fallback method"
-    # Fallback to copying .env.example
-    if [ ! -f .env ]; then
-        cp .env.example .env
-        log_info "Created .env file from .env.example"
     fi
 fi
 

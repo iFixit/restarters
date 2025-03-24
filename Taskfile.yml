@@ -1,0 +1,104 @@
+version: '3'
+
+# Base environment variables that apply to all environments
+env:
+  APP_NAME: Restarters.net
+  APP_LOGO: fixitclinic
+  APP_SHOW_BRANCH: true
+  SESSION_DRIVER: database
+  SESSION_COOKIE: restarters_session
+  SESSION_SECURE_COOKIE: true
+  SESSION_LIFETIME: 10080
+  SESSION_TABLE: laravel_sessions
+  CACHE_DRIVER: file
+  QUEUE_CONNECTION: database
+
+# Load environment-specific .env files in order of priority
+dotenv:
+  - '.env'                          # Main environment file (generated or user-provided)
+  - 'config/environments/base.env'  # Base environment variables
+  - 'config/environments/{{.ENV}}.env'  # Environment-specific variables
+  - 'config/environments/features.env'  # Feature flags
+  - 'config/environments/secrets.env'   # Secrets
+
+tasks:
+  # Environment setup tasks
+  env:setup:
+    desc: Set up environment configuration for specified environment
+    summary: |
+      Sets up environment configuration by combining multiple .env files
+      Usage: task env:setup ENV=local
+    cmds:
+      - echo "Setting up environment for {{.ENV}} environment"
+      - task: env:generate
+      - php artisan config:clear
+      - php artisan cache:clear
+    
+  env:generate:
+    desc: Generate .env file from environment configs
+    cmds:
+      - cat config/environments/base.env > .env
+      - echo "" >> .env
+      - cat config/environments/{{.ENV}}.env >> .env
+      - echo "" >> .env
+      - cat config/environments/features.env >> .env
+      - if [ -f config/environments/secrets.env ]; then cat config/environments/secrets.env >> .env; fi
+      - php config/generate-webpack-env.php
+
+  # Docker related tasks
+  docker:up:
+    desc: Start the Docker development environment
+    cmds:
+      - task: env:setup
+        vars: { ENV: docker }
+      - docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+  
+  docker:down:
+    desc: Stop the Docker development environment
+    cmds:
+      - docker-compose -f docker-compose.yml -f docker-compose.dev.yml down
+
+  # Development tasks
+  dev:
+    desc: Start the development server
+    cmds:
+      - task: env:setup
+        vars: { ENV: local }
+      - php artisan serve --host=0.0.0.0 --port=8050
+    
+  webpack:watch:
+    desc: Start webpack in watch mode
+    cmds:
+      - npm run watch
+  
+  # Database tasks
+  db:migrate:
+    desc: Run database migrations
+    cmds:
+      - php artisan migrate
+  
+  db:reset:
+    desc: Reset the database
+    cmds:
+      - php artisan migrate:reset
+      - php artisan migrate
+      - php artisan db:seed
+
+  # Utility tasks
+  test:
+    desc: Run the test suite
+    cmds:
+      - task: env:setup
+        vars: { ENV: testing }
+      - php artisan test
+  
+  lint:
+    desc: Run code linting
+    cmds:
+      - ./vendor/bin/phpcs
+  
+  # Default task
+  default:
+    desc: List all available tasks
+    cmds:
+      - task --list 

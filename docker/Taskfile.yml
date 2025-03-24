@@ -1,0 +1,118 @@
+version: '3'
+
+# Includes the main Taskfile
+includes:
+  root: 
+    taskfile: ../Taskfile.yml
+    dir: ..
+
+# Docker-specific environment variables
+env:
+  DOCKER_ENV: docker
+  WAIT_FOR_DB: "true"
+  APP_URL: http://localhost:8001
+  DB_HOST: restarters-db
+
+tasks:
+  # Service management tasks
+  up:
+    desc: Start all Docker services
+    cmds:
+      - task: root:env:setup
+        vars: { ENV: docker }
+      - docker-compose -f ../docker-compose.yml -f ../docker-compose.dev.yml up -d
+    
+  down:
+    desc: Stop all Docker services
+    cmds:
+      - docker-compose -f ../docker-compose.yml -f ../docker-compose.dev.yml down
+  
+  restart:
+    desc: Restart all Docker services
+    cmds:
+      - task: down
+      - task: up
+  
+  # Container management
+  bash:
+    desc: Open a bash shell in the app container
+    cmds:
+      - docker exec -it restarters-app bash
+  
+  # Database tasks
+  db:backup:
+    desc: Create a database backup
+    cmds:
+      - docker exec restarters-db mysqldump -u restarters -ps3cr3t restarters_db_test > db-backup-$(date +%Y%m%d-%H%M%S).sql
+  
+  db:restore:
+    desc: Restore a database backup
+    vars:
+      BACKUP:
+        sh: ls -t db-backup-*.sql | head -1
+    cmds:
+      - docker exec -i restarters-db mysql -u restarters -ps3cr3t restarters_db_test < {{.BACKUP}}
+  
+  # Utility tasks
+  logs:
+    desc: Show logs from Docker containers
+    cmds:
+      - docker-compose -f ../docker-compose.yml -f ../docker-compose.dev.yml logs -f
+  
+  # Build tasks
+  build:
+    desc: Rebuild Docker containers
+    cmds:
+      - docker-compose -f ../docker-compose.yml -f ../docker-compose.dev.yml build
+
+  # Environment setup within Docker
+  env:generate:
+    desc: Generate environment inside Docker
+    cmds:
+      - docker exec restarters-app php ../config/generate-webpack-env.php
+  
+  # Docker startup task
+  startup:
+    desc: Initial startup tasks when container is launched
+    cmds:
+      - task: root:env:setup
+        vars: { ENV: docker }
+      - |
+        # Wait for database to be ready if WAIT_FOR_DB is set
+        if [ "${WAIT_FOR_DB}" = "true" ]; then
+          echo "Waiting for database connection..."
+          max_tries=30
+          tries=0
+          
+          # Get database connection details
+          DB_HOST=${DB_HOST:-restarters_db}
+          DB_USERNAME=${DB_USERNAME:-restarters}
+          DB_PASSWORD=${DB_PASSWORD:-s3cr3t}
+          
+          while ! mysql -h "$DB_HOST" -u "$DB_USERNAME" -p"$DB_PASSWORD" -e "SELECT 1" >/dev/null 2>&1; do
+            tries=$((tries + 1))
+            if [ $tries -gt $max_tries ]; then
+              echo "Could not connect to database after $max_tries attempts."
+              exit 1
+            fi
+            echo "Waiting for database connection... ($tries/$max_tries)"
+            sleep 2
+          done
+          echo "Database connection established!"
+        fi
+      - composer install --ignore-platform-req=ext-xmlrpc
+      - php artisan key:generate --no-interaction --force
+      - php artisan migrate --no-interaction
+      - npm install --legacy-peer-deps
+      - npm rebuild node-sass
+      - php artisan lang:js --no-lib resources/js/translations.js
+      - php artisan cache:clear
+      - php artisan config:clear
+      - touch storage/framework/initialized
+      - php-fpm
+  
+  # Default task
+  default:
+    desc: List all Docker tasks
+    cmds:
+      - task --list 
