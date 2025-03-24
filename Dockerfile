@@ -18,6 +18,9 @@ COPY . /var/www/
 # Copy composer.lock and composer.json from the codebase to where we will install and run.
 COPY composer.lock composer.json /var/www/
 
+# Make sure our environment scripts are executable
+RUN sudo chmod +x /var/www/docker/build-env.sh /var/www/docker/run-services.sh 2>/dev/null || true
+
 # Grant permissions to /var/www so we can put files in it.
 RUN sudo chown -R circleci:circleci /var/www
 
@@ -41,4 +44,6 @@ RUN sudo pecl install channel://pecl.php.net/xmlrpc-1.0.0RC3  xmlrpc
 
 EXPOSE 22
 
-CMD ["bash", "docker_run.sh"]
+# Use our entrypoint script to handle environment setup and service startup
+ENTRYPOINT ["/var/www/docker/entrypoint.sh"]
+CMD ["php-fpm"]

@@ -1,5 +1,10 @@
 <?php
 
+require_once __DIR__.'/../vendor/autoload.php';
+
+// Load environment configuration
+Config\EnvironmentLoader::load();
+
 /*
 |--------------------------------------------------------------------------
 | Create The Application

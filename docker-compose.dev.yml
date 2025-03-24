@@ -1,3 +1,4 @@
+# This file extends the main docker-compose.yml file with development-specific settings
 version: '3'
 
 services:
@@ -13,6 +14,8 @@ services:
     working_dir: /var/www
     volumes:
       - ./:/var/www:cached
+      - ./config/environments:/var/www/config/environments:ro
+      - ./docker/build-env.sh:/var/www/docker/build-env.sh:ro
     environment:
       DB_CONNECTION: mysql
       DB_HOST: restarters-db
@@ -23,6 +26,8 @@ services:
       WAIT_FOR_DB: "true"
       FORCE_INIT: "${FORCE_INIT:-false}"
       HOST_GROUP_ID: ${GROUP_ID:-1000}
+      DOCKER_ENV: docker
+      APP_DEBUG: 'true'
     networks:
       - restarters-network
     depends_on:

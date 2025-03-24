@@ -6,10 +6,28 @@ source "$(dirname "$0")/bash_utils.sh"
 
 log_info "Starting Restarters initialization..."
 
-# Copy .env file if it doesn't exist
-if [ ! -f .env ]; then
-    cp .env.example .env
-    log_info "Created .env file from .env.example"
+# Check if environment directory exists and build the .env file
+ENV_DIR="./config/environments"
+if [ -d "$ENV_DIR" ]; then
+    log_info "Building .env file from environment configuration..."
+    if [ -f ./docker/build-env.sh ]; then
+        bash ./docker/build-env.sh local
+        log_info ".env file built successfully"
+    else
+        log_warn "build-env.sh not found, using fallback method"
+        # Fallback to copying .env.example
+        if [ ! -f .env ]; then
+            cp .env.example .env
+            log_info "Created .env file from .env.example"
+        fi
+    fi
+else
+    log_warn "Environment directory not found, using fallback method"
+    # Fallback to copying .env.example
+    if [ ! -f .env ]; then
+        cp .env.example .env
+        log_info "Created .env file from .env.example"
+    fi
 fi
 
 # Wait for database to be ready if WAIT_FOR_DB is set
