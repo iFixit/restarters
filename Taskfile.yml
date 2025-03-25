@@ -21,6 +21,12 @@ dotenv:
   - 'config/environments/features.env'  # Feature flags
   - 'config/environments/secrets.env'   # Secrets
 
+vars:
+  GROUP_ID:
+    sh: id -g
+  DOCKER_USER: www-data
+  PROJECT_ROOT: /var/www
+
 tasks:
   # Environment setup tasks
   env:setup:
@@ -101,4 +107,38 @@ tasks:
   default:
     desc: List all available tasks
     cmds:
-      - task --list 
+      - task --list
+
+  fix-permissions:
+    desc: Fix permissions for Laravel directories
+    cmds:
+      - |
+        if ! getent group hostgroup >/dev/null; then
+          groupadd -g {{.GROUP_ID}} hostgroup 2>/dev/null || \
+          groupmod -n hostgroup $(getent group {{.GROUP_ID}} | cut -d: -f1)
+        fi
+      - usermod -a -G hostgroup {{.DOCKER_USER}}
+      - mkdir -p {{.PROJECT_ROOT}}/storage/framework {{.PROJECT_ROOT}}/storage/logs {{.PROJECT_ROOT}}/bootstrap/cache
+      - chown -R {{.DOCKER_USER}}:hostgroup {{.PROJECT_ROOT}}/storage {{.PROJECT_ROOT}}/bootstrap/cache
+    status:
+      - test -d {{.PROJECT_ROOT}}/storage/framework
+      - test -d {{.PROJECT_ROOT}}/storage/logs
+      - test -d {{.PROJECT_ROOT}}/bootstrap/cache
+
+  ensure-directories:
+    desc: Ensure all required directories exist with correct permissions
+    cmds:
+      - mkdir -p {{.PROJECT_ROOT}}/storage/framework/cache
+      - mkdir -p {{.PROJECT_ROOT}}/storage/framework/sessions
+      - mkdir -p {{.PROJECT_ROOT}}/storage/framework/views
+      - mkdir -p {{.PROJECT_ROOT}}/bootstrap/cache
+      - chown -R {{.DOCKER_USER}}:hostgroup {{.PROJECT_ROOT}}/storage
+      - chown -R {{.DOCKER_USER}}:hostgroup {{.PROJECT_ROOT}}/bootstrap/cache
+      - chmod -R 775 {{.PROJECT_ROOT}}/storage
+      - chmod -R 775 {{.PROJECT_ROOT}}/bootstrap/cache
+
+  init:
+    desc: Initialize the application with correct permissions
+    cmds:
+      - task: ensure-directories
+      - task: fix-permissions 

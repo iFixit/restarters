@@ -4,27 +4,12 @@ set -e
 # Source the utility functions
 source "$(dirname "$0")/bash_utils.sh"
 
-# Fix ownership to match host user
-fix_permissions() {
-    GROUP_ID=${HOST_GROUP_ID:-1000}
-
-     # Ensure hostgroup exists with correct GID
-    if ! getent group hostgroup >/dev/null; then
-        groupadd -g ${GROUP_ID} hostgroup 2>/dev/null || \
-        groupmod -n hostgroup $(getent group ${GROUP_ID} | cut -d: -f1)
-    fi
-    
-    usermod -a -G hostgroup www-data
-
-    # Fix the ownership of critical directories
-    log_info "Ensuring proper permissions for Laravel directories"
-    mkdir -p /var/www/storage/framework /var/www/storage/logs /var/www/bootstrap/cache
-    chown -R www-data:hostgroup /var/www/storage /var/www/bootstrap/cache
+# Fix permissions on startup using Task
+log_info "Fixing permissions using Task"
+task fix-permissions || {
+    log_error "Failed to fix permissions. Check the logs for details."
+    exit 1
 }
-
-# Fix permissions on startup
-fix_permissions
-
 
 # Check if we need to run the initialization
 if [ -f /var/www/docker/startup.sh ]; then
