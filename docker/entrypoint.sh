@@ -12,19 +12,14 @@ task fix-permissions || {
 }
 
 # Check if we need to run the initialization
-if [ -f /var/www/docker/startup.sh ]; then
-    # Check if we've already initialized
-    if [ -f /var/www/storage/framework/initialized ] && [ "${FORCE_INIT}" != "true" ]; then
-        log_info "Application already initialized. Skipping initialization."
-    else
-        log_info "Running startup script..."
-        bash /var/www/docker/startup.sh || {
-            log_error "Startup script failed. Check the logs for details."
-            exit 1
-        }
-    fi
+if [ ! -f /var/www/storage/framework/initialized ] || [ "${FORCE_INIT}" = "true" ]; then
+    log_info "Running startup tasks..."
+    task startup || {
+        log_error "Startup tasks failed. Check the logs for details."
+        exit 1
+    }
 else
-    log_warn "Startup script not found. Skipping initialization."
+    log_info "Application already initialized. Skipping initialization."
 fi
 
 # Check if the command is php-fpm

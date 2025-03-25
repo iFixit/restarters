@@ -26,6 +26,12 @@ vars:
     sh: id -g
   DOCKER_USER: www-data
   PROJECT_ROOT: /var/www
+  DB_HOST:
+    sh: grep DB_HOST .env 2>/dev/null | cut -d '=' -f2 || echo "restarters_db"
+  DB_USERNAME:
+    sh: grep DB_USERNAME .env 2>/dev/null | cut -d '=' -f2 || echo "restarters"
+  DB_PASSWORD:
+    sh: grep DB_PASSWORD .env 2>/dev/null | cut -d '=' -f2 || echo "s3cr3t"
 
 tasks:
   # Environment setup tasks
@@ -142,3 +148,87 @@ tasks:
     cmds:
       - task: ensure-directories
       - task: fix-permissions 
+
+  startup:wait-db:
+    desc: Wait for database connection
+    cmds:
+      - |
+        max_tries=30
+        tries=0
+        until mysql -h "{{.DB_HOST}}" -u "{{.DB_USERNAME}}" -p"{{.DB_PASSWORD}}" -e "SELECT 1" >/dev/null 2>&1; do
+          tries=$((tries + 1))
+          if [ $tries -gt $max_tries ]; then
+            echo "Could not connect to database after $max_tries attempts."
+            exit 1
+          fi
+          echo "Waiting for database connection... ($tries/$max_tries)"
+          sleep 2
+        done
+    status:
+      - mysql -h "{{.DB_HOST}}" -u "{{.DB_USERNAME}}" -p"{{.DB_PASSWORD}}" -e "SELECT 1" >/dev/null 2>&1
+
+  startup:install-deps:
+    desc: Install application dependencies
+    cmds:
+      - composer install --ignore-platform-req=ext-xmlrpc
+      - npm install --legacy-peer-deps
+      - npm rebuild node-sass
+
+  startup:setup-app:
+    desc: Set up application key and migrations
+    cmds:
+      - task: startup:check-app-key
+      - php artisan migrate --no-interaction
+      - php artisan lang:js --no-lib resources/js/translations.js
+      - php artisan cache:clear
+      - php artisan config:clear
+
+  startup:check-app-key:
+    desc: Check and generate application key if needed
+    cmds:
+      - |
+        if ! grep -q "^APP_KEY=[A-Za-z0-9+/]\{40\}=$" .env; then
+          php artisan key:generate --no-interaction
+        fi
+
+  startup:create-admin:
+    desc: Ensure admin user exists
+    cmds:
+      - |
+        php artisan tinker --execute="
+        if (class_exists('App\\Models\\User')) {
+            \$userClass = 'App\\Models\\User';
+        } else {
+            \$userClass = 'App\\User';
+        }
+        if (\$userClass::where('email', 'jane@bloggs.net')->count() === 0) {
+            \$userClass::create([
+                'name' => 'Jane Bloggs',
+                'email' => 'jane@bloggs.net',
+                'password' => \Hash::make('passw0rd'),
+                'role' => 2,
+                'consent_past_data' => '2021-01-01',
+                'consent_future_data' => '2021-01-01',
+                'consent_gdpr' => '2021-01-01'
+            ]);
+            echo 'Admin user created successfully.\n';
+        } else {
+            echo 'Admin user already exists.\n';
+        }"
+
+  startup:mark-initialized:
+    desc: Mark the application as initialized
+    cmds:
+      - touch storage/framework/initialized
+
+  startup:
+    desc: Complete application startup process
+    cmds:
+      - task: env:setup
+        vars: { ENV: '{{.DOCKER_ENV | default "docker"}}' }
+      - task: startup:wait-db
+        vars: { WAIT_FOR_DB: '{{.WAIT_FOR_DB | default "true"}}' }
+      - task: startup:install-deps
+      - task: startup:setup-app
+      - task: startup:create-admin
+      - task: startup:mark-initialized 
