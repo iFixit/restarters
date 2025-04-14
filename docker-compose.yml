@@ -103,7 +103,7 @@ services:
       - app-network
 
   restarters_db:
-    image: mysql:5.7.33
+    image: juliusleppalanordhealth/mysql:5.7-arm64
     container_name: restarters_db
     restart: unless-stopped
     tty: true
