@@ -165,4 +165,9 @@ tasks:
       task docker:run:artisan -- migrate
 
     cmds:
-      - docker exec -it restarters php artisan "{{ .CLI_ARGS }}"
+      - docker exec -it restarters php artisan {{ .CLI_ARGS }}
+
+  test:
+    desc: Run the tests
+    cmds:
+      - task docker:run:artisan -- test {{.CLI_ARGS}}
