@@ -17,6 +17,19 @@ define('LARAVEL_START', microtime(true));
 
 require __DIR__.'/vendor/autoload.php';
 
+/*
+|--------------------------------------------------------------------------
+| Load Environment Variables
+|--------------------------------------------------------------------------
+|
+| Here we load environment-specific variables. This allows for having
+| different environment settings (testing, staging, etc.) that override
+| the base environment configuration.
+|
+*/
+
+require __DIR__.'/bootstrap/environment.php';
+
 $app = require_once __DIR__.'/bootstrap/app.php';
 
 /*
