@@ -15,6 +15,7 @@ chmod -R 777 public
 
 npm run watch&
 php artisan key:generate
+php artisan l5-swagger:generate # Needed for tests
 php artisan cache:clear
 php artisan config:clear
 
