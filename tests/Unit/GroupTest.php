@@ -20,13 +20,6 @@ class GroupTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        DB::statement('SET foreign_key_checks=0');
-        User::truncate();
-        Group::truncate();
-        GrouptagsGroups::truncate();
-        Network::truncate();
-        UserGroups::truncate();
-        DB::statement('SET foreign_key_checks=1');
     }
 
     #[Test]

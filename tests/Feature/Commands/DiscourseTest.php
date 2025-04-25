@@ -9,6 +9,15 @@ use DB;
 use Tests\TestCase;
 
 class DiscourseTest extends TestCase {
+    protected function setUp(): void
+    {
+        parent::setUp();
+        
+        if (env('FEATURE__DISCOURSE_INTEGRATION') === false) {
+            $this->markTestSkipped('Discourse integration is disabled.');
+        }
+    }
+    
     public function testSyncDiscourseUsernames(): void {
         $this->artisan('sync:discourseusernames')->assertExitCode(0);
     }

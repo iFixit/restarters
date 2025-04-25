@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\Devices;
 
 use App\Models\Device;
 use PHPUnit\Framework\Attributes\Test;
@@ -8,32 +8,45 @@ use App\Models\Party;
 use App\Models\User;
 use DB;
 use Tests\TestCase;
+use App\Models\Role;
 
 class NullProblemTest extends TestCase
 {
     protected function setUp(): void
     {
         parent::setUp();
-        DB::statement('SET foreign_key_checks=0');
-        User::truncate();
-        Party::truncate();
-        Device::truncate();
-        DB::statement('SET foreign_key_checks=1');
-
-        $this->event = Party::factory()->create();
-        $admin = User::factory()->administrator()->create();
-        $this->actingAs($admin);
-
-        $this->withoutExceptionHandling();
+        // No need for explicit truncation as we're using transactions in the parent
     }
 
     #[Test]
-    public function null_problem_mapped_to_empty_string(): void
+    public function test_invalid_problem_field(): void
     {
-        $iddevices = $this->createDevice($this->event->idevents, 'misc', null, 1, 100, null);
-        $iddevices = Device::latest()->first()->iddevices;
+        $admin = $this->loginAsTestUser(Role::ADMINISTRATOR);
+        $group = $this->createGroup('Whatever');
 
-        $device = Device::find($iddevices);
-        $this->assertEquals('', $device->problem);
+        $date = '2022-01-01';
+        $event = $this->createEvent($group, $date);
+
+        $dev_id = $this->createDevice($event, 'Fixed', NULL);
+
+        $dev = Device::find($dev_id);
+        // NULL problem is a special case, handled.
+        $this->assertEquals($dev->problem, null);
+        $this->assertNotEquals($dev->problem, '');
+
+        // We can request it.
+        $response = $this->get('/api/v2/devices/' . $dev_id);
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true);
+        $this->assertNull($json['data']['problem']);
+
+        // Now modify it.
+        $response = $this->patch('/api/v2/devices/' . $dev_id, [
+            'problem' => 'New problem',
+        ]);
+        $response->assertSuccessful();
+
+        $dev = Device::find($dev_id);
+        $this->assertEquals($dev->problem, 'New problem');
     }
 }

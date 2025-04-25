@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Device;
 use App\Models\Party;
 use App\Models\User;
+use App\Models\Role;
 use DB;
 use Tests\TestCase;
 
@@ -63,7 +64,10 @@ class CategoryTest extends TestCase
             'item_type' => 'flatscreen LCD'
         ]);
 
-        $response = $this->get('/api/v2/items');
+        // Create and login as an admin user for API access
+        $admin = $this->loginAsTestUser(Role::ADMINISTRATOR);
+        
+        $response = $this->actingAs($admin)->get('/api/v2/items?api_token=' . $admin->api_token);
         $response->assertSuccessful();
         $json = json_decode($response->getContent(), true);
         self::assertEquals(1, count($json['data']));

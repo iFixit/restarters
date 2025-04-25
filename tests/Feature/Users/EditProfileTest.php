@@ -24,9 +24,7 @@ class EditProfileTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        DB::statement('SET foreign_key_checks=0');
-        User::truncate();
-        DB::statement('SET foreign_key_checks=1');
+        // No need for truncation anymore as we're using transactions in parent::setUp()
     }
 
     #[Test]

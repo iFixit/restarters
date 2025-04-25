@@ -10,18 +10,13 @@ use App\Models\User;
 use Carbon\Carbon;
 use DB;
 use http\Client\Request;
-use Tests\TestCase;
+use Tests\ApiTestCase;
 
-class APIv2NetworkTest extends TestCase
+class APIv2NetworkTest extends ApiTestCase
 {
     public function testList(): void {
-        $user = User::factory()->administrator()->create([
-                                                                          'api_token' => '1234',
-                                                                      ]);
-        $this->actingAs($user);
-
         // List networks.
-        $response = $this->get('/api/v2/networks');
+        $response = $this->getWithAuth('/api/v2/networks');
 
         // Check that we can find a network in the list.
         $network = Network::first();
@@ -53,7 +48,7 @@ class APIv2NetworkTest extends TestCase
         $network->logo = 'network_logos/1590591632bedc48025b738e87fe674cf030e8c953ccdd91e914597.png';
         $network->save();
 
-        $response = $this->get('/api/v2/networks/' . $network->id);
+        $response = $this->getWithAuth('/api/v2/networks/' . $network->id);
         $response->assertSuccessful();
         $json = json_decode($response->getContent(), true)['data'];
         $this->assertEquals($network->id, $json['id']);
@@ -64,7 +59,7 @@ class APIv2NetworkTest extends TestCase
         $this->assertTrue(array_key_exists('stats', $json));
         $this->assertTrue(array_key_exists('default_language', $json));
 
-        $response = $this->get('/api/v2/networks');
+        $response = $this->getWithAuth('/api/v2/networks');
         $response->assertSuccessful();
         $json = json_decode($response->getContent(), true)['data'];
 
@@ -103,7 +98,7 @@ class APIv2NetworkTest extends TestCase
         $url = "/api/v2/networks/{$network->id}/groups?" .
                 ($getNextEvent ? '&includeNextEvent=true' : '') .
                 ($getDetails ? '&includeDetails=true' : '');
-        $response = $this->get($url);
+        $response = $this->getWithAuth($url);
 
         $response->assertSuccessful();
         $json = json_decode($response->getContent(), true)['data'];
@@ -134,14 +129,14 @@ class APIv2NetworkTest extends TestCase
         // Test updated_at filters.
         $start = Carbon::now()->subDays(1)->toIso8601String();
         $end = Carbon::now()->addDays(1)->toIso8601String();
-        $response = $this->get("/api/v2/networks/{$network->id}/groups?updated_start=" . urlencode($start) . "&updated_end=" . urlencode($end));
+        $response = $this->getWithAuth("/api/v2/networks/{$network->id}/groups?updated_start=" . urlencode($start) . "&updated_end=" . urlencode($end));
         $response->assertSuccessful();
         $json = json_decode($response->getContent(), true)['data'];
         $this->assertEquals(1, count($json));
 
         $start = Carbon::now()->addDays(1)->toIso8601String();
         $end = Carbon::now()->addDays(2)->toIso8601String();
-        $response = $this->get("/api/v2/networks/{$network->id}/groups?updated_start=" . urlencode($start) . "&updated_end=" . urlencode($end));
+        $response = $this->getWithAuth("/api/v2/networks/{$network->id}/groups?updated_start=" . urlencode($start) . "&updated_end=" . urlencode($end));
         $response->assertSuccessful();
         $json = json_decode($response->getContent(), true)['data'];
         $this->assertEquals(0, count($json));
@@ -183,7 +178,7 @@ class APIv2NetworkTest extends TestCase
 
         $url = "/api/v2/networks/{$network->id}/events" .
             ($getDetails ? '?includeDetails=true' : '');
-        $response = $this->get($url);
+        $response = $this->getWithAuth($url);
         $response->assertSuccessful();
         $json = json_decode($response->getContent(), true)['data'];
         $this->assertEquals(1, count($json));
@@ -200,14 +195,14 @@ class APIv2NetworkTest extends TestCase
         # Test updated filters.
         $start = '2011-01-01T10:34:00+00:00';
         $end = '2011-01-01T14:34:00+00:00';
-        $response = $this->get("/api/v2/networks/{$network->id}/events?updated_start=" . urlencode($start) . "&updated_end=" . urlencode($end));
+        $response = $this->getWithAuth("/api/v2/networks/{$network->id}/events?updated_start=" . urlencode($start) . "&updated_end=" . urlencode($end));
         $response->assertSuccessful();
         $json = json_decode($response->getContent(), true)['data'];
         $this->assertEquals(1, count($json));
 
         $start = '2011-01-01T15:34:00+00:00';
         $end = '2011-01-01T16:34:00+00:00';
-        $response = $this->get("/api/v2/networks/{$network->id}/events?updated_start=" . urlencode($start) . "&updated_end=" . urlencode($end));
+        $response = $this->getWithAuth("/api/v2/networks/{$network->id}/events?updated_start=" . urlencode($start) . "&updated_end=" . urlencode($end));
         $response->assertSuccessful();
         $json = json_decode($response->getContent(), true)['data'];
         $this->assertEquals(0, count($json));

@@ -5,6 +5,7 @@ namespace App\Observers;
 use App\Events\UserConfirmedEvent;
 use App\Events\UserLeftEvent;
 use App\Models\EventsUsers;
+use App\Models\Party;
 use App\Models\Role;
 use App\Services\DiscourseService;
 use App\Models\User;
@@ -24,15 +25,15 @@ class EventsUsersObserver {
         $this->discourseService = $discourseService;
     }
 
-        /**
+    /**
      * Listen to the created event.
      */
     public function created(EventsUsers $eu): void
     {
         $idevents = $eu->event;
-        $event = \App\Models\Party::find($idevents);
+        $event = Party::where('idevents', $idevents)->firstOrFail();
         $iduser = $eu->user;
-        $user = $iduser ? User::find($iduser) : null;
+        $user = $iduser ? User::where('id', $iduser)->first() : null;
         
         if ($eu->status == 1) {
             // Confirmed.  Make sure they are on the thread.
@@ -49,9 +50,9 @@ class EventsUsersObserver {
      */
     public function updating(EventsUsers $eu): void {
         $idevents = $eu->event;
-        $event = \App\Models\Party::find($idevents);
+        $event = Party::where('idevents', $idevents)->firstOrFail();
         $iduser = $eu->user;
-        $user = $iduser ? User::find($iduser) : null;
+        $user = $iduser ? User::where('id', $iduser)->first() : null;
 
         if ($eu->isDirty('status')) {
             // The confirmed status has changed, so we need to update the thread.
@@ -72,9 +73,9 @@ class EventsUsersObserver {
     public function deleted(EventsUsers $eu): void
     {
         $idevents = $eu->event;
-        $event = \App\Models\Party::find($idevents);
+        $event = Party::where('idevents', $idevents)->firstOrFail();
         $iduser = $eu->user;
-        $user = $iduser ? User::find($iduser) : null;
+        $user = $iduser ? User::where('id', $iduser)->first() : null;
 
         // Make sure they are not on the thread.  If they were confirmed, we need to update the volunteer count.
         $this->removed($event, $user, true, $eu->status == 1);
@@ -89,9 +90,9 @@ class EventsUsersObserver {
         event(new UserConfirmedEvent($event->idevents, $user ? $user->id : null));
     }
 
-    private function removed(Party $event, User $user, $count): void
+    private function removed(Party $event, User $user, $count, $wasConfirmed = false): void
     {
-        if ($count) {
+        if ($count && $wasConfirmed) {
             $event->decrement('volunteers');
         }
 
