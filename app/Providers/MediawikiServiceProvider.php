@@ -110,18 +110,4 @@ class MediawikiServiceProvider extends ServiceProvider
     {
         return env('FEATURE__WIKI_INTEGRATION') === true;
     }
-    
-    /**
-     * Get the services provided by the provider.
-     *
-     * @return array
-     */
-    public function provides()
-    {
-        return [
-            MediawikiFactory::class,
-            UserCreator::class,
-            ActionApi::class,
-        ];
-    }
 }
