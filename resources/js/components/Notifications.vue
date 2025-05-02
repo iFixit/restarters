@@ -1,6 +1,6 @@
 <template>
   <div class="badge-group">
-    <button id="badge-talk-notifications" :class="{
+    <button v-if="discourseEnabled" id="badge-talk-notifications" :class="{
       'badge': true,
       'badge-pill': true,
       'badge-info' : true,
@@ -22,7 +22,7 @@
       'badge': true,
       'badge-pill': true,
       'badge-info': true,
-      'badge-right': true,
+      'badge-right': !discourseEnabled,
       'badge-no-notifications': !restartersNotifications,
       'd-flex': true
        }" data-toggle="collapse" data-target="#notifications" aria-expanded="false" aria-controls="notifications">
@@ -63,6 +63,11 @@ export default {
     discourseUserName: {
       type: String,
       required: true
+    },
+    discourseEnabled: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   data () {
@@ -82,7 +87,9 @@ export default {
 
       if (ret.data.success) {
         this.restartersNotifications = ret.data.restarters
-        this.discourseNotifications = ret.data.discourse
+        if (this.discourseEnabled) {
+          this.discourseNotifications = ret.data.discourse
+        }
       }
     }, 5000)
   },

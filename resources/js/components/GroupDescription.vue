@@ -26,7 +26,7 @@
             <a :href="'mailto:' + group.email">{{ group.email }}</a>
           </div>
         </div>
-        <div class="d-flex pt-1 pb-1" v-if="discourseGroup">
+        <div class="d-flex pt-1 pb-1" v-if="discourseGroup && discourseEnabled">
           <div class="mr-2">
             <b-img-lazy src="/icons/talk_ico.svg" class="icon" />
           </div>
@@ -59,6 +59,11 @@ export default {
       required: false,
       default: null
     },
+    discourseEnabled: {
+      type: Boolean,
+      required: false,
+      default: false
+    }
   },
 }
 </script>

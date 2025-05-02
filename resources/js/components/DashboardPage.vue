@@ -11,8 +11,9 @@
         <DashboardYourGroups :newGroups="newGroups" :nearbyGroups="nearbyGroups" :location="location" />
       </div>
       <DashboardAddData class="adddata justify-self-end" />
-      <DashboardRightSidebar class="sidebar" />
+      <DashboardRightSidebar class="sidebar" :discourse-enabled="discourseEnabled" />
       <DiscourseDiscussion
+          v-if="discourseEnabled"
           class="discourse"
           :see-all-topics-link="seeAllTopicsLink"
           :discourse-base-url="discourseBaseUrl"
@@ -67,6 +68,11 @@ export default {
     newGroups: {
       type: Array,
       required: true
+    },
+    discourseEnabled: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   created() {

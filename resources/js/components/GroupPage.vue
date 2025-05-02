@@ -14,7 +14,7 @@
 
     <div class="d-flex flex-wrap">
       <div class="w-xs-100 w-md-50">
-        <GroupDescription class="pr-md-3" :idgroups="idgroups" :discourse-group="discourseGroup" />
+        <GroupDescription class="pr-md-3" :idgroups="idgroups" :discourse-group="discourseGroup" :discourse-enabled="discourseEnabled" />
       </div>
       <div class="w-xs-100 w-md-50">
         <GroupVolunteers class="pl-md-3" :idgroups="idgroups" :canedit="canedit" />
@@ -147,6 +147,11 @@ export default {
       type: String,
       required: false,
       default: null
+    },
+    discourseEnabled: {
+      type: Boolean,
+      required: false,
+      default: false
     },
   },
   data () {

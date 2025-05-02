@@ -30,7 +30,7 @@
           {{ start }}-{{ end }} <span class="text-muted small">{{ timezone }}</span>
         </div>
       </div>
-      <div class="border-top-thin d-flex pt-1 pb-1" v-if="isAttending && discourseThread">
+      <div class="border-top-thin d-flex pt-1 pb-1" v-if="isAttending && discourseThread && discourseEnabled">
         <div class="mr-2">
           <b-img-lazy src="/icons/talk_ico.svg" class="icon" />
         </div>
@@ -113,6 +113,11 @@ export default {
       type: String,
       required: false,
       default: null
+    },
+    discourseEnabled: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   }
 }

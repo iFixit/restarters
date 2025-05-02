@@ -19,20 +19,25 @@ class DiscourseController extends Controller
     {
         $topics = [];
 
+        if (!config('restarters.features.discourse_integration')) {
+            return response()->json([
+                'success' => 'success',
+                'topics' => $topics
+            ], 200);
+        }
+
         $key = $tag ? "discourse_topics_$tag" : 'discourse_topics';
 
-        if (config('restarters.features.discourse_integration')) {
-            if (Cache::has($key)) {
-                $topics = Cache::get($key);
-            } else {
-                $topics = $discourseService->getDiscussionTopics($tag);
-                Cache::put($key, $topics, 60);
-            }
+        if (Cache::has($key)) {
+            $topics = Cache::get($key);
+        } else {
+            $topics = $discourseService->getDiscussionTopics($tag);
+            Cache::put($key, $topics, 60);
         }
 
         return response()->json([
-                                    'success' => 'success',
-                                    'topics' => $topics
-                                ], 200);
+            'success' => 'success',
+            'topics' => $topics
+        ], 200);
     }
 }
