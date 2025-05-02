@@ -38,7 +38,7 @@ class LogInToWiki
     public function handle(Login $event): void
     {
         // Early return if wiki integration is disabled or dependencies are missing
-        if (env('FEATURE__WIKI_INTEGRATION') !== true || $this->wikiUserCreator === null) {
+        if (!env('FEATURE__WIKI_INTEGRATION') || !$this->wikiUserCreator) {
             return;
         }
 
