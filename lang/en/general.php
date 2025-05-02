@@ -30,6 +30,7 @@ return [
   'email_alerts_text' => 'Please choose what kind of email updates you would like to receive. You can change these at any time. Our Privacy Policy is available <a href="https://therestartproject.org/data-and-privacy-policy/fixometer/" rel="noopener noreferrer" target="_blank">here</a>',
   'menu_discourse' => 'Talk',
   'menu_wiki' => 'Wiki',
+  'menu_repair_guides' => 'Repair Guides',
   'menu_help_feedback' => 'Help & Feedback',
   'menu_faq' => 'FAQs',
   'therestartproject' => 'The Restart Project',
