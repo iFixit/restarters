@@ -35,7 +35,13 @@ class SyncDiscourseUsernames extends Command
     {
         parent::__construct();
         $this->discourseService = $discourseService;
+    }
 
+    /**
+     * Execute the console command.
+     */
+    public function handle(): void
+    {
         $discourseApiKey = env('DISCOURSE_APIKEY');
         $discourseApiUser = env('DISCOURSE_APIUSER');
 
@@ -51,13 +57,7 @@ class SyncDiscourseUsernames extends Command
 
         $this->discourseApiKey = $discourseApiKey;
         $this->discourseApiUser = $discourseApiUser;
-    }
 
-    /**
-     * Execute the console command.
-     */
-    public function handle(): void
-    {
         $usersFoundInRestarters = 0;
         $updatedUsers = 0;
 

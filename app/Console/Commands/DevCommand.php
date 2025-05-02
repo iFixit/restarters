@@ -91,7 +91,7 @@ class DevCommand extends Command
         $process->setTimeout(null);
         $process->setTty(true);
         $process->run(function ($type, $buffer) {
-            $this->output->write($buffer);
+            $this->line($buffer);
         });
         
         return $process->getExitCode();
