@@ -28,30 +28,25 @@ class MediawikiServiceProvider extends ServiceProvider
 
     /**
      * Register the application services.
-     * 
-     * Only registers if FEATURE__WIKI_INTEGRATION is true
      */
     public function register(): void
     {
-        // Do not register any services if wiki integration is disabled
-        if (env('FEATURE__WIKI_INTEGRATION') !== true) {
-            // Register null implementations to avoid dependency injection errors
-            $this->app->bind(MediawikiFactory::class, function() {
-                return null;
-            });
-            
-            $this->app->bind(UserCreator::class, function() {
-                return null;
-            });
-            
-            $this->app->bind(ActionApi::class, function() {
-                return null;
-            });
-            
-            return;
-        }
-        
+        // Register implementations based on feature flag
+        $this->registerMediawikiFactory();
+        $this->registerUserCreator();
+        $this->registerActionApi();
+    }
+    
+    /**
+     * Register MediawikiFactory implementation
+     */
+    protected function registerMediawikiFactory(): void
+    {
         $this->app->singleton(MediawikiFactory::class, function() {
+            if (!$this->isWikiIntegrationEnabled()) {
+                return null;
+            }
+            
             try {
                 Log::debug('Connect to Mediawiki');
                 $apiUrl = env('WIKI_URL').'/api.php';
@@ -66,8 +61,18 @@ class MediawikiServiceProvider extends ServiceProvider
                 return null;
             }
         });
-
+    }
+    
+    /**
+     * Register UserCreator implementation
+     */
+    protected function registerUserCreator(): void
+    {
         $this->app->bind(UserCreator::class, function($app) {
+            if (!$this->isWikiIntegrationEnabled()) {
+                return null;
+            }
+            
             $mw = $app->make(MediawikiFactory::class);
             if ($mw) {
                 return $mw->newUserCreator();
@@ -75,8 +80,18 @@ class MediawikiServiceProvider extends ServiceProvider
 
             return null;
         });
-        
+    }
+    
+    /**
+     * Register ActionApi implementation
+     */
+    protected function registerActionApi(): void
+    {
         $this->app->bind(ActionApi::class, function() {
+            if (!$this->isWikiIntegrationEnabled()) {
+                return null;
+            }
+            
             try {
                 $apiUrl = env('WIKI_URL').'/api.php';
                 $auth = new UserAndPassword(env('WIKI_APIUSER'), env('WIKI_APIPASSWORD'));
@@ -86,6 +101,14 @@ class MediawikiServiceProvider extends ServiceProvider
                 return null;
             }
         });
+    }
+    
+    /**
+     * Check if wiki integration is enabled
+     */
+    protected function isWikiIntegrationEnabled(): bool
+    {
+        return env('FEATURE__WIKI_INTEGRATION') === true;
     }
     
     /**
