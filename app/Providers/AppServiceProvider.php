@@ -109,8 +109,14 @@ class AppServiceProvider extends ServiceProvider
         // Group edit events
         Event::listen(\App\Events\EditGroup::class, \App\Listeners\EditWordpressPostForGroup::class);
         
-        // Password events
-        Event::listen(\App\Events\PasswordChanged::class, \App\Listeners\ChangeWikiPassword::class);
+        // Password events - only register the wiki-related listeners if wiki integration is enabled
+        if (env('FEATURE__WIKI_INTEGRATION') === true) {
+            Event::listen(\App\Events\PasswordChanged::class, \App\Listeners\ChangeWikiPassword::class);
+        } else {
+            Event::listen(\App\Events\PasswordChanged::class, function() {
+                // Do nothing, wiki integration is disabled
+            });
+        }
         
         // User events
         Event::listen(\App\Events\UserUpdated::class, \App\Listeners\SyncUserProperties::class);
@@ -124,8 +130,10 @@ class AppServiceProvider extends ServiceProvider
         // Event images events
         Event::listen(\App\Events\EventImagesUploaded::class, \App\Listeners\SendAdminModerateEventPhotosNotification::class);
         
-        // Logout events
-        Event::listen(\Illuminate\Auth\Events\Logout::class, \App\Listeners\LogOutOfWiki::class);
+        // Logout events - only register if wiki integration is enabled
+        if (env('FEATURE__WIKI_INTEGRATION') === true) {
+            Event::listen(\Illuminate\Auth\Events\Logout::class, \App\Listeners\LogOutOfWiki::class);
+        }
         
         // Device events
         Event::listen(\App\Events\DeviceCreatedOrUpdated::class, \App\Listeners\DeviceUpdatedAt::class);

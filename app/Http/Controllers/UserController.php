@@ -1029,11 +1029,17 @@ class UserController extends Controller
             }
         }
 
-        // Login will occur immediately after this registration has completed.
-        // So wiki account creation will be attempted.
-        // This could in future be made conditional on who the user is,
-        // but for now every single user is given a wiki account.
-        $user->wiki_sync_status = WikiSyncStatus::CreateAtLogin;
+        // Only create wiki account if wiki integration is enabled
+        if (env('FEATURE__WIKI_INTEGRATION') == true) {
+            // Login will occur immediately after this registration has completed.
+            // So wiki account creation will be attempted.
+            // This could in future be made conditional on who the user is,
+            // but for now every single user is given a wiki account.
+            $user->wiki_sync_status = WikiSyncStatus::CreateAtLogin;
+        } else {
+            // Wiki integration is disabled, so don't attempt to create wiki account
+            $user->wiki_sync_status = WikiSyncStatus::DoNotCreate;
+        }
 
         $user->save();
 
