@@ -112,10 +112,6 @@ class AppServiceProvider extends ServiceProvider
         // Password events - only register the wiki-related listeners if wiki integration is enabled
         if (env('FEATURE__WIKI_INTEGRATION') === true) {
             Event::listen(\App\Events\PasswordChanged::class, \App\Listeners\ChangeWikiPassword::class);
-        } else {
-            Event::listen(\App\Events\PasswordChanged::class, function() {
-                // Do nothing, wiki integration is disabled
-            });
         }
         
         // User events
