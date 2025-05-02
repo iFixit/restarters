@@ -1,5 +1,7 @@
 <?php
 
+namespace App\Helpers;
+
 use App\Models\Images;
 use App\Models\Xref;
 use Illuminate\Database\Eloquent\Model;

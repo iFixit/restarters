@@ -84,8 +84,7 @@
     "extra": {
         "laravel": {
             "dont-discover": []
-        },
-        "patches-file": "patches/composer.patches.json"
+        }
     },
     "scripts": {
         "post-root-package-install": [

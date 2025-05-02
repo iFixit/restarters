@@ -37,7 +37,13 @@ class DiscourseAnonymiseUser extends Command
     {
         parent::__construct();
         $this->discourseService = $discourseService;
+    }
 
+    /**
+     * Execute the console command.
+     */
+    public function handle(DiscourseService $discourseService): void
+    {
         $discourseApiKey = env('DISCOURSE_APIKEY');
         $discourseApiUser = env('DISCOURSE_APIUSER');
 
@@ -53,13 +59,7 @@ class DiscourseAnonymiseUser extends Command
 
         $this->discourseApiKey = $discourseApiKey;
         $this->discourseApiUser = $discourseApiUser;
-    }
 
-    /**
-     * Execute the console command.
-     */
-    public function handle(DiscourseService $discourseService): void
-    {
         $id = $this->argument('id');
         $user = User::findOrFail($id);
 

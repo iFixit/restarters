@@ -26,7 +26,7 @@ class LogInToWiki
      *
      * @return void
      */
-    public function __construct(Request $request, UserCreator $mediawikiUserCreator)
+    public function __construct(Request $request, ?UserCreator $mediawikiUserCreator = null)
     {
         $this->request = $request;
         $this->wikiUserCreator = $mediawikiUserCreator;
@@ -37,6 +37,11 @@ class LogInToWiki
      */
     public function handle(Login $event): void
     {
+        // Early return if wiki integration is disabled or dependencies are missing
+        if (!env('FEATURE__WIKI_INTEGRATION') || !$this->wikiUserCreator) {
+            return;
+        }
+
         $user = $event->user;
 
         if ($user->wiki_sync_status == WikiSyncStatus::CreateAtLogin) {

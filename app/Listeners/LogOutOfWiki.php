@@ -25,6 +25,11 @@ class LogOutOfWiki
      */
     public function handle(Logout $event): void
     {
+        // Early return if wiki integration is disabled
+        if (env('FEATURE__WIKI_INTEGRATION') !== true) {
+            return;
+        }
+        
         $user = $event->user;
 
         try {

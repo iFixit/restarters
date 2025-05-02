@@ -27,6 +27,11 @@ class ChangeWikiPassword extends BaseEvent
      */
     public function handle(PasswordChanged $event): void
     {
+        // Early return if wiki integration is disabled
+        if (env('FEATURE__WIKI_INTEGRATION') !== true) {
+            return;
+        }
+        
         $user = $event->user;
         $oldpw = $event->oldPassword;
 

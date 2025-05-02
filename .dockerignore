@@ -1,1 +1,8 @@
 node_modules
+vendor
+.circleci
+.github
+.env*
+docs/
+Dockerfile
+Dockerfile.prod
