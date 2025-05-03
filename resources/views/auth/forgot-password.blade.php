@@ -3,7 +3,7 @@
 <section class="login-page">
         <div class="container">
            <div class="align-items-center justify-content-center d-flex">
-            @include('includes.logo')
+            @include('includes/logo-'. env('APP_LOGO'))
            </div>
 
             <div class="entry-panel card card__login col-12 mt-5 text-left">

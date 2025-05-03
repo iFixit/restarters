@@ -2,7 +2,7 @@
     <div class="col-md-3 offset-2 p-0">
         <header>
           <a href="/">
-            @include('includes.logo')
+            @include('includes/logo-'. env('APP_LOGO'))
           </a>
         </header>
     </div>

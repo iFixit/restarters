@@ -85,7 +85,7 @@
             <div class="container container-nav">
                 <nav class="navbar navbar-expand-md navbar-light">
                     <div class="d-none d-sm-block navbar-brand">
-                        @include('includes/logo')
+                        @include('includes/logo-'. env('APP_LOGO'))
                     </div>
                     <div class="d-block d-sm-none">
                         @include('includes/logo-plain')
