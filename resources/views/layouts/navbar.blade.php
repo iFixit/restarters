@@ -7,7 +7,7 @@
     @include('includes/logo-'. env('APP_LOGO'))
     </div>
 
-    <div class="d-dlock d-md-none">
+    <div class="d-block d-md-none">
     @include('includes/logo-plain')
     </div>
 </a>
