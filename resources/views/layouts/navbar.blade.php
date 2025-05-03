@@ -4,7 +4,7 @@
 {{-- Logo --}}
 <a href="{{ route('home') }}" class="icon-brand">
     <div class="d-none d-md-block">
-    @include('includes/logo')
+    @include('includes/logo-'. env('APP_LOGO'))
     </div>
 
     <div class="d-dlock d-md-none">
