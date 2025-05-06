@@ -10,6 +10,10 @@ use Illuminate\Support\Facades\RateLimiter;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withProviders([
+        // App Service Providers
+        \App\Providers\TranslationServiceProvider::class,
+        
+        // Package Service Providers
         \Mariuzzo\LaravelJsLocalization\LaravelJsLocalizationServiceProvider::class,
         \Msurguy\Honeypot\HoneypotServiceProvider::class,
         \Intervention\Image\Laravel\ServiceProvider::class,
