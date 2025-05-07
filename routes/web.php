@@ -105,14 +105,6 @@ Route::middleware('ensureAPIToken')->group(function () {
         Route::get('/all-events/{hash_env}', [CalendarEventsController::class, 'allEvents'])->name('calendar-events-all');
     });
 
-    Route::get('workbench', function() {
-        if (config('restarters.features.discourse_integration')) {
-            return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
-        } else {
-            return redirect()->route('home');
-        }
-    })->name('workbench');
-
     Route::prefix('FaultCat')->group(function () {
         Route::get('/', function() {
             if (config('restarters.features.discourse_integration')) {
