@@ -3,7 +3,7 @@
 <section class="entry-wrapper align-items-center justify-content-center">
         <div class="container">
 
-            @include('includes/logo-'. env('APP_LOGO'))
+            @include('includes/logo-'. env('APP_INSTANCE', 'restarters'))
 
             @if($valid_code == false)
               <div class="entry-panel card card__login col-12 mt-5 text-left">
