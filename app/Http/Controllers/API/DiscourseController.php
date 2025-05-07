@@ -21,9 +21,8 @@ class DiscourseController extends Controller
 
         if (!config('restarters.features.discourse_integration')) {
             return response()->json([
-                'success' => 'success',
-                'topics' => $topics
-            ], 200);
+                'error' => 'Discourse integration is not enabled'
+            ], 400);
         }
 
         $key = $tag ? "discourse_topics_$tag" : 'discourse_topics';
