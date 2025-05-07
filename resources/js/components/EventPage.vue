@@ -5,7 +5,7 @@
       <EventHeading :idevents="idevents" :canedit="canedit" :candelete="candelete" :is-admin="isAdmin" :in-group="inGroup" :is-attending="isAttending" />
       <div class="ep-layout">
         <div>
-          <EventDetails class="pr-md-3" :idevents="idevents" :hosts="hosts" :calendar-links="calendarLinks" :is-attending="isAttending" :discourse-thread="discourseThread" />
+          <EventDetails class="pr-md-3" :idevents="idevents" :hosts="hosts" :calendar-links="calendarLinks" :is-attending="isAttending" :discourse-thread="discourseThread" :discourse-enabled="discourseEnabled" />
           <EventDescription class="pr-md-3" :idevents="idevents" />
         </div>
         <div>
@@ -81,6 +81,11 @@ export default {
       type: String,
       required: false,
       default: null
+    },
+    discourseEnabled: {
+      type: Boolean,
+      required: false,
+      default: false
     },
     inGroup: {
       type: Boolean,

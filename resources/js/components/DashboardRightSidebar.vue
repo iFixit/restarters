@@ -6,11 +6,11 @@
         <p class="font-weight-bold">
           <!--        eslint-disable-next-line-->
           {{ __('dashboard.sidebar_intro_1') }}
-          <span class="d-inline d-md-none">
+          <span class="d-inline d-md-none" v-if="discourseEnabled">
             {{ __('dashboard.sidebar_kit1') }} <a href="https://talk.restarters.net/session/sso?return_path=https://talk.restarters.net/t/how-to-run-a-repair-event-the-restart-party-kit/324">{{ __('dashboard.sidebar_kit2') }}</a>
           </span>
         </p>
-        <p class="d-block d-md-none">
+        <p class="d-block d-md-none" v-if="discourseEnabled">
           <!--        eslint-disable-next-line-->
           {{ __('dashboard.sidebar_help') }} <a href="https://talk.restarters.net/session/sso?return_path=https://talk.restarters.net/c/community-repair/5">{{ __('dashboard.sidebar_let_us_know') }}</a>.
         </p>
@@ -52,6 +52,13 @@
 import CollapsibleSection from './CollapsibleSection'
 export default {
   components: {CollapsibleSection},
+  props: {
+    discourseEnabled: {
+      type: Boolean,
+      required: false,
+      default: false
+    }
+  }
 }
 </script>
 <style scoped lang="scss">

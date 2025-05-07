@@ -114,6 +114,7 @@
             :initial-event="{{ json_encode($expanded_event, JSON_INVALID_UTF8_IGNORE) }}"
             :is-attending="{{ $is_attending ? 'true' : 'false' }}"
             discourse-thread="{{ $discourseThread }}"
+            :discourse-enabled="{{ config('restarters.features.discourse_integration') ? 'true' : 'false' }}"
             :canedit="{{ $can_edit_event ? 'true' : 'false' }}"
             :candelete="{{ $can_delete_event ? 'true' : 'false' }}"
             :is-admin="{{ $is_admin ? 'true' : 'false' }}"

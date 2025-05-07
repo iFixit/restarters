@@ -105,148 +105,268 @@ Route::middleware('ensureAPIToken')->group(function () {
         Route::get('/all-events/{hash_env}', [CalendarEventsController::class, 'allEvents'])->name('calendar-events-all');
     });
 
-    Route::get('workbench', function() {
-        return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
-    })->name('workbench');
-
     Route::prefix('FaultCat')->group(function () {
         Route::get('/', function() {
-            return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            if (config('restarters.features.discourse_integration')) {
+                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            } else {
+                return redirect()->route('home');
+            }
         });
         Route::get('/{any}', function() {
-            return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            if (config('restarters.features.discourse_integration')) {
+                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            } else {
+                return redirect()->route('home');
+            }
         });
     });
 
     Route::prefix('faultcat')->group(function () {
         Route::get('/', function() {
-            return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            if (config('restarters.features.discourse_integration')) {
+                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            } else {
+                return redirect()->route('home');
+            }
         });
         Route::get('/{any}', function() {
-            return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            if (config('restarters.features.discourse_integration')) {
+                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            } else {
+                return redirect()->route('home');
+            }
         });
     });
 
     Route::prefix('MiscCat')->group(function () {
         Route::get('/', function() {
-            return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            if (config('restarters.features.discourse_integration')) {
+                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            } else {
+                return redirect()->route('home');
+            }
         });
         Route::get('/{any}', function() {
-            return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            if (config('restarters.features.discourse_integration')) {
+                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            } else {
+                return redirect()->route('home');
+            }
         });
     });
 
     Route::prefix('misccat')->group(function () {
         Route::get('/', function() {
-            return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            if (config('restarters.features.discourse_integration')) {
+                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            } else {
+                return redirect()->route('home');
+            }
         });
         Route::get('/{any}', function() {
-            return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            if (config('restarters.features.discourse_integration')) {
+                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            } else {
+                return redirect()->route('home');
+            }
         });
     });
 
     Route::prefix('MobiFix')->group(function () {
         Route::get('/', function() {
-            return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            if (config('restarters.features.discourse_integration')) {
+                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            } else {
+                return redirect()->route('home');
+            }
         });
         Route::get('/{any}', function() {
-            return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            if (config('restarters.features.discourse_integration')) {
+                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            } else {
+                return redirect()->route('home');
+            }
         });
     });
 
     Route::prefix('mobifix')->group(function () {
         Route::get('/', function() {
-            return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            if (config('restarters.features.discourse_integration')) {
+                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            } else {
+                return redirect()->route('home');
+            }
         });
         Route::get('/{any}', function() {
-            return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            if (config('restarters.features.discourse_integration')) {
+                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            } else {
+                return redirect()->route('home');
+            }
         });
     });
 
     Route::prefix('MobiFixOra')->group(function () {
         Route::get('/', function() {
-            return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            if (config('restarters.features.discourse_integration')) {
+                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            } else {
+                return redirect()->route('home');
+            }
         });
         Route::get('/{any}', function() {
-            return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            if (config('restarters.features.discourse_integration')) {
+                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            } else {
+                return redirect()->route('home');
+            }
         });
     });
 
     Route::prefix('mobifixora')->group(function () {
         Route::get('/', function() {
-            return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            if (config('restarters.features.discourse_integration')) {
+                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            } else {
+                return redirect()->route('home');
+            }
         });
         Route::get('/{any}', function() {
-            return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            if (config('restarters.features.discourse_integration')) {
+                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            } else {
+                return redirect()->route('home');
+            }
         });
     });
 
     Route::prefix('TabiCat')->group(function () {
         Route::get('/', function() {
-            return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            if (config('restarters.features.discourse_integration')) {
+                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            } else {
+                return redirect()->route('home');
+            }
         });
         Route::get('/{any}', function() {
-            return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            if (config('restarters.features.discourse_integration')) {
+                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            } else {
+                return redirect()->route('home');
+            }
         });
     });
 
     Route::prefix('tabicat')->group(function () {
         Route::get('/', function() {
-            return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            if (config('restarters.features.discourse_integration')) {
+                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            } else {
+                return redirect()->route('home');
+            }
         });
         Route::get('/{any}', function() {
-            return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            if (config('restarters.features.discourse_integration')) {
+                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            } else {
+                return redirect()->route('home');
+            }
         });
     });
 
     Route::prefix('PrintCat')->group(function () {
         Route::get('/', function() {
-            return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            if (config('restarters.features.discourse_integration')) {
+                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            } else {
+                return redirect()->route('home');
+            }
         });
         Route::get('/{any}', function() {
-            return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            if (config('restarters.features.discourse_integration')) {
+                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            } else {
+                return redirect()->route('home');
+            }
         });
     });
 
     Route::prefix('printcat')->group(function () {
         Route::get('/', function() {
-            return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            if (config('restarters.features.discourse_integration')) {
+                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            } else {
+                return redirect()->route('home');
+            }
         });
         Route::get('/{any}', function() {
-            return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            if (config('restarters.features.discourse_integration')) {
+                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            } else {
+                return redirect()->route('home');
+            }
         });
     });
 
     Route::prefix('BattCat')->group(function () {
         Route::get('/', function() {
-            return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            if (config('restarters.features.discourse_integration')) {
+                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            } else {
+                return redirect()->route('home');
+            }
         });
         Route::get('/{any}', function() {
-            return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            if (config('restarters.features.discourse_integration')) {
+                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            } else {
+                return redirect()->route('home');
+            }
         });
     });
 
     Route::prefix('battcat')->group(function () {
         Route::get('/', function() {
-            return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            if (config('restarters.features.discourse_integration')) {
+                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            } else {
+                return redirect()->route('home');
+            }
         });
         Route::get('/{any}', function() {
-            return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            if (config('restarters.features.discourse_integration')) {
+                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            } else {
+                return redirect()->route('home');
+            }
         });
     });
 
     Route::prefix('DustUp')->group(function () {
         Route::get('/', function() {
-            return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            if (config('restarters.features.discourse_integration')) {
+                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            } else {
+                return redirect()->route('home');
+            }
         });
         Route::get('/{any}', function() {
-            return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            if (config('restarters.features.discourse_integration')) {
+                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            } else {
+                return redirect()->route('home');
+            }
         });
     });
 
     Route::prefix('dustup')->group(function () {
         Route::get('/{any}', function() {
-            return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            if (config('restarters.features.discourse_integration')) {
+                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            } else {
+                return redirect()->route('home');
+            }
         });
     });
 
