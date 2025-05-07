@@ -4,10 +4,10 @@
 {{-- Logo --}}
 <a href="{{ route('home') }}" class="icon-brand">
     <div class="d-none d-md-block">
-    @include('includes/logo')
+    @include('includes/logo-'. env('APP_LOGO'))
     </div>
 
-    <div class="d-dlock d-md-none">
+    <div class="d-block d-md-none">
     @include('includes/logo-plain')
     </div>
 </a>

@@ -6,7 +6,7 @@
             <div class="col-lg-4">
                 <header>
                     <a href="/">
-            @include('includes.logo')
+                        @include('includes/logo-'. env('APP_LOGO'))
           </a>
                 </header>
             </div>
