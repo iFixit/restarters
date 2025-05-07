@@ -35,12 +35,12 @@ RUN composer install --optimize-autoloader --no-interaction --no-scripts
 # Copy the rest of the application
 COPY . .
 
-# Install NPM dependencies and build assets
-RUN npm ci && npm run production
-
 # Generate translations and Swagger documentation
 RUN php artisan lang:js --no-lib resources/js/translations.js && \
     php artisan l5-swagger:generate
+
+# Install NPM dependencies and build assets
+RUN npm ci && npm run production
 
 # Production stage
 FROM php:8.2-fpm AS production
