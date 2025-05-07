@@ -4,6 +4,8 @@ import LangJS from "./lang.js"; // Assuming Lang.js is in the same directory
 
 export const Lang = new LangJS({
     messages: translations,
+    // PHP returns 1 for true, 0 for false instead of true/false
+    debug: window.appDebug === '1'
 });
 
 export default {
