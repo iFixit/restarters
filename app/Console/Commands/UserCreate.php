@@ -6,6 +6,7 @@ use App\Models\Role;
 use App\Services\DiscourseService;
 use App\Models\User;
 use App\WikiSyncStatus;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -18,14 +19,19 @@ class UserCreate extends Command
      *
      * @var string
      */
-    protected $signature = 'user:create {name} {email} {password} {language} {repair_network_id}';
+    protected $signature = 'user:create {name} {email} {password} {language} {repair_network_id} 
+                           {--role=4 : Role ID (1=ROOT, 2=ADMINISTRATOR, 3=HOST, 4=RESTARTER, 5=GUEST, 6=NETWORK_COORDINATOR)}
+                           {--consent-past-data= : Consent date for past data in YYYY-MM-DD format, defaults to today}
+                           {--consent-future-data= : Consent date for future data in YYYY-MM-DD format, defaults to today}
+                           {--consent-gdpr= : Consent date for GDPR in YYYY-MM-DD format, defaults to today}
+                           {--auto-consent : Automatically set all consent dates to today}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Create a user.';
+    protected $description = 'Create a user with specified attributes.';
 
     /**
      * Create a new command instance.
@@ -47,6 +53,16 @@ class UserCreate extends Command
         $password = $this->argument('password');
         $language = $this->argument('language');
         $repair_network_id = $this->argument('repair_network_id');
+        $role = $this->option('role');
+        $autoConsent = $this->option('auto-consent');
+        
+        // Get today's date for default consent values
+        $today = Carbon::today()->format('Y-m-d');
+        
+        // Get consent dates from options or use today if auto-consent is set
+        $consent_past_data = $autoConsent ? $today : $this->option('consent-past-data');
+        $consent_future_data = $autoConsent ? $today : $this->option('consent-future-data');
+        $consent_gdpr = $autoConsent ? $today : $this->option('consent-gdpr');
 
         if (User::where('email', $email)->count() > 0)
         {
@@ -71,23 +87,52 @@ class UserCreate extends Command
             $this->error("Invalid parameters " . $validator->messages()->toJson());
         } else
         {
-            $user = User::create([
-                                     'name' => $name,
-                                     'email' => $email,
-                                     'password' => Hash::make($password),
-                                     'role' => Role::RESTARTER,
-                                     'recovery' => substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24),
-                                     'recovery_expires' => strftime('%Y-%m-%d %X', time() + (24 * 60 * 60)),
-                                     'calendar_hash' => Str::random(15),
-                                     'username' => '',
-                                     'wiki_sync_status' => WikiSyncStatus::CreateAtLogin,
-                                     'language' => $language,
-                                     'repair_network' => $repair_network_id,
-                                 ]);
+            $userData = [
+                'name' => $name,
+                'email' => $email,
+                'password' => Hash::make($password),
+                'role' => $role,
+                'recovery' => substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24),
+                'recovery_expires' => strftime('%Y-%m-%d %X', time() + (24 * 60 * 60)),
+                'calendar_hash' => Str::random(15),
+                'username' => '',
+                'wiki_sync_status' => WikiSyncStatus::CreateAtLogin,
+                'language' => $language,
+                'repair_network' => $repair_network_id,
+            ];
+
+            // Add consent data if provided
+            if (!empty($consent_past_data)) {
+                $userData['consent_past_data'] = $consent_past_data;
+            }
+            
+            if (!empty($consent_future_data)) {
+                $userData['consent_future_data'] = $consent_future_data;
+            }
+            
+            if (!empty($consent_gdpr)) {
+                $userData['consent_gdpr'] = $consent_gdpr;
+            }
+
+            $user = User::create($userData);
 
             if ($user)
             {
                 $this->info("User created #" . $user->id);
+                $this->info("Role: " . $this->getRoleName($user->role));
+                
+                if (!empty($userData['consent_past_data']) || !empty($userData['consent_future_data']) || !empty($userData['consent_gdpr'])) {
+                    $this->info("Consent dates set:");
+                    if (!empty($userData['consent_past_data'])) {
+                        $this->info("- Past data: {$userData['consent_past_data']}");
+                    }
+                    if (!empty($userData['consent_future_data'])) {
+                        $this->info("- Future data: {$userData['consent_future_data']}");
+                    }
+                    if (!empty($userData['consent_gdpr'])) {
+                        $this->info("- GDPR: {$userData['consent_gdpr']}");
+                    }
+                }
 
                 if (config('restarters.features.discourse_integration')) {
                     $user->generateAndSetUsername();
@@ -100,5 +145,25 @@ class UserCreate extends Command
 
             $user->generateAndSetUsername();
         }
+    }
+
+    /**
+     * Get the role name from the role ID.
+     *
+     * @param int $roleId
+     * @return string
+     */
+    private function getRoleName($roleId)
+    {
+        $roles = [
+            Role::ROOT => 'ROOT',
+            Role::ADMINISTRATOR => 'ADMINISTRATOR',
+            Role::HOST => 'HOST',
+            Role::RESTARTER => 'RESTARTER',
+            Role::GUSET => 'GUEST',
+            Role::NETWORK_COORDINATOR => 'NETWORK_COORDINATOR',
+        ];
+
+        return $roles[$roleId] ?? 'Unknown Role';
     }
 }
