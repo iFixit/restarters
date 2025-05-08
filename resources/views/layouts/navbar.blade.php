@@ -4,7 +4,7 @@
 {{-- Logo --}}
 <a href="{{ route('home') }}" class="icon-brand">
     <div class="d-none d-md-block">
-    @include('includes/logo-'. env('APP_INSTANCE', 'restarters'))
+    @include('includes/logo-'. (env('APP_INSTANCE') === 'base' ? 'restarters' : (env('APP_INSTANCE') ?: 'restarters')))
     </div>
 
     <div class="d-block d-md-none">

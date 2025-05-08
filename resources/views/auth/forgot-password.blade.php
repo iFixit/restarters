@@ -3,7 +3,7 @@
 <section class="login-page">
         <div class="container">
            <div class="align-items-center justify-content-center d-flex">
-            @include('includes/logo-'. env('APP_INSTANCE', 'restarters'))
+            @include('includes/logo-'. (env('APP_INSTANCE') === 'base' ? 'restarters' : (env('APP_INSTANCE') ?: 'restarters')))
            </div>
 
             <div class="entry-panel card card__login col-12 mt-5 text-left">
