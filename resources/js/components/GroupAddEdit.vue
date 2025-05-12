@@ -53,7 +53,7 @@
           :lat.sync="lat"
           :lng.sync="lng"
           :postcode.sync="postcode"
-          :override-postcode="overridePostcode"
+          :override-postcode.sync="overridePostcode"
           class="group-location"
           :has-error="$v.location.$error"
           ref="location"

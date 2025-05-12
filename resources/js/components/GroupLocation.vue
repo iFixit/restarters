@@ -108,6 +108,9 @@ export default {
     currentPostcode(newVal) {
       this.$emit('update:postcode', newVal)
     },
+    overridePostcode(newVal) {
+      this.$emit('update:overridePostcode', newVal)
+    },
   },
   methods: {
     async placeChanged(addressData, placeResultData) {
