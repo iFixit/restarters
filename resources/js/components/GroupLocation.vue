@@ -113,6 +113,8 @@ export default {
       if (!this.currentPostcode && addressData.postal_code) {
         this.currentPostcode = addressData.postal_code
       }
+      // Emit location-changed for timezone lookup
+      this.$emit('location-changed', { lat: addressData.latitude, lng: addressData.longitude })
     },
     resetValues() {
       // This means that if the input changes, we will assume it's invalid unless we subsequently (because of

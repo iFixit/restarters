@@ -125,3 +125,5 @@ Route::prefix('v2')->group(function() {
         });
     });
 });
+
+Route::get('/timezone', [API\TimeZoneController::class, 'lookup']);

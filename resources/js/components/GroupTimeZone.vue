@@ -42,6 +42,9 @@ export default {
     }
   },
   watch: {
+    value(newValue) {
+      this.currentValue = newValue;
+    },
     valid(newValue) {
       this.$emit('update:valid', newValue)
     },

@@ -56,6 +56,7 @@
           class="group-location"
           :has-error="$v.location.$error"
           ref="location"
+          @location-changed="handleLocationChanged"
       />
       <GroupLocationMap
           :lat="lat"
@@ -446,7 +447,25 @@ export default {
       }
 
       callback(success)
-    }
+    },
+    async handleLocationChanged({ lat, lng }) {
+
+      if (!this.timezone && lat && lng) {
+        try {
+          const timestamp = Math.floor(Date.now() / 1000);
+          const url = `/api/timezone?lat=${lat}&lng=${lng}&timestamp=${timestamp}`;
+
+          const response = await fetch(url);
+          const data = await response.json();
+
+          if (data && data.timeZoneId) {
+            this.timezone = data.timeZoneId;
+          }
+        } catch (e) {
+          console.error('Timezone API error', e);
+        }
+      }
+    },
   }
 }
 </script>
