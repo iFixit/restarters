@@ -26,6 +26,9 @@
     <b-form-group>
       <label for="group_postcode">{{ __('groups.postcode') }}:</label>
       <b-input id="group_postcode" name="postcode" v-model="currentPostcode" :class="{ hasError: hasError }" />
+      <b-form-checkbox id="group_override_postcode" name="override_postcode" v-model="overridePostcode" type="checkbox">
+        {{ __('groups.override_postcode') }}
+      </b-form-checkbox>
       <small>{{ __('groups.groups_postcode_small') }}</small>
     </b-form-group>
   </div>
@@ -79,6 +82,11 @@ export default {
       required: false,
       default: false
     },
+    overridePostcode: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
   },
   components: {
     VueGoogleAutocomplete
@@ -109,8 +117,8 @@ export default {
       this.$emit('update:value', this.currentValue)
       this.$emit('update:lat', addressData.latitude)
       this.$emit('update:lng', addressData.longitude)
-      // Set postcode from autocompletion only if the field is empty
-      if (!this.currentPostcode && addressData.postal_code) {
+      // Set postcode from autocompletion only if overridePostcode is false
+      if (!this.overridePostcode && addressData.postal_code) {
         this.currentPostcode = addressData.postal_code
       }
       // Emit location-changed for timezone lookup

@@ -11,6 +11,9 @@
 'invalid': !valid
         }"
     />
+    <b-form-checkbox id="group_override_timezone" name="override_timezone" v-model="overrideTimezone" type="checkbox">
+      {{ __('groups.override_timezone') }}
+    </b-form-checkbox>
     <small class="form-text text-muted">
       {{ __('groups.timezone_placeholder') }}
     </small>
@@ -28,12 +31,18 @@ export default {
       required: false,
       default: null
     },
+    overrideTimezone: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
   },
   components: { VueTypeaheadBootstrap },
   data () {
     return {
       currentValue: null,
-      timezones: []
+      timezones: [],
+      overrideTimezoneLocal: this.overrideTimezone,
     }
   },
   computed: {
@@ -45,6 +54,12 @@ export default {
     value(newValue) {
       this.currentValue = newValue;
     },
+    overrideTimezoneLocal(newValue) {
+      this.$emit('update:overrideTimezone', newValue)
+    },
+    overrideTimezone(newValue) {
+      this.overrideTimezoneLocal = newValue;
+    },
     valid(newValue) {
       this.$emit('update:valid', newValue)
     },
@@ -54,6 +69,7 @@ export default {
   },
   async mounted() {
     this.currentValue = this.value
+    this.overrideTimezoneLocal = this.overrideTimezone
 
     const ret = await axios.get('/api/timezones')
 

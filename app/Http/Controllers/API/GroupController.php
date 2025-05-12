@@ -834,6 +834,8 @@ class GroupController extends Controller
             'phone' => $phone,
             'network_data' => $network_data,
             'email' => $email,
+            'override_postcode' => $request->input('override_postcode', false),
+            'override_timezone' => $request->input('override_timezone', false),
         ];
 
         $group = Group::create($data);
@@ -982,6 +984,8 @@ class GroupController extends Controller
             'name' => $name,
             'website' => $website,
             'location' => $location,
+            'area' => $area,
+            'postcode' => $postcode,
             'latitude' => $latitude,
             'longitude' => $longitude,
             'country_code' => $country,
@@ -990,6 +994,8 @@ class GroupController extends Controller
             'phone' => $phone,
             'network_data' => $network_data,
             'email' => $email,
+            'override_postcode' => $request->input('override_postcode', false),
+            'override_timezone' => $request->input('override_timezone', false),
         ];
 
         if ($user->hasRole('Administrator') || ($user->hasRole('NetworkCoordinator') && $isCoordinatorForGroup)) {

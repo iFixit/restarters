@@ -300,7 +300,9 @@ class Group extends JsonResource
             'network_data' => $networkData,
             'full' => true,
             'email' => $this->email,
-            'archived_at' => $this->archived_at ? Carbon::parse($this->archived_at)->toIso8601String() : null
+            'archived_at' => $this->archived_at ? Carbon::parse($this->archived_at)->toIso8601String() : null,
+            'override_postcode' => (bool) $this->override_postcode,
+            'override_timezone' => (bool) $this->override_timezone,
         ];
 
         $ret['hosts'] = $this->resource->all_confirmed_hosts_count;
