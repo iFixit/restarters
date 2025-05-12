@@ -1,7 +1,10 @@
 <template>
   <b-form-group>
     <label for="group_website">{{ __('groups.groups_website') }}:</label>
-    <b-input type="url" id="group_website" name="website" v-model="currentwebsite" :class="{ hasError: hasError }"/>
+    <b-input-group>
+      <b-input-group-prepend is-text>https://</b-input-group-prepend>
+      <b-input type="text" id="group_website" name="website" v-model="websiteInput" :class="{ hasError: hasError }"/>
+    </b-input-group>
     <small>{{ __('groups.groups_website_small') }}</small>
   </b-form-group>
 </template>
@@ -21,16 +24,32 @@ export default {
   },
   data () {
     return {
-      currentwebsite: null,
+      websiteInput: ''
     }
   },
   mounted () {
-    this.currentwebsite = this.website
+    // Remove protocol for display
+    if (this.website && this.website.match(/^https?:\/\//)) {
+      this.websiteInput = this.website.replace(/^https?:\/\//, '');
+    } else {
+      this.websiteInput = this.website || '';
+    }
   },
   watch: {
-    currentwebsite(newVal) {
-      this.$emit('update:website', newVal)
+    websiteInput(newVal) {
+      let url = newVal.trim();
+      if (url && !/^https?:\/\//.test(url)) {
+        url = 'https://' + url;
+      }
+      this.$emit('update:website', url)
     },
+    website(newVal) {
+      if (newVal && newVal.match(/^https?:\/\//)) {
+        this.websiteInput = newVal.replace(/^https?:\/\//, '');
+      } else {
+        this.websiteInput = newVal || '';
+      }
+    }
   }
 }
 </script>
