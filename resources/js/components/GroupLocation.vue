@@ -25,7 +25,7 @@
     </b-form-group>
     <b-form-group>
       <label for="group_postcode">{{ __('groups.postcode') }}:</label>
-      <b-input id="group_postcode" name="postcode" v-model="currentPostcode" :class="{ hasError: hasError }" :readonly="!canEditPostcode" />
+      <b-input id="group_postcode" name="postcode" v-model="currentPostcode" :class="{ hasError: hasError }" />
       <small>{{ __('groups.groups_postcode_small') }}</small>
     </b-form-group>
   </div>
@@ -79,11 +79,6 @@ export default {
       required: false,
       default: false
     },
-    canEditPostcode: {
-      type: Boolean,
-      required: false,
-      default: false
-    }
   },
   components: {
     VueGoogleAutocomplete
@@ -114,6 +109,10 @@ export default {
       this.$emit('update:value', this.currentValue)
       this.$emit('update:lat', addressData.latitude)
       this.$emit('update:lng', addressData.longitude)
+      // Set postcode from autocompletion only if the field is empty
+      if (!this.currentPostcode && addressData.postal_code) {
+        this.currentPostcode = addressData.postal_code
+      }
     },
     resetValues() {
       // This means that if the input changes, we will assume it's invalid unless we subsequently (because of
