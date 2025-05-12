@@ -25,7 +25,7 @@
     </b-form-group>
     <b-form-group>
       <label for="group_postcode">{{ __('groups.postcode') }}:</label>
-      <b-input id="group_postcode" name="postcode" v-model="currentPostcode" :class="{ hasError: hasError }" />
+      <b-input id="group_postcode" name="postcode" v-model="currentPostcode" :class="{ hasError: hasError }" :readonly="!overridePostcode" />
       <b-form-checkbox id="group_override_postcode" name="override_postcode" v-model="overridePostcode" type="checkbox">
         {{ __('groups.override_postcode') }}
       </b-form-checkbox>

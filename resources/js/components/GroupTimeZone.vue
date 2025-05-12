@@ -10,6 +10,7 @@
         :class="{
 'invalid': !valid
         }"
+        ref="typeahead"
     />
     <b-form-checkbox id="group_override_timezone" name="override_timezone" v-model="overrideTimezone" type="checkbox">
       {{ __('groups.override_timezone') }}
@@ -59,6 +60,7 @@ export default {
     },
     overrideTimezone(newValue) {
       this.overrideTimezoneLocal = newValue;
+      this.setReadonlyOnInput();
     },
     valid(newValue) {
       this.$emit('update:valid', newValue)
@@ -71,10 +73,32 @@ export default {
     this.currentValue = this.value
     this.overrideTimezoneLocal = this.overrideTimezone
 
+    // Set input to readOnly immediately
+    this.setReadonlyOnInput(true);
+
     const ret = await axios.get('/api/timezones')
 
     if (ret.status && ret.status === 200 && ret.data) {
       this.timezones = ret.data.map(t => t.name)
+    }
+    // Now update based on actual overrideTimezone value
+    this.setReadonlyOnInput();
+  },
+  methods: {
+    setReadonlyOnInput(forceReadOnly = false) {
+      this.$nextTick(() => {
+        const typeahead = this.$refs.typeahead;
+        if (typeahead && typeahead.$el) {
+          const input = typeahead.$el.querySelector('input[type="text"]');
+          if (input) {
+            if (forceReadOnly) {
+              input.readOnly = true;
+            } else {
+              input.readOnly = !this.overrideTimezone;
+            }
+          }
+        }
+      });
     }
   }
 }
