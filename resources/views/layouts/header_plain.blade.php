@@ -43,6 +43,12 @@
         <meta data-hid="twitter:card" name="twitter:card" content="summary_large_image">
         <meta data-hid="twitter:site" name="twitter:site" content="RestartProject">
 
+
+        <script>
+            window.appInstance = "{{ env('APP_INSTANCE', 'base') }}";
+            window.appDebug = "{{ env('APP_DEBUG', '0') }}";
+        </script>
+
         <!-- Cookie banner with fine-grained opt-in -->
         <script src="{{ asset('js/gdpr-cookie-notice.js') }}"></script>
         <!-- Check to see if visitor has opted in to analytics cookies -->
@@ -85,7 +91,7 @@
             <div class="container container-nav">
                 <nav class="navbar navbar-expand-md navbar-light">
                     <div class="d-none d-sm-block navbar-brand">
-                        @include('includes/logo-'. env('APP_LOGO'))
+                        @include('includes/logo-'. (env('APP_INSTANCE') === 'base' ? 'restarters' : (env('APP_INSTANCE') ?: 'restarters')))
                     </div>
                     <div class="d-block d-sm-none">
                         @include('includes/logo-plain')

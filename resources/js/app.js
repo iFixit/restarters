@@ -67,8 +67,8 @@ L.Icon.Default.mergeOptions({
 Vue.use(BootstrapVue)
 Vue.use(IconsPlugin)
 
-import LangMixin from './mixins/lang'
-import { Lang } from './mixins/lang'
+import LangMixin from './mixins/i18n'
+import { Lang } from './mixins/i18n'
 Vue.mixin(LangMixin)
 
 const Icon = require('vue-awesome/components/Icon')

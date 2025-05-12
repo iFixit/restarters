@@ -3,7 +3,7 @@ require('bootstrap');
 import { BootstrapVue } from 'bootstrap-vue'
 Vue.use(BootstrapVue)
 
-import LangMixin from 'resources/js/mixins/lang.js'
+import LangMixin from 'resources/js/mixins/i18n.js'
 
 import { mount  } from '@vue/test-utils'
 import DeviceWeight from './DeviceWeight.vue'

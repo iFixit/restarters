@@ -6,8 +6,8 @@
             <div class="col-lg-4">
                 <header>
                     <a href="/">
-                        @include('includes/logo-'. env('APP_LOGO'))
-          </a>
+                    @include('includes/logo-'. (env('APP_INSTANCE') === 'base' ? 'restarters' : (env('APP_INSTANCE') ?: 'restarters')))
+                    </a>
                 </header>
             </div>
         </div>

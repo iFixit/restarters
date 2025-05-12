@@ -1,12 +1,9 @@
 <?php
 
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Facade;
-use Illuminate\Support\Facades\Route;
 
 return [
-
-
+    'instance' => env('APP_INSTANCE', 'base'),
+    
     'aliases' => [
         'App' => Illuminate\Support\Facades\App::class,
         'Arr' => Illuminate\Support\Arr::class,

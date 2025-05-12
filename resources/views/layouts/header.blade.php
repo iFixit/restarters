@@ -50,6 +50,11 @@
       })();
     </script>
     <!-- End Matomo Code -->
+
+    <script>
+      window.appInstance = "{{ env('APP_INSTANCE', 'base') }}";
+      window.appDebug = "{{ env('APP_DEBUG', '0') }}";
+    </script>
   </head>
   @if( Request::is('login') || Request::is('user/register') )
     <body class="fixed-layout">

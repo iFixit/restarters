@@ -2,17 +2,13 @@
 
 namespace App\Providers;
 
-use App\Models\EventsUsers;
 use App\Helpers\Geocoder;
-use App\Helpers\RobustTranslator;
-use App\Observers\EventsUsersObserver;
-use Auth;
-use Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Translation\Translator;
 use OwenIt\Auditing\Models\Audit;
 use Schema;
+use Illuminate\Support\Facades\URL;
+use App\Providers\TranslationServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -65,13 +61,10 @@ class AppServiceProvider extends ServiceProvider
             return new Geocoder();
         });
 
-        // Override the existing translator with our own robust one.
-        $this->app->extend('translator', function (Translator $translator) {
-            $trans = new RobustTranslator($translator->getLoader(), $translator->getLocale());
-            $trans->setFallback($translator->getFallback());
-            return $trans;
-        });
-
+        
+        // Register our custom TranslationServiceProvider
+        $this->app->register(TranslationServiceProvider::class);
+        
         $this->app->register(\L5Swagger\L5SwaggerServiceProvider::class);
         $this->app->register(\App\Providers\FormServiceProvider::class);
 
