@@ -1,7 +1,8 @@
 <?php
 
 return [
-  'title' => 'Welcome to Fixit Clinic!',
-  'intro' => 'We are a global network of Fixit Clinics who help others repair at community events.',
+  'title' => 'Welcome to the Repair Event Locator!',
+  'intro' => "We’re a global network of repair-minded people helping others connect with repair events in their communities.<br/><br/>
+Want to organize an event, volunteer your skills, or get something fixed? We’ve got you covered.",
   'network_start_url' => 'mailto:community@ifixit.com'
 ];

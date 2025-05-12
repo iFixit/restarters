@@ -79,9 +79,10 @@
 
     .landing-layout {
         display: grid;
-        grid-template-rows: 1fr 1fr 1fr;
-        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-rows: auto;
+        grid-template-columns: 1fr 3fr 1fr;
         column-gap: 30px;
+        row-gap: 15px;
         align-items: center;
     }
 
@@ -103,6 +104,7 @@
     .landing-top-middle {
         grid-row: 1 / 2;
         grid-column: 2 / 3;
+        text-align: center;
     }
 
     .landing-top-right {
@@ -182,7 +184,7 @@
       </div>
       <div class="landing-middle-middle">
         <div class="textlarge">
-          {{ __('landing.intro') }}
+          {!! __('landing.intro') !!}
         </div>
       </div>
       <div class="landing-middle-right">
