@@ -548,7 +548,7 @@ export default {
     grid-column: 1 / 2;
 
     @include media-breakpoint-up(lg) {
-      grid-row: 3 / 5;
+      grid-row: 4 / 5;
       grid-column: 2 / 3;
     }
   }
