@@ -994,8 +994,8 @@ class GroupController extends Controller
             'phone' => $phone,
             'network_data' => $network_data,
             'email' => $email,
-            'override_postcode' => filter_var($request->input('override_postcode', false), FILTER_VALIDATE_BOOLEAN),
-            'override_timezone' => filter_var($request->input('override_timezone', false), FILTER_VALIDATE_BOOLEAN),
+            'override_postcode' => $request->boolean('override_postcode', false),
+            'override_timezone' => $request->boolean('override_timezone', false),
         ];
 
         if ($user->hasRole('Administrator') || ($user->hasRole('NetworkCoordinator') && $isCoordinatorForGroup)) {
