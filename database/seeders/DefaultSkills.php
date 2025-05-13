@@ -25,14 +25,11 @@ class DefaultSkills extends Seeder
             $data = [];
             foreach ($raw as $categoryId => $skills) {
                 foreach ($skills as $skill) {
-                    $entry = [
+                    $data[] = [
                         'skill_name' => $skill['skill_name'],
                         'category' => (int)$categoryId,
+                        'description' => $skill['description'] ?? ''
                     ];
-                    if (isset($skill['description'])) {
-                        $entry['description'] = $skill['description'];
-                    }
-                    $data[] = $entry;
                 }
             }
         } else {
