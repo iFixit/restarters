@@ -12,8 +12,6 @@ class DefaultSkills extends Seeder
      */
     public function run(): void
     {
-        DB::table('skills')->truncate();
-
         $jsonPath = base_path('config/skills.json');
 
         if (file_exists($jsonPath)) {
@@ -56,6 +54,17 @@ class DefaultSkills extends Seeder
             ];
         }
 
-        DB::table('skills')->insert($data);
+        $truncate = env('SEEDING_TRUNCATE_SKILLS', true);
+
+        if ($truncate) {
+            DB::table('skills')->truncate();
+            DB::table('skills')->insert($data);
+        } else {
+            foreach ($data as $entry) {
+                if (!DB::table('skills')->where('skill_name', $entry['skill_name'])->exists()) {
+                    DB::table('skills')->insert($entry);
+                }
+            }
+        }
     }
 }
