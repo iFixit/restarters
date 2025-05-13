@@ -23,8 +23,7 @@ class UserCreate extends Command
                            {--role=4 : Role ID (1=ROOT, 2=ADMINISTRATOR, 3=HOST, 4=RESTARTER, 5=GUEST, 6=NETWORK_COORDINATOR)}
                            {--consent-past-data= : Consent date for past data in YYYY-MM-DD format, defaults to today}
                            {--consent-future-data= : Consent date for future data in YYYY-MM-DD format, defaults to today}
-                           {--consent-gdpr= : Consent date for GDPR in YYYY-MM-DD format, defaults to today}
-                           {--auto-consent : Automatically set all consent dates to today}';
+                           {--consent-gdpr= : Consent date for GDPR in YYYY-MM-DD format, defaults to today}';
 
     /**
      * The console command description.
@@ -54,15 +53,26 @@ class UserCreate extends Command
         $language = $this->argument('language');
         $repair_network_id = $this->argument('repair_network_id');
         $role = $this->option('role');
-        $autoConsent = $this->option('auto-consent');
         
         // Get today's date for default consent values
         $today = Carbon::today()->format('Y-m-d');
         
-        // Get consent dates from options or use today if auto-consent is set
-        $consent_past_data = $autoConsent ? $today : $this->option('consent-past-data');
-        $consent_future_data = $autoConsent ? $today : $this->option('consent-future-data');
-        $consent_gdpr = $autoConsent ? $today : $this->option('consent-gdpr');
+        // Get consent dates from options or use today if not set
+        $consent_past_data = $this->option('consent-past-data') ?: $today;
+        $consent_future_data = $this->option('consent-future-data') ?: $today;
+        $consent_gdpr = $this->option('consent-gdpr') ?: $today;
+
+        // Validate consent dates
+        foreach ([
+            'consent_past_data' => $consent_past_data,
+            'consent_future_data' => $consent_future_data,
+            'consent_gdpr' => $consent_gdpr,
+        ] as $label => $date) {
+            if (!$this->validateDate($date)) {
+                $this->error("Invalid date for $label: $date. Expected format: YYYY-MM-DD");
+                return;
+            }
+        }
 
         if (User::where('email', $email)->count() > 0)
         {
@@ -165,5 +175,14 @@ class UserCreate extends Command
         ];
 
         return $roles[$roleId] ?? 'Unknown Role';
+    }
+
+    /**
+     * Validate a date string against a format.
+     */
+    private function validateDate($date, $format = 'Y-m-d')
+    {
+        $d = \DateTime::createFromFormat($format, $date);
+        return $d && $d->format($format) === $date;
     }
 }

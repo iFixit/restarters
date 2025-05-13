@@ -19,7 +19,7 @@ php artisan cache:clear
 php artisan config:clear
 
 # Ensure we have the admin user
-php artisan user:create "Jane Bloggs" "jane@bloggs.net" "passw0rd" "en" "1" --role=2 --auto-consent
+php artisan user:create "Jane Bloggs" "jane@bloggs.net" "passw0rd" "en" "1" --role=2
 
 php artisan dev --no-logs
 
