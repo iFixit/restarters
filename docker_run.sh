@@ -19,7 +19,7 @@ php artisan cache:clear
 php artisan config:clear
 
 # Ensure we have the admin user
-echo "User::create(['name'=>'Jane Bloggs','email'=>'jane@bloggs.net','password'=>Hash::make('passw0rd'),'role'=>2,'consent_past_data'=>'2021-01-01','consent_future_data'=>'2021-01-01','consent_gdpr'=>'2021-01-01']);" | php artisan tinker
+php artisan user:create "Jane Bloggs" "jane@bloggs.net" "passw0rd" "en" "1" --role=2
 
 php artisan dev --no-logs
 
