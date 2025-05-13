@@ -29,7 +29,7 @@ use Auth;
 use Carbon\Carbon;
 use DateTime;
 use DB;
-use FixometerFile;
+use App\Helpers\FixometerFile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Lang;

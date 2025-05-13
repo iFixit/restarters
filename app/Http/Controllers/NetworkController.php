@@ -8,7 +8,7 @@ use Illuminate\Http\RedirectResponse;
 use App\Models\Group;
 use App\Models\Network;
 use Auth;
-use FixometerFile;
+use App\Helpers\FixometerFile;
 use Illuminate\Http\Request;
 use Lang;
 

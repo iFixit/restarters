@@ -16,7 +16,7 @@ use App\Models\User;
 use App\Models\UserGroups;
 use App\Models\Xref;
 use Auth;
-use FixometerFile;
+use App\Helpers\FixometerFile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -86,7 +86,7 @@ class DeviceController extends Controller
                     $fn = $file->upload('file', 'image', $id, env('TBL_DEVICES'), true, false, true);
 
                     if ($fn) {
-                        $File = new \FixometerFile;
+                        $File = new FixometerFile;
                         $images = $File->findImages(env('TBL_DEVICES'), $id);
                     } else {
                         return __('devices.image_upload_error');

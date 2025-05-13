@@ -21,6 +21,7 @@ use App\Models\User;
 use App\Models\UserGroups;
 use App\Models\Xref;
 use App\Models\Alert;
+use App\Helpers\FixometerFile;
 use Auth;
 use Carbon\Carbon;
 use DB;
@@ -74,7 +75,7 @@ abstract class TestCase extends BaseTestCase
         Category::factory()->count(1)->desktopComputer()->create(); // ID 11
 
         // We manipulate some globals for image upload testing.
-        \FixometerFile::$uploadTesting = FALSE;
+        FixometerFile::$uploadTesting = FALSE;
         
         // Create the uploads directory if it doesn't exist
         $uploadsDir = public_path('uploads');

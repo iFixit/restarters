@@ -8,6 +8,7 @@ use App\Events\EditGroup;
 use App\Models\Group;
 use App\Models\GroupTags;
 use App\Helpers\Fixometer;
+use App\Helpers\FixometerFile;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\PartySummaryCollection;
 use App\Http\Resources\TagCollection;
@@ -862,7 +863,7 @@ class GroupController extends Controller
                            ]);
 
         if (isset($_FILES) && !empty($_FILES)) {
-            $file = new \FixometerFile();
+            $file = new FixometerFile();
             $file->upload('image', 'image', $idGroup, env('TBL_GROUPS'), false, true, true);
         }
 
@@ -1007,7 +1008,7 @@ class GroupController extends Controller
 
         if (isset($_FILES) && !empty($_FILES)) {
             // Update the group image.
-            $file = new \FixometerFile();
+            $file = new FixometerFile();
             $group_avatar = $file->upload('image', 'image', $idGroup, env('TBL_GROUPS'), false, true, true);
             $group_avatar = env('UPLOADS_URL').'mid_'.$group_avatar;
         } else {

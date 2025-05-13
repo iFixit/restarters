@@ -7,6 +7,7 @@ use App\Events\EditEvent;
 use App\Models\EventsUsers;
 use App\Models\Group;
 use App\Helpers\Fixometer;
+use App\Helpers\FixometerFile;
 use App\Http\Controllers\Controller;
 use App\Models\Invite;
 use App\Models\Network;
@@ -548,7 +549,7 @@ class EventController extends Controller
         }
 
         if (isset($_FILES) && !empty($_FILES)) {
-            $file = new \FixometerFile();
+            $file = new FixometerFile();
             $file->upload('image', 'image', $idParty, env('TBL_EVENTS'), false, true, true);
         }
 
