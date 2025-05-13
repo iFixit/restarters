@@ -155,11 +155,11 @@ class UserCreate extends Command
     }
 
     /**
-     * Validate a date string against a format.
+     * Validate a date string for proper format.
      */
-    private function validateDate($date, $format = 'Y-m-d')
+    private function validateDate($date)
     {
-        $d = \DateTime::createFromFormat($format, $date);
-        return $d && $d->format($format) === $date;
+        $d = \DateTime::createFromFormat('Y-m-d', $date);
+        return $d && $d->format('Y-m-d') === $date;
     }
 }
