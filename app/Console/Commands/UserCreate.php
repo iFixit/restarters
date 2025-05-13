@@ -109,40 +109,17 @@ class UserCreate extends Command
                 'wiki_sync_status' => WikiSyncStatus::CreateAtLogin,
                 'language' => $language,
                 'repair_network' => $repair_network_id,
+                'consent_past_data' => $consent_past_data,
+                'consent_future_data' => $consent_future_data,
+                'consent_gdpr' => $consent_gdpr,
             ];
-
-            // Add consent data if provided
-            if (!empty($consent_past_data)) {
-                $userData['consent_past_data'] = $consent_past_data;
-            }
-            
-            if (!empty($consent_future_data)) {
-                $userData['consent_future_data'] = $consent_future_data;
-            }
-            
-            if (!empty($consent_gdpr)) {
-                $userData['consent_gdpr'] = $consent_gdpr;
-            }
 
             $user = User::create($userData);
 
             if ($user)
             {
-                $this->info("User created #" . $user->id);
-                $this->info("Role: " . $this->getRoleName($user->role));
-                
-                if (!empty($userData['consent_past_data']) || !empty($userData['consent_future_data']) || !empty($userData['consent_gdpr'])) {
-                    $this->info("Consent dates set:");
-                    if (!empty($userData['consent_past_data'])) {
-                        $this->info("- Past data: {$userData['consent_past_data']}");
-                    }
-                    if (!empty($userData['consent_future_data'])) {
-                        $this->info("- Future data: {$userData['consent_future_data']}");
-                    }
-                    if (!empty($userData['consent_gdpr'])) {
-                        $this->info("- GDPR: {$userData['consent_gdpr']}");
-                    }
-                }
+                $this->info("User created {$user->name} (#{$user->id})");
+                $this->info("Role: {$this->getRoleName($user->role)}");
 
                 if (config('restarters.features.discourse_integration')) {
                     $user->generateAndSetUsername();
