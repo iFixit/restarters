@@ -364,8 +364,10 @@ class PartyController extends Controller
         $device_images = [];
 
         //Get Device Images
-        foreach ($event->devices as $device) {
-            $device_images[$device->iddevices] = $File->findImages(env('TBL_DEVICES'), $device->iddevices);
+        if(config('restarters.features.image_upload_enabled')) {
+            foreach ($event->devices as $device) {
+                $device_images[$device->iddevices] = $File->findImages(env('TBL_DEVICES'), $device->iddevices);
+            }
         }
 
         // Items can be logged at any time.
