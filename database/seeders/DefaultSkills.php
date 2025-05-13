@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Log;
 
 class DefaultSkills extends Seeder
 {
@@ -12,56 +13,105 @@ class DefaultSkills extends Seeder
      */
     public function run(): void
     {
+        $data = $this->getSkillsData();
+
+        try {
+            $this->seedSkills($data);
+        } catch (\Exception $e) {
+            Log::error("Failed to seed skills: {$e->getMessage()}");
+        }
+    }
+
+    /**
+     * Get skills data from JSON file or fallback to defaults
+     */
+    private function getSkillsData(): array
+    {
         $jsonPath = base_path('config/skills.json');
 
         if (file_exists($jsonPath)) {
-            $raw = json_decode(file_get_contents($jsonPath), true);
-
-            if (!is_array($raw)) {
-                throw new \Exception("Invalid JSON in $jsonPath");
+            try {
+                return $this->processJsonData($jsonPath);
+            } catch (\Exception $e) {
+                Log::warning("Failed to process skills JSON: {$e->getMessage()}. Using fallback data.");
+                return $this->getFallbackData();
             }
-
-            // Flatten the new schema: { <category_id>: [ { skill_name, description? }, ... ] }
-            $data = [];
-            foreach ($raw as $categoryId => $skills) {
-                foreach ($skills as $skill) {
-                    $data[] = [
-                        'skill_name' => $skill['skill_name'],
-                        'category' => (int)$categoryId,
-                        'description' => $skill['description'] ?? ''
-                    ];
-                }
-            }
-        } else {
-            // Fallback to hardcoded data
-            $data = [
-                ['skill_name' => 'Publicising events', 'category' => 1],
-                ['skill_name' => 'Recruiting volunteers', 'category' => 1],
-                ['skill_name' => 'Managing events', 'category' => 1],
-                ['skill_name' => 'Finding venues', 'category' => 1],
-    
-                ['skill_name' => 'Software/OS', 'category' => 2],
-                ['skill_name' => 'Changing a fuse', 'category' => 2],
-                ['skill_name' => 'Using a multimeter', 'category' => 2],
-                ['skill_name' => 'Laptop disassembly', 'category' => 2],
-                ['skill_name' => 'Replacing PCB components', 'category' => 2],
-                ['skill_name' => 'Headphones', 'category' => 2],
-                ['skill_name' => 'Electronics safety', 'category' => 2],
-                ['skill_name' => 'Replacing screens', 'category' => 2],
-            ];
         }
 
+        return $this->getFallbackData();
+    }
+
+    /**
+     * Process JSON data from file
+     */
+    private function processJsonData(string $jsonPath): array
+    {
+        $raw = json_decode(file_get_contents($jsonPath), true);
+
+        if (!is_array($raw)) {
+            throw new \Exception("Invalid JSON in $jsonPath");
+        }
+
+        $data = [];
+        foreach ($raw as $categoryId => $skills) {
+            foreach ($skills as $skill) {
+                $data[] = [
+                    'skill_name' => $skill['skill_name'],
+                    'category' => (int)$categoryId,
+                    'description' => $skill['description'] ?? ''
+                ];
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * Get fallback skills data
+     */
+    private function getFallbackData(): array
+    {
+        return [
+            ['skill_name' => 'Publicising events', 'category' => 1],
+            ['skill_name' => 'Recruiting volunteers', 'category' => 1],
+            ['skill_name' => 'Managing events', 'category' => 1],
+            ['skill_name' => 'Finding venues', 'category' => 1],
+
+            ['skill_name' => 'Software/OS', 'category' => 2],
+            ['skill_name' => 'Changing a fuse', 'category' => 2],
+            ['skill_name' => 'Using a multimeter', 'category' => 2],
+            ['skill_name' => 'Laptop disassembly', 'category' => 2],
+            ['skill_name' => 'Replacing PCB components', 'category' => 2],
+            ['skill_name' => 'Headphones', 'category' => 2],
+            ['skill_name' => 'Electronics safety', 'category' => 2],
+            ['skill_name' => 'Replacing screens', 'category' => 2],
+        ];
+    }
+
+    /**
+     * Seed skills to database based on configuration
+     */
+    private function seedSkills(array $data): void
+    {
         $truncate = env('SEEDING_TRUNCATE_SKILLS', true);
 
         if ($truncate) {
+            Log::info('Truncating and re-inserting all skills');
             DB::table('skills')->truncate();
             DB::table('skills')->insert($data);
+            Log::info('Inserted ' . count($data) . ' skills');
         } else {
+            Log::info('Merging new skills only');
+            $added = 0;
+            
             foreach ($data as $entry) {
                 if (!DB::table('skills')->where('skill_name', $entry['skill_name'])->exists()) {
                     DB::table('skills')->insert($entry);
+                    $added++;
                 }
             }
+            
+            Log::info("Added $added new skills");
         }
     }
 }
