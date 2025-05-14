@@ -52,7 +52,9 @@ class Group extends Model implements Auditable
         'phone',
         'network_data',
         'email',
-        'archived_at'
+        'archived_at',
+        'override_postcode',
+        'override_timezone',
     ];
 
     protected $appends = ['ShareableLink', 'auto_approve'];

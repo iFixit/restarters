@@ -53,11 +53,13 @@
           :lat.sync="lat"
           :lng.sync="lng"
           :postcode.sync="postcode"
-          :can-edit-postcode="canApprove"
+          :override-postcode.sync="overridePostcode"
           class="group-location"
           :has-error="$v.location.$error"
           ref="location"
+          @location-changed="handleLocationChanged"
       />
+
       <GroupLocationMap
           :lat="lat"
           :lng="lng"
@@ -71,7 +73,9 @@
           class="group-timezone"
           :has-error="!timezoneValid"
           ref="timezone"
+          :override-timezone.sync="overrideTimezone"
       />
+
       <GroupPhone
           :phone.sync="phone"
           class="group-phone"
@@ -253,6 +257,8 @@ export default {
       tagList: null,
       networkData: {},
       archived_at: null,
+      overridePostcode: false,
+      overrideTimezone: false,
     }
   },
   validations: {
@@ -358,6 +364,8 @@ export default {
       this.tagList = group.tags
       this.networkData = group.network_data ? group.network_data : {}
       this.archived_at = group.archived_at
+      this.overridePostcode = group.override_postcode || false;
+      this.overrideTimezone = group.override_timezone || false;
     }
 
     if (this.canNetwork) {
@@ -398,7 +406,9 @@ export default {
               timezone: this.timezone,
               phone: this.phone,
               image: this.image,
-              network_data: JSON.stringify(this.networkData)
+              network_data: JSON.stringify(this.networkData),
+              override_postcode: this.overridePostcode,
+              override_timezone: this.overrideTimezone,
             })
 
             if (id) {
@@ -430,6 +440,8 @@ export default {
                 tags: JSON.stringify(this.tagList.map(n => n.id)),
                 network_data: JSON.stringify(this.networkData),
                 archived_at: this.archived_at,
+                override_postcode: this.overridePostcode,
+                override_timezone: this.overrideTimezone,
               })
 
               if (id) {
@@ -447,7 +459,20 @@ export default {
       }
 
       callback(success)
-    }
+    },
+    async handleLocationChanged({ lat, lng }) {
+      if (!this.overrideTimezone && lat && lng) {
+        try {
+          const timestamp = Math.floor(Date.now() / 1000);
+          const url = `/api/timezone?lat=${lat}&lng=${lng}&timestamp=${timestamp}`;
+          const response = await fetch(url);
+          const data = await response.json();
+          if (data && data.timeZoneId) {
+            this.timezone = data.timeZoneId;
+          }
+        } catch (e) {}
+      }
+    },
   }
 }
 </script>
@@ -523,7 +548,7 @@ export default {
     grid-column: 1 / 2;
 
     @include media-breakpoint-up(lg) {
-      grid-row: 3 / 5;
+      grid-row: 4 / 5;
       grid-column: 2 / 3;
     }
   }

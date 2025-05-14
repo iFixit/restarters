@@ -25,7 +25,10 @@
     </b-form-group>
     <b-form-group>
       <label for="group_postcode">{{ __('groups.postcode') }}:</label>
-      <b-input id="group_postcode" name="postcode" v-model="currentPostcode" :class="{ hasError: hasError }" :readonly="!canEditPostcode" />
+      <b-input id="group_postcode" name="postcode" v-model="currentPostcode" :class="{ hasError: hasError }" :readonly="!overridePostcode" />
+      <b-form-checkbox id="group_override_postcode" name="override_postcode" v-model="overridePostcode" type="checkbox">
+        {{ __('groups.override_postcode') }}
+      </b-form-checkbox>
       <small>{{ __('groups.groups_postcode_small') }}</small>
     </b-form-group>
   </div>
@@ -79,11 +82,11 @@ export default {
       required: false,
       default: false
     },
-    canEditPostcode: {
+    overridePostcode: {
       type: Boolean,
       required: false,
       default: false
-    }
+    },
   },
   components: {
     VueGoogleAutocomplete
@@ -105,6 +108,9 @@ export default {
     currentPostcode(newVal) {
       this.$emit('update:postcode', newVal)
     },
+    overridePostcode(newVal) {
+      this.$emit('update:overridePostcode', newVal)
+    },
   },
   methods: {
     async placeChanged(addressData, placeResultData) {
@@ -114,6 +120,12 @@ export default {
       this.$emit('update:value', this.currentValue)
       this.$emit('update:lat', addressData.latitude)
       this.$emit('update:lng', addressData.longitude)
+      // Set postcode from autocompletion only if overridePostcode is false
+      if (!this.overridePostcode && addressData.postal_code) {
+        this.currentPostcode = addressData.postal_code
+      }
+      // Emit location-changed for timezone lookup
+      this.$emit('location-changed', { lat: addressData.latitude, lng: addressData.longitude })
     },
     resetValues() {
       // This means that if the input changes, we will assume it's invalid unless we subsequently (because of
