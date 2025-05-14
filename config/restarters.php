@@ -5,6 +5,7 @@ return [
     'features' => [
         'discourse_integration' => env('FEATURE__DISCOURSE_INTEGRATION', true),
         'wordpress_integration' => env('FEATURE__WORDPRESS_INTEGRATION', true),
+        'image_upload_enabled' => env('FEATURE__IMAGE_UPLOAD', false),
     ],
 
     'wiki' => [
