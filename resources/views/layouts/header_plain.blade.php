@@ -39,9 +39,9 @@
         <meta data-hid="twitter:title" name="twitter:title" content="{{ config('app.name', 'Laravel') }}">
         <meta data-hid="twitter:description" name="twitter:description" content="{{ __('landing.intro') }}">
         <meta data-hid="twitter:image" name="twitter:image" content="{{ url('/images/landing/landing1.jpg') }}">
-        <meta data-hid="twitter:image:alt" name="twitter:image:alt" content="The Restart logo">
+        <meta data-hid="twitter:image:alt" name="twitter:image:alt" content="{{ env('META_TWITTER_IMAGE_ALT') }}">
         <meta data-hid="twitter:card" name="twitter:card" content="summary_large_image">
-        <meta data-hid="twitter:site" name="twitter:site" content="RestartProject">
+        <meta data-hid="twitter:site" name="twitter:site" content="{{ env('META_TWITTER_SITE') }}">
 
 
         <script>
