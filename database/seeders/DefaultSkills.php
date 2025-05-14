@@ -100,18 +100,28 @@ class DefaultSkills extends Seeder
             DB::table('skills')->truncate();
             DB::table('skills')->insert($data);
             Log::info('Inserted ' . count($data) . ' skills');
-        } else {
-            Log::info('Merging new skills only');
-            $added = 0;
-            
-            foreach ($data as $entry) {
-                if (!DB::table('skills')->where('skill_name', $entry['skill_name'])->exists()) {
-                    DB::table('skills')->insert($entry);
-                    $added++;
-                }
-            }
-            
-            Log::info("Added $added new skills");
+            return;
         }
+
+        Log::info('Merging new skills only');
+        $added = 0;
+        $modified = 0;
+
+        foreach ($data as $entry) {
+            $skill = DB::table('skills')->where('skill_name', $entry['skill_name'])->first();
+
+            if (is_null($skill)) {
+                DB::table('skills')->insert($entry);
+                $added++;
+                continue;
+            }
+
+            if (empty($skill->description) && !empty($entry['description'])) {
+                DB::table('skills')->where('id', $skill->id)->update(['description' => $entry['description']]);
+                $modified++;
+            }
+        }
+
+        Log::info("Added $added new skills and modified $modified skills");
     }
 }
