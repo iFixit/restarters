@@ -31,7 +31,7 @@
         <meta data-hid="og:type" property="og:type" content="website">
         <meta data-hid="description" name="description" content="{{ __('landing.intro') }}">
         <meta data-hid="og:image" property="og:image" content="{{ url('/images/landing/landing1.jpg') }}">
-        <meta data-hid="og:locale" property="og:locale" content="en_GB">
+        <meta data-hid="og:locale" property="og:locale" content="{{ app()->getLocale() }}">
         <meta data-hid="og:title" property="og:title" content="{{ config('app.name', 'Laravel') }}">
         <meta data-hid="og:site_name" property="og:site_name" content="{{ config('app.name', 'Laravel') }}">
         <meta data-hid="og:url" property="og:url" content="{{ url()->current() }}">
