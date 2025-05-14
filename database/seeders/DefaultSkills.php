@@ -110,7 +110,7 @@ class DefaultSkills extends Seeder
         foreach ($data as $entry) {
             $skill = DB::table('skills')->where('skill_name', $entry['skill_name'])->first();
 
-            if (is_null($skill)) {
+            if (!$skill) {
                 DB::table('skills')->insert($entry);
                 $added++;
                 continue;
