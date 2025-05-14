@@ -7,7 +7,7 @@
         @yield('extra-meta')
         <!-- CSRF Token -->
         <meta name="csrf-token" content="{{ csrf_token() }}">
-        <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+        <link rel="shortcut icon" href="/favicon-{{ (env('APP_INSTANCE') === 'base' ? 'restarters' : (env('APP_INSTANCE') ?: 'restarters')) }}.ico" type="image/x-icon" />
 
         <title>
             @hasSection('title')
