@@ -1,4 +1,5 @@
 <template>
+  @if(config('restarters.features.image_upload_enabled'))
   <b-form-group>
     <label for="dropzone">{{ __('groups.group_image') }}:</label>
     <div class="layout">
@@ -13,6 +14,7 @@
       </b-btn>
     </div>
   </b-form-group>
+  @endif
 </template>
 <script>
 import vue2Dropzone from 'vue2-dropzone'

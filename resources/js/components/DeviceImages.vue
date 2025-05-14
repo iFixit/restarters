@@ -1,4 +1,5 @@
 <template>
+  @if(config('restarters.features.image_upload_enabled'))
   <div>
     <div class="device-photo-layout">
       <label>
@@ -10,6 +11,7 @@
       </div>
     </div>
   </div>
+  @endif
 </template>
 <script>
 import FileUploader from './FileUploader'
