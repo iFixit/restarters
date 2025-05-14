@@ -137,6 +137,7 @@
 
     </div>
 
+    @if (config('restarters.features.image_upload_enabled'))
     <div class="col-lg-6 d-flex col-bottom" id="change-photo">
     <div class="edit-panel">
         <h4>@lang('profile.change_photo')</h4>
@@ -171,4 +172,5 @@
     <!-- / edit-panel -->
 
     </div>
+    @endif
 </div>
