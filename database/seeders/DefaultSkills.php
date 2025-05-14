@@ -116,7 +116,7 @@ class DefaultSkills extends Seeder
                 continue;
             }
 
-            if (empty($skill->description) && !empty($entry['description'])) {
+            if (!$skill->description && $entry['description'] ?? null) {
                 DB::table('skills')->where('id', $skill->id)->update(['description' => $entry['description']]);
                 $modified++;
             }
