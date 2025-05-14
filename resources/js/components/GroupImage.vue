@@ -1,6 +1,5 @@
 <template>
-  @if(config('restarters.features.image_upload_enabled'))
-  <b-form-group>
+  <b-form-group v-if="imageUploadEnabled">
     <label for="dropzone">{{ __('groups.group_image') }}:</label>
     <div class="layout">
       <vue-dropzone ref="dropzone" id="dropzone" :options="dropzoneOptions"
@@ -14,7 +13,6 @@
       </b-btn>
     </div>
   </b-form-group>
-  @endif
 </template>
 <script>
 import vue2Dropzone from 'vue2-dropzone'
@@ -36,6 +34,9 @@ export default {
     vueDropzone: vue2Dropzone
   },
   computed: {
+    imageUploadEnabled() {
+      return window.Laravel && window.Laravel.imageUploadEnabled;
+    },
     src() {
       if (this.image) {
         return '/uploads/' + this.image

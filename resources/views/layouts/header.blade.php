@@ -54,6 +54,9 @@
     <script>
       window.appInstance = "{{ env('APP_INSTANCE', 'base') }}";
       window.appDebug = "{{ env('APP_DEBUG', '0') }}";
+      window.Laravel = {
+        imageUploadEnabled: @json(config('restarters.features.image_upload_enabled', false)),
+      };
     </script>
   </head>
   @if( Request::is('login') || Request::is('user/register') )
