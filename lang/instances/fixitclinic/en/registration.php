@@ -2,6 +2,7 @@
 
 return [
     'reg-step-1-heading' => 'What skills would you like to share with others on iFixit?',
+    'reg-step-3-1a' => 'We can send you email updates about events and groups related to you, and about iFixit in general.',
     'reg-step-3-label1' => 'I would like to receive monthly newsletter',
     'reg-step-3-label2' => 'I would like to receive email notifications about events or groups near me',
     'reg-step-4-label1' => '<strong>Personal Data</strong>. I consent for iFixit to use my personal data internally for the purposes of registering me in the community, verifying the source of repair data and improving the volunteer experience. I understand that my personal profile will be visible to other community members, however personal data provided will never be shared with third parties without my consent. I understand I can delete my profile and all my personal data at any time - and access the community Privacy Policy <a href="https://www.ifixit.com/Info/Privacy" rel="noopener noreferrer" target="_blank">here</a>.',
