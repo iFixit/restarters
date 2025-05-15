@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Events\DeviceCreatedOrUpdated;
+use App\Helpers\FixometerFile;
 use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
@@ -386,7 +387,7 @@ class Device extends Model implements Auditable
 
     public function getImages()
     {
-        $File = new \FixometerFile;
+        $File = new FixometerFile;
 
         return $File->findImages(env('TBL_DEVICES'), $this->iddevices);
     }

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="imageUploadEnabled">
     <div class="device-photo-layout">
       <label>
         {{ __('devices.images') }}
@@ -37,7 +37,7 @@ export default {
       type: Boolean,
       required: false,
       default: false
-    },
+    }
   },
   data () {
     return {
@@ -57,6 +57,9 @@ export default {
     },
     uploadURL() {
       return '/device/image-upload/' + (this.id ? this.id : 0)
+    },
+    imageUploadEnabled() {
+      return window.Laravel && window.Laravel.imageUploadEnabled;
     }
   },
   methods: {

@@ -8,6 +8,7 @@ use App\Models\Device;
 use App\Models\DeviceBarrier;
 use App\Events\DeviceCreatedOrUpdated;
 use App\Helpers\Fixometer;
+use App\Helpers\FixometerFile;
 use App\Http\Controllers\Controller;
 use App\Notifications\AdminAbnormalDevices;
 use App\Models\Party;
@@ -224,7 +225,7 @@ class DeviceController extends Controller {
 
             // We might have some photos uploaded for this device.  Record them against this device instance.
             // Each instance of a device shares the same underlying photo file.
-            $File = new \FixometerFile;
+            $File = new FixometerFile;
             $images = $File->findImages(env('TBL_DEVICES'), $draftId);
             foreach ($images as $image) {
                 $xref = Xref::findOrFail($image->idxref);

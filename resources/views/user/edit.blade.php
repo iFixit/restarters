@@ -77,12 +77,13 @@
                                   </select>
                                 </div>
                                 @endif
+
+                                @if(config('restarters.features.image_upload_enabled'))
                                 <div class="form-group">
                                     <label for="profile">Profile Picture:</label>
                                     <input type="file" class="form-control file" name="profile"data-show-upload="false" data-show-caption="true">
                                 </div>
-
-
+                                @endif
                                 <?php $groupclass = (App\Helpers\Fixometer::hasRole($user, 'Administrator') ? 'show' : 'hidden'); ?>
                                 <div class="form-group <?php echo $groupclass; ?> <?php if(isset($error) && isset($error['group']) && !empty($error['group'])) { echo "has-error"; } ?>">
                                     <label for="group">Group(s):</label>

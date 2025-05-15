@@ -33,7 +33,7 @@ use App\Models\UsersSkills;
 use App\WikiSyncStatus;
 use Auth;
 use Cache;
-use FixometerFile;
+use App\Helpers\FixometerFile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Input;

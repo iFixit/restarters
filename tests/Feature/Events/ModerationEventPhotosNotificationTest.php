@@ -6,6 +6,7 @@ use App\Models\EventsUsers;
 use PHPUnit\Framework\Attributes\Test;
 use App\Models\Group;
 use App\Helpers\Fixometer;
+use App\Helpers\FixometerFile;
 use App\Notifications\AdminModerationEvent;
 use App\Notifications\AdminModerationEventPhotos;
 use App\Models\Party;
@@ -49,7 +50,7 @@ class ModerationEventPhotosNotificationTest extends TestCase
         \Storage::fake('avatars');
 
         $_SERVER['DOCUMENT_ROOT'] = getcwd();
-        \FixometerFile::$uploadTesting = TRUE;
+        FixometerFile::$uploadTesting = TRUE;
         file_put_contents('/tmp/UT.jpg', file_get_contents(public_path() .'/images/community.jpg'));
 
         $_FILES = [

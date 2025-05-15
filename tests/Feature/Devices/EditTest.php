@@ -11,6 +11,7 @@ use App\Models\Network;
 use App\Models\Party;
 use App\Models\Role;
 use App\Models\User;
+use App\Helpers\FixometerFile;
 use DB;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
@@ -99,7 +100,7 @@ class EditTest extends TestCase
         ]);
 
         // We don't upload files in a standard Laravel way, so testing upload is a bit of a hack.
-        \FixometerFile::$uploadTesting = TRUE;
+        FixometerFile::$uploadTesting = TRUE;
         file_put_contents('/tmp/UT.jpg', file_get_contents(public_path() . '/images/community.jpg'));
 
         $_FILES = [
@@ -154,7 +155,7 @@ class EditTest extends TestCase
         $iddevices = -1;
 
         // We don't upload files in a standard Laravel way, so testing upload is a bit of a hack.
-        \FixometerFile::$uploadTesting = TRUE;
+        FixometerFile::$uploadTesting = TRUE;
         file_put_contents('/tmp/UT.jpg', file_get_contents(public_path() . '/images/community.jpg'));
 
         $_FILES = [

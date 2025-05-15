@@ -32,9 +32,11 @@
           <li class="nav-item">
             <a class="nav-link active" data-toggle="tab" href="#details">@lang('events.event_details')</a>
           </li>
+          @if(config('restarters.features.image_upload_enabled'))
           <li class="nav-item">
             <a class="nav-link" data-toggle="tab" href="#photos">@lang('events.event_photos')</a>
           </li>
+          @endif
           @if( $audits && App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator') )
           <li class="nav-item">
             <a class="nav-link" data-toggle="tab" href="#log">@lang('events.event_log')</a>
@@ -70,6 +72,7 @@
               </div>
           </div>
 
+          @if(config('restarters.features.image_upload_enabled'))
           <div class="tab-pane" id="photos">
             <div class="form-group row">
 
@@ -102,6 +105,7 @@
             </div>
 
           </div>
+          @endif
 
           @if( $audits && App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator') )
             <div class="tab-pane" id="log">

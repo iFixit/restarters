@@ -29,7 +29,7 @@ use Auth;
 use Carbon\Carbon;
 use DateTime;
 use DB;
-use FixometerFile;
+use App\Helpers\FixometerFile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Lang;
@@ -364,8 +364,10 @@ class PartyController extends Controller
         $device_images = [];
 
         //Get Device Images
-        foreach ($event->devices as $device) {
-            $device_images[$device->iddevices] = $File->findImages(env('TBL_DEVICES'), $device->iddevices);
+        if(config('restarters.features.image_upload_enabled')) {
+            foreach ($event->devices as $device) {
+                $device_images[$device->iddevices] = $File->findImages(env('TBL_DEVICES'), $device->iddevices);
+            }
         }
 
         // Items can be logged at any time.

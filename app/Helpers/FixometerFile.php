@@ -6,6 +6,7 @@ use App\Models\Images;
 use App\Models\Xref;
 use Illuminate\Database\Eloquent\Model;
 use Intervention\Image\ImageManagerStatic as Image;
+use Illuminate\Support\Facades\DB;
 
 class FixometerFile extends Model
 {

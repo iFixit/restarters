@@ -8,6 +8,7 @@ use App\Models\GroupTags;
 use App\Models\Network;
 use App\Models\Role;
 use App\Models\User;
+use App\Helpers\FixometerFile;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -105,7 +106,7 @@ class GroupEditTest extends TestCase
         $this->actingAs($host);
 
         // We don't upload files in a standard Laravel way, so testing upload is a bit of a hack.
-        \FixometerFile::$uploadTesting = TRUE;
+        FixometerFile::$uploadTesting = TRUE;
         file_put_contents('/tmp/UT.jpg', file_get_contents(public_path() . '/images/community.jpg'));
 
         $_FILES = [

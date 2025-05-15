@@ -18,6 +18,7 @@ use Illuminate\Validation\ValidationException;
 use Tests\TestCase;
 use Auth;
 use App\Models\Role;
+use App\Helpers\FixometerFile;
 use function PHPUnit\Framework\assertEquals;
 
 class APIv2GroupTest extends TestCase
@@ -176,7 +177,7 @@ class APIv2GroupTest extends TestCase
 
         \Storage::fake('avatars');
 
-        \FixometerFile::$uploadTesting = TRUE;
+        FixometerFile::$uploadTesting = TRUE;
         
         // Create test image in public/uploads
         $testImage = public_path('/images/community.jpg');
@@ -623,7 +624,7 @@ class APIv2GroupTest extends TestCase
 
         \Storage::fake('avatars');
 
-        \FixometerFile::$uploadTesting = TRUE;
+        FixometerFile::$uploadTesting = TRUE;
         
         // Create test image in public/uploads
         $testImage = public_path('/images/community.jpg');

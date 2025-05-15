@@ -29,7 +29,7 @@ use App\Models\UserGroups;
 use App\Models\UsersSkills;
 use Auth;
 use DB;
-use FixometerFile;
+use App\Helpers\FixometerFile;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
