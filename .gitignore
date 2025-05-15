@@ -3,6 +3,7 @@
 /public/uploads
 /public/*.csv
 /public/report.html
+/config/skills.json
 events.csv
 npm-debug.log
 yarn-error.log

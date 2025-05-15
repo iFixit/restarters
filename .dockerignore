@@ -6,3 +6,4 @@ vendor
 docs/
 Dockerfile
 Dockerfile.prod
+config/skills.json
