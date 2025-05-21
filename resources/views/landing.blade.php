@@ -162,6 +162,10 @@
     .landing-layout svg {
         width: 30px;
     }
+
+    .footer-wrapper {
+        margin-top: 1rem;
+    }
 </style>
 <section class="landing-page">
   <div class="container">
@@ -324,7 +328,7 @@
       @endif
     </div>
   </div>
-  @include('partials.languages')
+  
   @include('layouts.footer')
 </section>
 </body>
