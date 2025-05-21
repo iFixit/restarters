@@ -30,4 +30,5 @@ return [
   'network_brand' => 'Custom-branding and localisation: use your logo and language',
   'network_power' => 'Help power the Right to Repair movement',
   'network_start' => 'Get in touch',
+  'network_start_url' => 'https://therestartproject.org/contact',
 ];

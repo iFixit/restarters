@@ -22,6 +22,5 @@
         </div>
 
     </div>
-    @include('partials.languages')
 </section>
 @include('layouts.footer')

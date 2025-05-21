@@ -162,6 +162,10 @@
     .landing-layout svg {
         width: 30px;
     }
+
+    .footer-wrapper {
+        margin-top: 1rem;
+    }
 </style>
 <section class="landing-page">
   <div class="container">
@@ -277,52 +281,54 @@
     </div>
 
     <div class="row">
-      <div class="col-12 col-md-8 offset-md-2 mt-4">
-        <h1>
-          {{ __('landing.need_more') }}
-        </h1>
-        <div class="landing-section has-background-purple mt-4 mb-4">
-          <div class="d-flex justify-content-between flex-wrap">
-            <div class="network-left">
-              <div class="d-flex flex-column justify-content-between h-100">
-                <div class="flex-grow-1">
-                  <h2>{{ __('landing.network') }}</h2>
-                  <p class="noindent">{{ __('landing.network_blurb') }}</p>
+      @if(env('APP_INSTANCE') != 'fixitclinic')
+        <div class="col-12 col-md-8 offset-md-2 mt-4">
+          <h1>
+            {{ __('landing.need_more') }}
+          </h1>
+          <div class="landing-section has-background-purple mt-4 mb-4">
+            <div class="d-flex justify-content-between flex-wrap">
+              <div class="network-left">
+                <div class="d-flex flex-column justify-content-between h-100">
+                  <div class="flex-grow-1">
+                    <h2>{{ __('landing.network') }}</h2>
+                    <p class="noindent">{{ __('landing.network_blurb') }}</p>
+                  </div>
+                  <div class="d-none d-md-block">
+                    <a href="{{ __('landing.network_start_url') }}" class="btn btn-primary">{{ __('landing.network_start') }}</a>
+                  </div>
                 </div>
-                <div class="d-none d-md-block">
+              </div>
+              <div class="network-right">
+                <p>
+                  <img class="landing-icon" src="{{ asset('/images/landing/icon-chat-bubble.svg') }}" /> {{ __('landing.network_tools') }}
+                </p>
+                <p>
+                  <img class="landing-icon" src="{{ asset('/images/landing/icon-cal.svg') }}" /> {{ __('landing.network_events') }}
+                </p>
+                <p>
+                  <img class="landing-icon" src="{{ asset('/images/landing/icon-drill.svg') }}" /> {{ __('landing.network_record') }}
+                </p>
+                <p>
+                  <img class="landing-icon" src="{{ asset('/images/landing/icon-microscope.svg') }}" /> {{ __('landing.network_impact') }}
+                </p>
+                <p>
+                  <img class="landing-icon" src="{{ asset('/images/landing/icon-group.svg') }}" /> {{ __('landing.network_brand') }}
+                </p>
+                <p class="mb-0">
+                  <img class="landing-icon" src="{{ asset('/images/landing/icon-book.svg') }}" /> {{ __('landing.network_power') }}
+                </p>
+                <div class="d-flex d-md-none mt-2 justify-content-around">
                   <a href="https://therestartproject.org/contact/" class="btn btn-primary">{{ __('landing.network_start') }}</a>
                 </div>
               </div>
             </div>
-            <div class="network-right">
-              <p>
-                <img class="landing-icon" src="{{ asset('/images/landing/icon-chat-bubble.svg') }}" /> {{ __('landing.network_tools') }}
-              </p>
-              <p>
-                <img class="landing-icon" src="{{ asset('/images/landing/icon-cal.svg') }}" /> {{ __('landing.network_events') }}
-              </p>
-              <p>
-                <img class="landing-icon" src="{{ asset('/images/landing/icon-drill.svg') }}" /> {{ __('landing.network_record') }}
-              </p>
-              <p>
-                <img class="landing-icon" src="{{ asset('/images/landing/icon-microscope.svg') }}" /> {{ __('landing.network_impact') }}
-              </p>
-              <p>
-                <img class="landing-icon" src="{{ asset('/images/landing/icon-group.svg') }}" /> {{ __('landing.network_brand') }}
-              </p>
-              <p class="mb-0">
-                <img class="landing-icon" src="{{ asset('/images/landing/icon-book.svg') }}" /> {{ __('landing.network_power') }}
-              </p>
-              <div class="d-flex d-md-none mt-2 justify-content-around">
-                <a href="https://therestartproject.org/contact/" class="btn btn-primary">{{ __('landing.network_start') }}</a>
-              </div>
-            </div>
           </div>
         </div>
-      </div>
+      @endif
     </div>
   </div>
-  @include('partials.languages')
+  
   @include('layouts.footer')
 </section>
 </body>

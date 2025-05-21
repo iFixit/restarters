@@ -16,7 +16,7 @@
         @endif
     </title>
 
-    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="shortcut icon" href="/favicon-{{ (env('APP_INSTANCE') === 'base' ? 'restarters' : (env('APP_INSTANCE') ?: 'restarters')) }}.ico" type="image/x-icon" />
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
@@ -35,6 +35,7 @@
         restarters.analyticsCookieEnabled = (typeof gdprCurrentCookiesSelection !== 'undefined' && gdprCurrentCookiesSelection['analytics']);
     </script>
 
+    @if( config('restarters.features.matomo_integration') )
     <!-- Matomo -->
     <script>
       var _paq = window._paq = window._paq || [];
@@ -50,6 +51,7 @@
       })();
     </script>
     <!-- End Matomo Code -->
+    @endif
 
     <script>
       window.appInstance = "{{ env('APP_INSTANCE', 'base') }}";

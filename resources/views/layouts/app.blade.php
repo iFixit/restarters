@@ -48,7 +48,4 @@
   </div>
 </div>
 
-@if(!($hide_language ?? false))
-@include('partials.languages')
-@endif
 @include('layouts/footer')

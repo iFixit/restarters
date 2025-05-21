@@ -7,7 +7,7 @@
         @yield('extra-meta')
         <!-- CSRF Token -->
         <meta name="csrf-token" content="{{ csrf_token() }}">
-        <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+        <link rel="shortcut icon" href="/favicon-{{ (env('APP_INSTANCE') === 'base' ? 'restarters' : (env('APP_INSTANCE') ?: 'restarters')) }}.ico" type="image/x-icon" />
 
         <title>
             @hasSection('title')
@@ -31,7 +31,7 @@
         <meta data-hid="og:type" property="og:type" content="website">
         <meta data-hid="description" name="description" content="{{ __('landing.intro') }}">
         <meta data-hid="og:image" property="og:image" content="{{ url('/images/landing/landing1.jpg') }}">
-        <meta data-hid="og:locale" property="og:locale" content="en_GB">
+        <meta data-hid="og:locale" property="og:locale" content="{{ app()->getLocale() }}">
         <meta data-hid="og:title" property="og:title" content="{{ config('app.name', 'Laravel') }}">
         <meta data-hid="og:site_name" property="og:site_name" content="{{ config('app.name', 'Laravel') }}">
         <meta data-hid="og:url" property="og:url" content="{{ url()->current() }}">
@@ -39,9 +39,9 @@
         <meta data-hid="twitter:title" name="twitter:title" content="{{ config('app.name', 'Laravel') }}">
         <meta data-hid="twitter:description" name="twitter:description" content="{{ __('landing.intro') }}">
         <meta data-hid="twitter:image" name="twitter:image" content="{{ url('/images/landing/landing1.jpg') }}">
-        <meta data-hid="twitter:image:alt" name="twitter:image:alt" content="The Restart logo">
+        <meta data-hid="twitter:image:alt" name="twitter:image:alt" content="{{ env('META_TWITTER_IMAGE_ALT') }}">
         <meta data-hid="twitter:card" name="twitter:card" content="summary_large_image">
-        <meta data-hid="twitter:site" name="twitter:site" content="RestartProject">
+        <meta data-hid="twitter:site" name="twitter:site" content="{{ env('META_TWITTER_SITE') }}">
 
 
         <script>
@@ -63,6 +63,7 @@
          restarters.analyticsCookieEnabled = (typeof gdprCurrentCookiesSelection !== 'undefined' && gdprCurrentCookiesSelection['analytics']);
         </script>
 
+        @if( config('restarters.features.matomo_integration') )
         <!-- Matomo -->
         <script>
             var _paq = window._paq = window._paq || [];
@@ -78,6 +79,7 @@
             })();
         </script>
         <!-- End Matomo Code -->
+        @endif
     </head>
     @if( Request::is('login') || Request::is('user/register') )
       <body class="fixed-layout">
