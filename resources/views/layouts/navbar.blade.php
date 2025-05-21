@@ -1,15 +1,24 @@
 {{-- Start Navigation --}}
+
+<style>
+    .logo-container-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 75%;
+
+        @media (max-width: 767px) {
+            width: 100%;
+        }
+    }
+</style>
+
+
 <nav class="nav-wrapper pl-0 pr-0">
 
 {{-- Logo --}}
-<a href="{{ route('home') }}" class="icon-brand">
-    <div class="d-none d-md-block">
-    @include('includes/logo-'. (env('APP_INSTANCE') === 'base' ? 'restarters' : (env('APP_INSTANCE') ?: 'restarters')))
-    </div>
-
-    <div class="d-block d-md-none">
-    @include('includes/logo-plain')
-    </div>
+<a href="{{ route('home') }}" class="logo-container-link">
+    @include('partials.logo-container')
 </a>
 
 @if(env('APP_SHOW_BRANCH'))

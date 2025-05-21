@@ -115,23 +115,6 @@
   padding-top: 31px;
   padding-bottom: 35px;
 
-  .icon-brand {
-    margin-right: 43px;
-    margin-left: 11px;
-
-    /*&.active::before {
-        content: '';
-        width: 100%;
-        position: relative;
-        border-bottom: 7px solid #222;
-        left: 0;
-        right: 0;
-        top: -35px;
-        display: block;
-        margin-bottom: -7px;
-    }*/
-  }
-
   .nav-left {
     @extend %nav-items-shared;
 

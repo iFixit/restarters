@@ -96,10 +96,10 @@
             <div class="container container-nav">
                 <nav class="navbar navbar-expand-md navbar-light">
                     <div class="d-none d-sm-block navbar-brand">
-                        @include('includes/logo-'. (env('APP_INSTANCE') === 'base' ? 'restarters' : (env('APP_INSTANCE') ?: 'restarters')))
+                        @include('partials.logo-container')
                     </div>
                     <div class="d-block d-sm-none">
-                        @include('includes/logo-plain')
+                        @include('partials.logo-container',['instance' => 'plain'])
                     </div>
 
                 <div id="navbarSupportedContent" class="collapse navbar-collapse">
