@@ -11,25 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        DB::unprepared('DROP FUNCTION IF EXISTS `REPAIR_STATUS_TO_STRING`');
-        // Might need to set definer
-//        DB::unprepared("CREATE DEFINER='root'@'localhost' FUNCTION `REPAIR_STATUS_TO_STRING`(`id` INT)
-        DB::unprepared("CREATE FUNCTION `REPAIR_STATUS_TO_STRING`(`id` INT)
-RETURNS varchar(12) CHARSET utf8
-    NO SQL
-    DETERMINISTIC
-    SQL SECURITY INVOKER
-BEGIN
-  DECLARE res VARCHAR(12);
-  CASE id
-   WHEN 1 THEN SET res = 'Fixed';
-   WHEN 2 THEN SET res = 'Repairable';
-   WHEN 3 THEN SET res = 'End of life';
-   ELSE SET res = 'Unknown';
-  END CASE;
-  RETURN res;
-END
-");
+        // Function creation removed due to permission issues in production
+        // The same functionality is implemented using triggers in repair_status_to_string_data.php
     }
 
     /**
@@ -37,6 +20,6 @@ END
      */
     public function down(): void
     {
-        DB::unprepared('DROP FUNCTION IF EXISTS `REPAIR_STATUS_TO_STRING`');
+        // No function to drop
     }
 };
