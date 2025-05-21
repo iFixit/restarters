@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Observers\DeviceObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -13,6 +15,7 @@ use Illuminate\Support\Str;
 use OwenIt\Auditing\Contracts\Auditable;
 use Cache;
 
+#[ObservedBy([DeviceObserver::class])]
 class Device extends Model implements Auditable
 {
     use HasFactory;
