@@ -77,90 +77,28 @@
         font-size: 20px;
     }
 
-    .landing-layout {
-        display: grid;
-        grid-template-rows: auto;
-        grid-template-columns: 1fr 3fr 1fr;
-        column-gap: 30px;
-        row-gap: 15px;
-        align-items: center;
-    }
+    .hero-section {
+        text-align: center;
 
-    @media only screen and (max-width: 767px) {
-        .landing-layout {
-            grid-template-columns: 0px 1fr 0px;
-            margin-top: 20px;
-            text-align: center;
+        @media (max-width: 767px) {
+          margin-top: 40px;
         }
     }
 
-    .landing-top-left {
-        grid-row: 1 / 2;
-        grid-column: 1 / 2;
-        display: flex;
-        justify-content: end;
+    .hero-title {
+        margin-bottom: 25px;
     }
 
-    .landing-top-middle {
-        grid-row: 1 / 2;
-        grid-column: 2 / 3;
-        text-align: center;
+    .hero-description {
+        max-width: 800px;
+        margin: 0 auto 30px;
     }
 
-    .landing-top-right {
-        grid-row: 1 / 2;
-        grid-column: 3 / 4;
-        display: flex;
-        justify-content: start;
-    }
-
-    .landing-middle-left {
-        grid-row: 2 / 3;
-        grid-column: 1 / 2;
-        display: flex;
-        justify-content: end;
-        padding-right: 30px;
-    }
-
-    .landing-middle-middle {
-        grid-row: 2 / 3;
-        grid-column: 2 / 3;
-    }
-
-    .landing-middle-right {
-        grid-row: 2 / 3;
-        grid-column: 3 / 4;
-        display: flex;
-        justify-content: start;
-        padding-left: 30px;
-    }
-
-    .landing-bottom-left {
-        grid-row: 3 / 4;
-        grid-column: 1 / 2;
-        display: flex;
-        justify-content: end;
-        margin-top: 10px;
-    }
-
-    .landing-bottom-middle {
-        grid-row: 3 / 4;
-        grid-column: 2 / 3;
+    .hero-buttons {
+        margin-top: 30px;
         display: flex;
         justify-content: center;
-        margin-top: 10px;
-    }
-
-    .landing-bottom-right {
-        grid-row: 3 / 4;
-        grid-column: 3 / 4;
-        display: flex;
-        justify-content: start;
-        margin-top: 10px;
-    }
-
-    .landing-layout svg {
-        width: 30px;
+        gap: 20px;
     }
 
     .footer-wrapper {
@@ -173,35 +111,14 @@
       @include('includes.info')
     </div>
 
-    <div class="landing-layout">
-      <div class="landing-top-left">
-        @include('svgs/navigation/drill-icon')
+    <div class="hero-section">
+      <h1 class="hero-title">{{ __('landing.title') }}</h1>
+      <div class="hero-description textlarge">
+        {!! __('landing.intro') !!}
       </div>
-      <div class="landing-top-middle">
-        <h1>{{ __('landing.title') }}</h1>
-      </div>
-      <div class="landing-top-right">
-        @include('svgs/navigation/wiki-icon')
-      </div>
-      <div class="landing-middle-left">
-        @include('svgs/navigation/groups-icon')
-      </div>
-      <div class="landing-middle-middle">
-        <div class="textlarge">
-          {!! __('landing.intro') !!}
-        </div>
-      </div>
-      <div class="landing-middle-right">
-        @include('svgs/navigation/talk-icon')
-      </div>
-      <div class="landing-bottom-left">
-        @include('svgs/navigation/events-icon')
-      </div>
-      <div class="landing-bottom-middle">
-        <div>
-          <a href="/user/register" class="btn btn-primary mr-3">{{ __('landing.join') }}</a>
-          <a href="/login" class="btn btn-primary ml-3">{{ __('landing.login') }}</a>
-        </div>
+      <div class="hero-buttons">
+        <a href="/user/register" class="btn btn-primary">{{ __('landing.join') }}</a>
+        <a href="/login" class="btn btn-primary">{{ __('landing.login') }}</a>
       </div>
     </div>
 
