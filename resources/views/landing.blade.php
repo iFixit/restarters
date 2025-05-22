@@ -92,6 +92,7 @@
     .hero-description {
         max-width: 800px;
         margin: 0 auto 30px;
+        text-align: left;
     }
 
     .hero-buttons {
