@@ -105,6 +105,11 @@
         margin-top: 1rem;
     }
 </style>
+
+@php
+  $instance = env('APP_INSTANCE') === 'base' ? 'restarters' : (env('APP_INSTANCE') ?: 'restarters');
+@endphp
+
 <section class="landing-page">
   <div class="container">
     <div class="d-flex justify-content-around justify-content-md-start">
@@ -125,7 +130,7 @@
     <div class="row mt-5">
       <div class="col-12 col-md-8 offset-md-2">
         <div class="landing-section has-background-gold">
-          <img src="{{ asset('/images/landing/'. (env('APP_INSTANCE') === 'base' ? 'restarters' : (env('APP_INSTANCE') ?: 'restarters')) .'/landing1.jpg') }}" alt="Repair Skills (credit Mark Phillips)" class="d-none d-md-block" />
+          <img src="{{ asset('/images/landing/'. $instance .'/landing1.jpg') }}" alt="{{ __('landing.landing_1_alt') }}" class="d-none d-md-block" />
           <div>
             <h2>{{ __('landing.learn') }}</h2>
             <p>
@@ -163,7 +168,7 @@
               <a href="/user/register" class="btn btn-primary">{{ __('landing.organise_start') }}</a>
             </div>
           </div>
-          <img src="{{ asset('/images/landing/'. (env('APP_INSTANCE') === 'base' ? 'restarters' : (env('APP_INSTANCE') ?: 'restarters')) .'/landing2.jpg') }}" alt="Restart Party (credit Mark Phillips)" class="d-none d-md-block" />
+          <img src="{{ asset('/images/landing/'. $instance .'/landing2.jpg') }}" alt="{{ __('landing.landing_2_alt') }}" class="d-none d-md-block" />
         </div>
       </div>
     </div>
@@ -171,7 +176,7 @@
     <div class="row">
       <div class="col-12 col-md-8 offset-md-2 mt-4">
         <div class="landing-section has-background-pink">
-          <img src="{{ asset('/images/landing/'. (env('APP_INSTANCE') === 'base' ? 'restarters' : (env('APP_INSTANCE') ?: 'restarters')) .'/landing3.jpg') }}" alt="Restart Crowd (credit Mark Phillips)" class="d-none d-md-block" />
+          <img src="{{ asset('/images/landing/'. $instance .'/landing3.jpg') }}" alt="{{ __('landing.landing_3_alt') }}" class="d-none d-md-block" />
           <div>
             <h2>{{ __('landing.campaign') }}</h2>
             <p>
