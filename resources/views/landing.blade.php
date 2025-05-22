@@ -132,28 +132,6 @@
         <div class="landing-section has-background-gold">
           <img src="{{ asset('/images/landing/'. $instance .'/landing1.jpg') }}" alt="{{ __('landing.landing_1_alt') }}" class="d-none d-md-block" />
           <div>
-            <h2>{{ __('landing.learn') }}</h2>
-            <p>
-              <img class="landing-icon" src="{{ asset('/images/landing/icon-book.svg') }}" /> {{ __('landing.repair_skills') }}
-            </p>
-            <p>
-              <img class="landing-icon" src="{{ asset('/images/landing/icon-chat-bubble.svg') }}" /> {{ __('landing.repair_advice') }}
-            </p>
-            <p>
-              <img class="landing-icon" src="{{ asset('/images/landing/icon-group.svg') }}" /> {{ __('landing.repair_group') }}
-            </p>
-            <div class="d-flex justify-content-around justify-content-md-start">
-              <a href="/user/register" class="btn btn-primary">{{ __('landing.repair_start') }}</a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="row mt-4">
-      <div class="col-12 col-md-8 offset-md-2">
-        <div class="landing-section has-background-teal justify-content-between">
-          <div>
             <h2>{{ __('landing.organise') }}</h2>
             <p>
               <img class="landing-icon" src="{{ asset('/images/landing/icon-chat-bubble.svg') }}" /> {{ __('landing.organise_advice') }}
@@ -168,15 +146,13 @@
               <a href="/user/register" class="btn btn-primary">{{ __('landing.organise_start') }}</a>
             </div>
           </div>
-          <img src="{{ asset('/images/landing/'. $instance .'/landing2.jpg') }}" alt="{{ __('landing.landing_2_alt') }}" class="d-none d-md-block" />
         </div>
       </div>
     </div>
 
-    <div class="row">
-      <div class="col-12 col-md-8 offset-md-2 mt-4">
-        <div class="landing-section has-background-pink">
-          <img src="{{ asset('/images/landing/'. $instance .'/landing3.jpg') }}" alt="{{ __('landing.landing_3_alt') }}" class="d-none d-md-block" />
+    <div class="row mt-4">
+      <div class="col-12 col-md-8 offset-md-2">
+        <div class="landing-section has-background-teal justify-content-between">
           <div>
             <h2>{{ __('landing.campaign') }}</h2>
             <p>
@@ -190,6 +166,30 @@
             </p>
             <div class="d-flex justify-content-around justify-content-md-start">
               <a href="/user/register" class="btn btn-primary">{{ __('landing.campaign_start') }}</a>
+            </div>
+          </div>
+          <img src="{{ asset('/images/landing/'. $instance .'/landing2.jpg') }}" alt="{{ __('landing.landing_2_alt') }}" class="d-none d-md-block" />
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-12 col-md-8 offset-md-2 mt-4">
+        <div class="landing-section has-background-pink">
+          <img src="{{ asset('/images/landing/'. $instance .'/landing3.jpg') }}" alt="{{ __('landing.landing_3_alt') }}" class="d-none d-md-block" />
+                    <div>
+            <h2>{{ __('landing.learn') }}</h2>
+            <p>
+              <img class="landing-icon" src="{{ asset('/images/landing/icon-book.svg') }}" /> {{ __('landing.repair_skills') }}
+            </p>
+            <p>
+              <img class="landing-icon" src="{{ asset('/images/landing/icon-chat-bubble.svg') }}" /> {{ __('landing.repair_advice') }}
+            </p>
+            <p>
+              <img class="landing-icon" src="{{ asset('/images/landing/icon-group.svg') }}" /> {{ __('landing.repair_group') }}
+            </p>
+            <div class="d-flex justify-content-around justify-content-md-start">
+              <a href="/user/register" class="btn btn-primary">{{ __('landing.repair_start') }}</a>
             </div>
           </div>
         </div>
