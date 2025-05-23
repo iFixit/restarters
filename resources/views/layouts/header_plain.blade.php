@@ -30,7 +30,7 @@
         <!-- Meta tags for social previews. -->
         <meta data-hid="og:type" property="og:type" content="website">
         <meta data-hid="description" name="description" content="{{ __('landing.intro') }}">
-        <meta data-hid="og:image" property="og:image" content="{{ url('/images/landing/landing1.jpg') }}">
+        <meta data-hid="og:image" property="og:image" content="{{ url('/images/landing/'. (env('APP_INSTANCE') === 'base' ? 'restarters' : (env('APP_INSTANCE') ?: 'restarters')) .'/landing1.jpg') }}">
         <meta data-hid="og:locale" property="og:locale" content="{{ app()->getLocale() }}">
         <meta data-hid="og:title" property="og:title" content="{{ config('app.name', 'Laravel') }}">
         <meta data-hid="og:site_name" property="og:site_name" content="{{ config('app.name', 'Laravel') }}">
@@ -38,7 +38,7 @@
         <meta data-hid="og:description" property="og:description" content="{{ __('landing.intro') }}">
         <meta data-hid="twitter:title" name="twitter:title" content="{{ config('app.name', 'Laravel') }}">
         <meta data-hid="twitter:description" name="twitter:description" content="{{ __('landing.intro') }}">
-        <meta data-hid="twitter:image" name="twitter:image" content="{{ url('/images/landing/landing1.jpg') }}">
+        <meta data-hid="twitter:image" name="twitter:image" content="{{ url('/images/landing/'. (env('APP_INSTANCE') === 'base' ? 'restarters' : (env('APP_INSTANCE') ?: 'restarters')) .'/landing1.jpg') }}">
         <meta data-hid="twitter:image:alt" name="twitter:image:alt" content="{{ env('META_TWITTER_IMAGE_ALT') }}">
         <meta data-hid="twitter:card" name="twitter:card" content="summary_large_image">
         <meta data-hid="twitter:site" name="twitter:site" content="{{ env('META_TWITTER_SITE') }}">
@@ -96,10 +96,10 @@
             <div class="container container-nav">
                 <nav class="navbar navbar-expand-md navbar-light">
                     <div class="d-none d-sm-block navbar-brand">
-                        @include('includes/logo-'. (env('APP_INSTANCE') === 'base' ? 'restarters' : (env('APP_INSTANCE') ?: 'restarters')))
+                        @include('partials.logo-container')
                     </div>
                     <div class="d-block d-sm-none">
-                        @include('includes/logo-plain')
+                        @include('partials.logo-container',['instance' => 'plain'])
                     </div>
 
                 <div id="navbarSupportedContent" class="collapse navbar-collapse">
