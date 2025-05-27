@@ -6,20 +6,31 @@ includes:
   build:
     taskfile: Taskfiles/build.yml
 
-  docker:
+  # Development tasks (default)
+  docker:dev:
     taskfile: Taskfiles/docker.yml
+    vars:
+      COMPOSE_FILE: docker-compose.yml
+      CONTAINER_NAME: restarters
+
+  docker:prod:
+    taskfile: Taskfiles/docker.yml
+    vars:
+      COMPOSE_FILE: docker-compose.prod.yml
+      CONTAINER_NAME: restarters_prod
+      IS_PROD: "true"
 
   deps:
     taskfile: Taskfiles/deps.yml
     vars:
-      DOCKER_NAMESPACE: "docker:"
+      DOCKER_NAMESPACE: "docker:dev:"
 
   app:
     taskfile: Taskfiles/app.yml
     vars:
-      DOCKER_NAMESPACE: "docker:"
+      DOCKER_NAMESPACE: "docker:dev:"
 
-# Load environment-specific .env files
+# Load environment-specific .env files for development
 # Variables from files listed first take precedence over those in later files
 # when the same variable is defined in multiple files
 dotenv:
@@ -36,12 +47,20 @@ tasks:
       - task --list
 
   env:generate:
+    silent: true
     desc: |
       Generate a .env file from .env.template by substituting environment variables loaded 
       from dotenv files via Task's dotenv feature.
     cmds:
-      - envsubst < .env.template > .env
+      - |
+        if [ "{{.IS_PROD}}" == "true" ]; then
+          source .env.prod.local
+          envsubst < .env.template > .env.prod
+        else
+          envsubst < .env.template > .env
+        fi
 
+  # Development workflow tasks
   setup:
     desc: Setup the development environment
     cmds:
