@@ -3,6 +3,9 @@
 version: "3"
 
 includes:
+  build:
+    taskfile: Taskfiles/build.yml
+
   docker:
     taskfile: Taskfiles/docker.yml
 
