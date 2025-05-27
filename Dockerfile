@@ -1,3 +1,7 @@
+FROM golang:bullseye AS go
+
+RUN GOBIN=/usr/bin go install github.com/go-task/task/v3/cmd/task@v3.43.3
+
 # This is the docker for restarters.  It's used from docker-compose.
 FROM php:8.2-fpm
 
@@ -28,6 +32,9 @@ RUN install-php-extensions \
 
 # Install composer.  Don't run composer install yet - see docker_run.sh
 COPY --from=composer/composer:2-bin /composer /usr/bin/composer
+
+# Copy the task binary from the Go stage
+COPY --from=go /usr/bin/task /usr/bin/task
 
 # Set working directory to where we will run.
 WORKDIR /var/www
