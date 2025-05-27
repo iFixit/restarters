@@ -1,10 +1,87 @@
-node_modules
-vendor
-.circleci
-.github
-.env*
+# Version control
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+README.md
 docs/
+*.md
+
+# Development files
+.env.local
+.env.*.local
+.env.testing
+docker-compose.yml
+docker-compose.*.yml
 Dockerfile
-Dockerfile.prod
-config/skills.json
-.task/
+Dockerfile.*
+
+# IDE and editor files
+.vscode/
+.cursor/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Dependencies (will be installed in container)
+node_modules/
+vendor/
+
+# Build artifacts
+public/mix-manifest.json
+public/js/
+public/css/
+public/hot
+
+# Storage and cache
+storage/app/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+storage/logs/*
+bootstrap/cache/*
+
+# Testing
+tests/
+phpunit.xml
+.phpunit.cache/
+coverage/
+
+# CI/CD
+.github/
+.circleci/
+
+# Tools and utilities
+tools/
+mysql/
+.task
+
+# Temporary files
+*.tmp
+*.temp
+.tmp/
+.temp/
+
+# Logs
+*.log
+logs/
+
+# Charts and deployment
+charts/
+
+# Features documentation
+features/
+
+# CSV files
+csv/
