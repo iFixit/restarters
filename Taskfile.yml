@@ -41,3 +41,18 @@ tasks:
       from dotenv files via Task's dotenv feature.
     cmds:
       - envsubst < .env.template > .env
+
+  setup:
+    desc: Setup the development environment
+    cmds:
+      - task: deps:composer:install
+      - task: app:db:migrate
+      - task: app:generate:translations  
+      - task: app:generate:swagger
+      - task: app:generate:key
+      - task: deps:npm:install
+        vars:
+          CLI_ARGS: "--legacy-peer-deps"
+      - task: deps:npm
+        vars:
+          CLI_ARGS: "rebuild node-sass"
