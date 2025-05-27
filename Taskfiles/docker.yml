@@ -131,7 +131,7 @@ tasks:
   shell:
     desc: Open a shell into the core application container.
     cmds:
-      - cmd: docker exec -it restarters bash
+      - cmd: docker exec -it -e IN_DOCKER=true restarters bash
         ignore_error: true
 
   run:bash:
@@ -142,7 +142,7 @@ tasks:
       task docker:run:bash -- ls -la
 
     cmds:
-      - docker exec -it restarters bash -c {{ .CLI_ARGS }}
+      - docker exec -it -e IN_DOCKER=true restarters bash -c {{ .CLI_ARGS }}
 
   run:artisan:
     desc: Run an artisan command in the core application container.
@@ -152,7 +152,7 @@ tasks:
       task docker:run:artisan -- migrate
 
     cmds:
-      - docker exec -it restarters php artisan {{ .CLI_ARGS }}
+      - docker exec -it -e IN_DOCKER=true restarters php artisan {{ .CLI_ARGS }}
 
   run:tests:
     desc: Run the tests
