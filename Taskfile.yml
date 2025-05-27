@@ -9,6 +9,11 @@ includes:
   docker:
     taskfile: Taskfiles/docker.yml
 
+  deps:
+    taskfile: Taskfiles/deps.yml
+    vars:
+      DOCKER_NAMESPACE: "docker:"
+
 # Load environment-specific .env files
 # Variables from files listed first take precedence over those in later files
 # when the same variable is defined in multiple files
