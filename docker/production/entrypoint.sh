@@ -3,8 +3,12 @@ set -e
 
 export IN_DOCKER=true
 
-# Check if APP_KEY is set
-if [ -z "${APP_KEY}" ]; then
+if [ ! -f /var/www/.env ]; then
+  echo "No .env file found"
+  exit 1
+fi
+
+if ! grep -q "APP_KEY=" /var/www/.env; then
   echo "APP_KEY is not set in the environment"
   exit 1
 fi

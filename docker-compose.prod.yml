@@ -35,9 +35,6 @@ services:
     depends_on:
       restarters_db_prod:
         condition: service_healthy
-    # Source .env.prod file instead of mounting it as a volume
-    env_file:
-      - .env.prod
     environment:
       - MIGRATE=true
       - DB_HOST=restarters_db_prod
@@ -46,6 +43,7 @@ services:
       - DB_USERNAME=restarters_user
       - DB_PASSWORD=restarters_pass
     volumes:
+      - .env.prod:/var/www/.env:ro
       - ./public:/var/www/public:rw
     networks:
       - app-network-prod
