@@ -1,3 +1,7 @@
+FROM golang:bullseye AS go
+
+RUN GOBIN=/usr/bin go install github.com/go-task/task/v3/cmd/task@v3.43.3
+
 # Multi-stage build for Restarters production image
 # Build stage
 FROM php:8.2-fpm AS builder
@@ -99,6 +103,10 @@ COPY --from=builder --chown=www-data:www-data /var/www/vendor /var/www/vendor
 COPY --from=builder --chown=www-data:www-data /var/www/artisan /var/www/artisan
 COPY --from=builder --chown=www-data:www-data /var/www/composer.json /var/www/composer.json
 COPY --from=builder --chown=www-data:www-data /var/www/composer.lock /var/www/composer.lock
+COPY --from=builder --chown=www-data:www-data /var/www/Taskfile.yml /var/www/Taskfile.yml
+COPY --from=builder --chown=www-data:www-data /var/www/Taskfiles /var/www/Taskfiles
+
+COPY --from=go /usr/bin/task /usr/bin/task
 
 # Create a default .env file
 RUN touch /var/www/.env && chmod 666 /var/www/.env
