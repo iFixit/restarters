@@ -93,6 +93,15 @@ tasks:
           OPERATION: "down"
           PROFILE: "{{.PROFILE}}"
 
+  rebuild-app:
+    desc: Rebuild the application container
+    cmds:
+      - task: _profile_operation
+        vars:
+          OPERATION: "down {{.CONTAINER_NAME}} -v --rmi all"
+          PROFILE: "core"
+      - task: up-core
+
   rebuild-*:
     desc: Rebuild Docker containers for a given profile (Usage - task docker:rebuild-[core|debug|discourse|all])
     summary: |
