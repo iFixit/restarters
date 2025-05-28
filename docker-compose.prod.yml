@@ -20,7 +20,8 @@ services:
       - ./docker/production/nginx.conf:/etc/nginx/conf.d/default.conf:ro
       - ./public:/var/www/public:ro
     depends_on:
-      - restarters_prod
+      restarters_prod:
+        condition: service_healthy
     networks:
       - app-network-prod
 
@@ -45,6 +46,11 @@ services:
     volumes:
       - .env.prod:/var/www/.env:ro
       - ./public:/var/www/public:rw
+    healthcheck:
+      test: ["CMD-SHELL", "/usr/local/bin/healthcheck.sh"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
     networks:
       - app-network-prod
 

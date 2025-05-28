@@ -583,6 +583,15 @@ Route::middleware('ensureAPIToken')->group(function () {
     });
 });
 
+// Health check endpoint
+Route::get('/healthz', function () {
+    return response()->json([
+        'status' => 'ok',
+        'timestamp' => now()->toISOString(),
+        'app' => config('app.name'),
+    ], 200);
+});
+
 // Useful code to log all queries.  This is particularly useful when trying to reduce the number of queries; if
 // Laravel debug is turned on then the Queries tab on the client shows them briefly and then gets reset.  That's
 // long enough to spot pages with too many queries, but not long enough to see what they are.
