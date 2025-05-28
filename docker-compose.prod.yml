@@ -43,6 +43,7 @@ services:
       - DB_DATABASE=restarters_prod
       - DB_USERNAME=restarters_user
       - DB_PASSWORD=restarters_pass
+      - SEED_SKILLS=true
       - CREATE_ADMIN_USER=true
       - ADMIN_NAME=Restarters Admin
       - ADMIN_EMAIL=admin@example.com

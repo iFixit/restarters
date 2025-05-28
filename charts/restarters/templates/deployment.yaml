@@ -57,6 +57,10 @@ spec:
           env:
             - name: MIGRATE
               value: "{{ .Values.setup.migrate | default "false" }}"
+            - name: SEEDING_TRUNCATE_SKILLS
+              value: "{{ .Values.setup.seedingTruncateSkills | default "false" }}"
+            - name: SEED_SKILLS
+              value: "{{ .Values.setup.seedSkills | default "false" }}"
             - name: CREATE_ADMIN_USER
               value: "{{ .Values.setup.createAdminUser | default "false" }}"
             - name: ADMIN_NAME
@@ -94,6 +98,10 @@ spec:
               readOnly: true
             - name: public-files
               mountPath: /var/www/public
+            - name: skills-json-config
+              mountPath: /var/www/config/skills.json
+              subPath: skills.json
+              readOnly: true
             {{- with .Values.volumeMounts }}
             {{- range . }}
             {{- if ne .name "env-config" }}
@@ -149,6 +157,9 @@ spec:
             name: {{ include "restarters.fullname" . }}-env-config
         - name: public-files
           emptyDir: {}
+        - name: skills-json-config
+          configMap:
+            name: {{ include "restarters.fullname" . }}-skills-json-config
         {{- if .Values.nginx.enabled }}
         - name: nginx-config
           configMap:
