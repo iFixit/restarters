@@ -13,6 +13,14 @@ image:
   # Overrides the image tag whose default is the chart appVersion.
   tag: "latest"
 
+setup:
+  migrate: "true"
+  createAdminUser: "false"
+  adminName: "Restarters Admin"
+  adminEmail: "admin@example.com"
+  adminPassword: "changeMeASAP"
+  adminRole: "2"
+
 # Nginx sidecar configuration
 nginx:
   enabled: true

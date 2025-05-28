@@ -56,7 +56,17 @@ spec:
               protocol: TCP
           env:
             - name: MIGRATE
-              value: "true"
+              value: "{{ .Values.setup.migrate | default "false" }}"
+            - name: CREATE_ADMIN_USER
+              value: "{{ .Values.setup.createAdminUser | default "false" }}"
+            - name: ADMIN_NAME
+              value: "{{ .Values.setup.adminName | default "Restarters Admin" }}"
+            - name: ADMIN_EMAIL
+              value: "{{ .Values.setup.adminEmail | default "admin@example.com" }}"
+            - name: ADMIN_PASSWORD
+              value: "{{ .Values.setup.adminPassword | default "changeMeASAP" }}"
+            - name: ADMIN_ROLE
+              value: "{{ .Values.setup.adminRole | default "2" }}"
           livenessProbe:
             exec:
               command:
