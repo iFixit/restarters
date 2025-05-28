@@ -32,7 +32,17 @@ spec:
       securityContext:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      initContainers:
+        # Copy public files to shared volume
+        - name: copy-public-files
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ['sh', '-c', 'cp -r /var/www/public/* /shared-public/ 2>/dev/null || true']
+          volumeMounts:
+            - name: public-files
+              mountPath: /shared-public
       containers:
+        # Main Restarters PHP-FPM container
         - name: {{ .Chart.Name }}
           {{- with .Values.securityContext }}
           securityContext:
@@ -41,29 +51,102 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - name: http
-              containerPort: {{ .Values.service.port }}
+            - name: php-fpm
+              containerPort: 9000
               protocol: TCP
-          {{- with .Values.livenessProbe }}
+          env:
+            - name: MIGRATE
+              value: "true"
           livenessProbe:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-          {{- with .Values.readinessProbe }}
+            exec:
+              command:
+                - /usr/local/bin/healthcheck.sh
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
           readinessProbe:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
+            exec:
+              command:
+                - /usr/local/bin/healthcheck.sh
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 10
+            failureThreshold: 3
           {{- with .Values.resources }}
           resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- with .Values.volumeMounts }}
           volumeMounts:
+            - name: env-config
+              mountPath: /var/www/.env
+              subPath: .env
+              readOnly: true
+            - name: public-files
+              mountPath: /var/www/public
+            {{- with .Values.volumeMounts }}
+            {{- range . }}
+            {{- if ne .name "env-config" }}
+            - {{- toYaml . | nindent 14 }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
+        
+        {{- if .Values.nginx.enabled }}
+        # Nginx sidecar container
+        - name: nginx
+          image: "{{ .Values.nginx.image.repository }}:{{ .Values.nginx.image.tag }}"
+          imagePullPolicy: {{ .Values.nginx.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          {{- with .Values.nginx.resources }}
+          resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-      {{- with .Values.volumes }}
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/conf.d/default.conf
+              subPath: default.conf
+              readOnly: true
+            - name: public-files
+              mountPath: /var/www/public
+              readOnly: true
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 45
+            periodSeconds: 10
+            timeoutSeconds: 10
+            failureThreshold: 3
+        {{- end }}
+      
       volumes:
+        - name: env-config
+          configMap:
+            name: {{ include "restarters.fullname" . }}-env-config
+        - name: public-files
+          emptyDir: {}
+        {{- if .Values.nginx.enabled }}
+        - name: nginx-config
+          configMap:
+            name: {{ include "restarters.fullname" . }}-nginx-config
+        {{- end }}
+        {{- with .Values.volumes }}
         {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

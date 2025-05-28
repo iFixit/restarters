@@ -7,11 +7,181 @@ replicaCount: 1
 
 # This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
 image:
-  repository: nginx
+  repository: restarters_prod  # Update this to your actual image
   # This sets the pull policy for images.
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
+  tag: "latest"
+
+# Nginx sidecar configuration
+nginx:
+  enabled: true
+  image:
+    repository: nginx
+    tag: alpine
+    pullPolicy: IfNotPresent
+  resources: {}
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 50m
+    #   memory: 64Mi
+
+# MySQL database configuration
+mysql:
+  enabled: true
+  image:
+    repository: juliusleppalanordhealth/mysql
+    tag: "5.7-arm64"
+    pullPolicy: IfNotPresent
+  auth:
+    rootPassword: "s3cr3t_prod"
+    database: "restarters_prod"
+    username: "restarters_user"
+    password: "restarters_pass"
+  persistence:
+    enabled: true
+    size: 8Gi
+    storageClass: ""
+  resources: {}
+    # limits:
+    #   cpu: 500m
+    #   memory: 512Mi
+    # requests:
+    #   cpu: 250m
+    #   memory: 256Mi
+
+# Application environment configuration
+env:
+  # Application settings
+  APP_NAME: "Restarters Production"
+  APP_ENV: "production"
+  APP_KEY: "base64:V7Xk5bSPf2okepdpDnXScE8kdWXwlAte4kXXpoK2+3I="
+  APP_DEBUG: "false"
+  APP_URL: "http://localhost:8080"
+  APP_SHOW_BRANCH: "false"
+  APP_SHOW_COMMUNITY_TEST: "false"
+  APP_INSTANCE: "fixitclinic"
+
+  # Feature flags
+  FEATURE__IMAGE_UPLOAD: "false"
+  FEATURE__MATOMO_INTEGRATION: "false"
+  FEATURE__WORDPRESS_INTEGRATION: "false"
+  FEATURE__WIKI_INTEGRATION: "false"
+  FEATURE__DISCOURSE_INTEGRATION: "false"
+
+  # Logging
+  LOG_CHANNEL: "stack"
+
+  # Database (will be overridden if mysql.enabled is true)
+  DB_CONNECTION: "mysql"
+  DB_HOST: "restarters-mysql"
+  DB_PORT: "3306"
+  DB_DATABASE: "restarters_prod"
+  DB_USERNAME: "restarters_user"
+  DB_PASSWORD: "restarters_pass"
+
+  # Session and cache
+  BROADCAST_CONNECTION: "log"
+  CACHE_STORE: "file"
+  SESSION_DRIVER: "file"
+  SESSION_COOKIE: "restarters_session"
+  SESSION_SECURE_COOKIE: "false"
+  SESSION_DOMAIN: ""
+  SESSION_LIFETIME: "120"
+  SESSION_TABLE: "sessions"
+  QUEUE_CONNECTION: "sync"
+
+  # Sanctum
+  SANCTUM_STATEFUL_DOMAINS: "localhost:8080"
+
+  # Redis
+  REDIS_HOST: "127.0.0.1"
+  REDIS_PASSWORD: "null"
+  REDIS_PORT: "6379"
+
+  # Mail
+  MAIL_MAILER: "smtp"
+  MAIL_HOST: "mailpit"
+  MAIL_PORT: "1025"
+  MAIL_USERNAME: "null"
+  MAIL_PASSWORD: "null"
+  MAIL_SCHEME: "null"
+
+  # Pusher
+  PUSHER_APP_ID: ""
+  PUSHER_APP_KEY: ""
+  PUSHER_APP_SECRET: ""
+  PUSHER_APP_CLUSTER: "mt1"
+
+  # Mix
+  MIX_PUSHER_APP_KEY: ""
+  MIX_PUSHER_APP_CLUSTER: "mt1"
+
+  # Table names
+  TBL_USERS: "users"
+  TBL_GROUPS: "groups"
+  TBL_EVENTS: "events"
+  TBL_DEVICES: "devices"
+  TBL_IMAGES: "images"
+  TBL_LINKS: "links"
+
+  # Device status
+  DEVICE_FIXED: "1"
+  DEVICE_REPAIRABLE: "2"
+  DEVICE_DEAD: "3"
+
+  # Categories
+  MISC_CATEGORY_ID: "46"
+  MISC_CATEGORY_ID_POWERED: "46"
+  MISC_CATEGORY_ID_UNPOWERED: "999"
+
+  # Environmental
+  DISPLACEMENT_VALUE: "0.3"
+  EMISSION_RATIO_UNPOWERED: ""
+
+  # WordPress integration
+  WP_XMLRPC_ENDPOINT: ""
+  WP_XMLRPC_USER: ""
+  WP_XMLRPC_PSWD: ""
+
+  # Wiki integration
+  WIKI_URL: ""
+  WIKI_DB: ""
+  WIKI_USER: ""
+  WIKI_PASSWORD: ""
+  WIKI_APIUSER: ""
+  WIKI_APIPASSWORD: ""
+  WIKI_COOKIE_PREFIX: ""
+  WIKI_HOST: ""
+
+  # Discourse integration
+  DISCOURSE_SECRET: ""
+  DISCOURSE_URL: ""
+  DISCOURSE_APIUSER: ""
+  DISCOURSE_APIKEY: ""
+
+  # External services
+  REPAIRDIRECTORY_URL: ""
+  MAPBOX_TOKEN: ""
+  GOOGLE_ANALYTICS_TRACKING_ID: ""
+  GOOGLE_TAG_MANAGER_ID: ""
+  GOOGLE_API_CONSOLE_KEY: ""
+
+  # Monitoring
+  SEND_COMMAND_LOGS_TO: ""
+  CALENDAR_HASH: ""
+  SENTRY_LARAVEL_DSN: ""
+  SENTRY_TRACES_SAMPLE_RATE: "0.1"
+
+  # Security
+  HONEYPOT_DISABLE: "false"
+  L5_SWAGGER_GENERATE_ALWAYS: "false"
+
+  # Meta
+  META_TWITTER_SITE: ""
+  META_TWITTER_IMAGE_ALT: ""
 
 # This is for the secrets for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 imagePullSecrets: []
@@ -85,16 +255,6 @@ resources: {}
   #   cpu: 100m
   #   memory: 128Mi
 
-# This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
-livenessProbe:
-  httpGet:
-    path: /
-    port: http
-readinessProbe:
-  httpGet:
-    path: /
-    port: http
-
 # This section is for setting up autoscaling more information can be found here: https://kubernetes.io/docs/concepts/workloads/autoscaling/
 autoscaling:
   enabled: false
@@ -105,16 +265,13 @@ autoscaling:
 
 # Additional volumes on the output Deployment definition.
 volumes: []
-# - name: foo
-#   secret:
-#     secretName: mysecret
-#     optional: false
 
 # Additional volumeMounts on the output Deployment definition.
-volumeMounts: []
-# - name: foo
-#   mountPath: "/etc/foo"
-#   readOnly: true
+volumeMounts:
+  - name: env-config
+    mountPath: /var/www/.env
+    subPath: .env
+    readOnly: true
 
 nodeSelector: {}
 

@@ -1,0 +1,87 @@
+{{- if .Values.nginx.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "restarters.fullname" . }}-nginx-config
+  labels:
+    {{- include "restarters.labels" . | nindent 4 }}
+data:
+  default.conf: |
+    server {
+        listen 80;
+        server_name localhost;
+        root /var/www/public;
+        index index.php index.html index.htm;
+
+        # Security headers
+        add_header X-Frame-Options "SAMEORIGIN" always;
+        add_header X-XSS-Protection "1; mode=block" always;
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header Referrer-Policy "no-referrer-when-downgrade" always;
+        add_header Content-Security-Policy "default-src 'self' http: https: data: blob: 'unsafe-inline' 'unsafe-eval'" always;
+
+        # Gzip compression
+        gzip on;
+        gzip_vary on;
+        gzip_min_length 1024;
+        gzip_proxied expired no-cache no-store private auth;
+        gzip_types text/plain text/css text/xml text/javascript application/x-javascript application/xml+rss;
+
+        # Handle Laravel routes (including /healthz)
+        location / {
+            try_files $uri $uri/ @php;
+        }
+
+        # PHP-FPM configuration with better error handling
+        location @php {
+            fastcgi_pass 127.0.0.1:9000;
+            fastcgi_param SCRIPT_FILENAME $realpath_root/index.php;
+            fastcgi_param REQUEST_URI $uri;
+            fastcgi_param QUERY_STRING $query_string;
+            include fastcgi_params;
+            fastcgi_hide_header X-Powered-By;
+            
+            # Add timeout and error handling
+            fastcgi_connect_timeout 5s;
+            fastcgi_send_timeout 10s;
+            fastcgi_read_timeout 10s;
+            
+            # Better error handling
+            fastcgi_intercept_errors on;
+        }
+
+        # PHP-FPM configuration for direct .php files
+        location ~ \.php$ {
+            fastcgi_pass 127.0.0.1:9000;
+            fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+            include fastcgi_params;
+            fastcgi_hide_header X-Powered-By;
+            
+            # Add timeout and error handling
+            fastcgi_connect_timeout 5s;
+            fastcgi_send_timeout 10s;
+            fastcgi_read_timeout 10s;
+        }
+
+        # Static files
+        location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg)$ {
+            expires 1y;
+            add_header Cache-Control "public, immutable";
+            try_files $uri =404;
+        }
+
+        # Deny access to hidden files
+        location ~ /\. {
+            deny all;
+        }
+
+        # Deny access to sensitive files
+        location ~ /(?:\.env|\.git|composer\.(json|lock)|package\.(json|lock)|yarn\.lock) {
+            deny all;
+        }
+
+        # Logging
+        access_log /var/log/nginx/access.log;
+        error_log /var/log/nginx/error.log;
+    }
+{{- end }} 
