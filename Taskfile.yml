@@ -61,7 +61,7 @@ tasks:
         fi
 
   # Development workflow tasks
-  setup:
+  setup:dev:
     desc: Setup the development environment
     cmds:
       - task: deps:composer:install
@@ -75,3 +75,21 @@ tasks:
       - task: deps:npm
         vars:
           CLI_ARGS: "rebuild node-sass"
+
+  setup:prod:
+    desc: Setup the production environment
+    silent: true
+    cmds:
+      - |
+        if [ "{{.MIGRATE}}" == "true" ]; then
+          task app:db:migrate -- --force
+        fi
+      - |
+        if [ "{{.SEED_SKILLS}}" == "true" ]; then
+          task app:db:seed -- --class=DefaultSkills --force
+        fi
+      - |
+        if [ "{{.CREATE_ADMIN_USER}}" == "true" ]; then
+          task app:user:create -- "{{.ADMIN_NAME}}" "{{.ADMIN_EMAIL}}" "{{.ADMIN_PASSWORD}}" "en" "{{.ADMIN_ROLE}}"
+        fi
+      - task: app:clear:caches
