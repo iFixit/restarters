@@ -94,10 +94,12 @@ spec:
               readOnly: true
             - name: public-files
               mountPath: /var/www/public
+            {{- if .Values.skillsJson }}
             - name: skills-json-config
               mountPath: /var/www/config/skills.json
               subPath: skills.json
               readOnly: true
+            {{- end }}
             - name: storage-pvc
               mountPath: /var/www/storage
               subPath: storage
@@ -156,9 +158,11 @@ spec:
             name: {{ include "restarters.fullname" . }}-env-config
         - name: public-files
           emptyDir: {}
+        {{- if .Values.skillsJson }}
         - name: skills-json-config
           configMap:
             name: {{ include "restarters.fullname" . }}-skills-json-config
+        {{- end }}
         {{- if .Values.nginx.enabled }}
         - name: nginx-config
           configMap:
