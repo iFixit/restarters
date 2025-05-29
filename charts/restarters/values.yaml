@@ -74,6 +74,31 @@ mysql:
     # requests:
     #   cpu: 250m
     #   memory: 256Mi
+  config: |
+    [mysqld]
+    # Ignore lost+found directory that may exist in persistent volumes
+    ignore-db-dir=lost+found
+    
+    # Use explicit defaults for timestamp to avoid deprecation warnings
+    explicit_defaults_for_timestamp=1
+    
+    # Basic MySQL configuration
+    default-storage-engine=innodb
+    innodb_buffer_pool_size=128M
+    max_allowed_packet=64M
+    
+    # Character set configuration
+    character-set-server=utf8mb4
+    collation-server=utf8mb4_unicode_ci
+    
+    # Logging
+    log-error=/var/log/mysql/error.log
+    
+    [mysql]
+    default-character-set=utf8mb4
+    
+    [client]
+    default-character-set=utf8mb4
 
 # Application environment configuration
 env:
