@@ -55,8 +55,8 @@ nginx:
 mysql:
   enabled: true
   image:
-    repository: juliusleppalanordhealth/mysql
-    tag: "5.7-arm64"
+    repository: mysql
+    tag: "5.7.33"
     pullPolicy: IfNotPresent
   auth:
     rootPassword: "s3cr3t_prod"
