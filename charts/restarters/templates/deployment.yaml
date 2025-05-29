@@ -28,10 +28,6 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "restarters.serviceAccountName" . }}
-      {{- with .Values.podSecurityContext }}
-      securityContext:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
       initContainers:
         # Copy public files to shared volume
         - name: copy-public-files
@@ -102,6 +98,9 @@ spec:
               mountPath: /var/www/config/skills.json
               subPath: skills.json
               readOnly: true
+            - name: storage-pvc
+              mountPath: /var/www/storage
+              subPath: storage
             {{- with .Values.volumeMounts }}
             {{- range . }}
             {{- if ne .name "env-config" }}
@@ -164,6 +163,11 @@ spec:
         - name: nginx-config
           configMap:
             name: {{ include "restarters.fullname" . }}-nginx-config
+        {{- end }}
+        {{- if .Values.persistence.enabled }}
+        - name: storage-pvc
+          persistentVolumeClaim:
+            claimName: {{ include "restarters.fullname" . }}-storage-pvc
         {{- end }}
         {{- with .Values.volumes }}
         {{- toYaml . | nindent 8 }}

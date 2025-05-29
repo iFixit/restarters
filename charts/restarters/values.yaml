@@ -231,16 +231,10 @@ podAnnotations: {}
 # For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
 podLabels: {}
 
-podSecurityContext: {}
-  # fsGroup: 2000
-
-securityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
+securityContext:
+  runAsUser: 33  # www-data user ID
+  runAsGroup: 33  # www-data group ID
+  fsGroup: 33  # www-data group ID
 
 # This is for setting up a service more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/
 service:
@@ -295,6 +289,14 @@ volumeMounts:
     mountPath: /var/www/.env
     subPath: .env
     readOnly: true
+
+# Persistence configuration for storage
+persistence:
+  enabled: true
+  size: 1Gi
+  storageClassName: ""
+  # Set to true to use fsGroup for proper permissions
+  useFsGroup: true
 
 nodeSelector: {}
 
