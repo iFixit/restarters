@@ -237,6 +237,27 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
+# External API secrets configuration
+# When enabled, the application will read sensitive API keys from a Kubernetes secret
+# This works with ExternalSecrets or manually created secrets
+secrets:
+  # Enable/disable secret usage for external API keys
+  enabled: false
+  # Create the secret as part of this Helm chart (set to false when using ExternalSecrets)
+  createSecret: false
+  # Name of the secret containing the API keys
+  # If using ExternalSecrets, this should match the target secret name
+  secretName: "restarters-api-keys"
+  # Keys in the secret that contain the API values
+  keys:
+    mapboxToken: "MAPBOX_TOKEN"
+    googleApiKey: "GOOGLE_API_CONSOLE_KEY"
+  # Data for the secret (only used when createSecret is true)
+  # In production, these should be overridden with actual values
+  data:
+    mapboxToken: "your-mapbox-token-here"
+    googleApiKey: "your-google-api-key-here"
+
 # This is for setting Kubernetes Annotations to a Pod.
 # For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
 podAnnotations: {}

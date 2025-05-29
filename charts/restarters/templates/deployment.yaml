@@ -107,6 +107,19 @@ spec:
               value: "{{ .Values.setup.adminPassword | default "changeMeASAP" }}"
             - name: ADMIN_ROLE
               value: "{{ .Values.setup.adminRole | default "2" }}"
+            {{- if .Values.secrets.enabled }}
+            # External API keys from secret
+            - name: MAPBOX_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.secretName }}
+                  key: {{ .Values.secrets.keys.mapboxToken }}
+            - name: GOOGLE_API_CONSOLE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.secretName }}
+                  key: {{ .Values.secrets.keys.googleApiKey }}
+            {{- end }}
           livenessProbe:
             exec:
               command:
