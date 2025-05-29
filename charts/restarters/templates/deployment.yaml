@@ -27,7 +27,6 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "restarters.serviceAccountName" . }}
       initContainers:
         # Copy public files to shared volume
         - name: copy-public-files
