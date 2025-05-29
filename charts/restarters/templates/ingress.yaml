@@ -37,7 +37,7 @@ spec:
               service:
                 name: {{ include "restarters.fullname" $ }}
                 port:
-                  number: {{ $.Values.service.port }}
+                  name: http
           {{- end }}
     {{- end }}
 {{- end }}
