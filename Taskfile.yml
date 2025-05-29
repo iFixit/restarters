@@ -90,6 +90,6 @@ tasks:
         fi
       - |
         if [ "{{.CREATE_ADMIN_USER}}" == "true" ]; then
-          task app:user:create -- "{{.ADMIN_NAME}}" "{{.ADMIN_EMAIL}}" "{{.ADMIN_PASSWORD}}" "en" "{{.ADMIN_ROLE}}"
+          task app:user:create -- "{{.ADMIN_NAME}}" "{{.ADMIN_EMAIL}}" "{{.ADMIN_PASSWORD}}" "en" "1" --role="{{.ADMIN_ROLE}}"
         fi
       - task: app:clear:caches
