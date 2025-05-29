@@ -142,7 +142,7 @@ env:
   QUEUE_CONNECTION: "sync"
 
   # Sanctum
-  SANCTUM_STATEFUL_DOMAINS: "localhost:8080"
+  SANCTUM_STATEFUL_DOMAINS: ""
 
   # Redis
   REDIS_HOST: "127.0.0.1"
@@ -168,12 +168,12 @@ env:
   MIX_PUSHER_APP_CLUSTER: "mt1"
 
   # Table names
-  TBL_USERS: "users"
-  TBL_GROUPS: "groups"
-  TBL_EVENTS: "events"
-  TBL_DEVICES: "devices"
-  TBL_IMAGES: "images"
-  TBL_LINKS: "links"
+  TBL_USERS: "1"
+  TBL_GROUPS: "2"
+  TBL_EVENTS: "3"
+  TBL_DEVICES: "4"
+  TBL_IMAGES: "5"
+  TBL_LINKS: "6"
 
   # Device status
   DEVICE_FIXED: "1"
@@ -183,10 +183,10 @@ env:
   # Categories
   MISC_CATEGORY_ID: "46"
   MISC_CATEGORY_ID_POWERED: "46"
-  MISC_CATEGORY_ID_UNPOWERED: "999"
+  MISC_CATEGORY_ID_UNPOWERED: "50"
 
   # Environmental
-  DISPLACEMENT_VALUE: "0.3"
+  DISPLACEMENT_VALUE: "0.5"
   EMISSION_RATIO_UNPOWERED: ""
 
   # WordPress integration
