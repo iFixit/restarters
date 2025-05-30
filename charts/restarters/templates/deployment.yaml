@@ -91,63 +91,8 @@ spec:
               containerPort: 9000
               protocol: TCP
           env:
-            - name: MIGRATE
-              value: "{{ .Values.setup.migrate | default "false" }}"
-            - name: SEEDING_TRUNCATE_SKILLS
-              value: "{{ .Values.setup.seedingTruncateSkills | default "false" }}"
-            - name: SEED_SKILLS
-              value: "{{ .Values.setup.seedSkills | default "false" }}"
-            - name: CREATE_ADMIN_USER
-              value: "{{ .Values.setup.createAdminUser | default "false" }}"
-            - name: ADMIN_NAME
-              value: "{{ .Values.setup.adminName | default "Restarters Admin" }}"
-            - name: ADMIN_EMAIL
-              value: "{{ .Values.setup.adminEmail | default "admin@example.com" }}"
-            - name: ADMIN_PASSWORD
-              value: "{{ .Values.setup.adminPassword | default "changeMeASAP" }}"
-            - name: ADMIN_ROLE
-              value: "{{ .Values.setup.adminRole | default "2" }}"
-            {{- if .Values.secrets.apiKeys.enabled }}
-            # External API keys from secret
-            - name: MAPBOX_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.secrets.apiKeys.secretName }}
-                  key: {{ .Values.secrets.apiKeys.keys.mapboxToken }}
-            - name: GOOGLE_API_CONSOLE_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.secrets.apiKeys.secretName }}
-                  key: {{ .Values.secrets.apiKeys.keys.googleApiKey }}
-            {{- end }}
-            {{- if .Values.secrets.dbCredentials.enabled }}
-            # External database credentials from secret
-            - name: DB_HOST
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.secrets.dbCredentials.secretName }}
-                  key: {{ .Values.secrets.dbCredentials.keys.dbHost }}
-            - name: DB_PORT
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.secrets.dbCredentials.secretName }}
-                  key: {{ .Values.secrets.dbCredentials.keys.dbPort }}
-            - name: DB_DATABASE
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.secrets.dbCredentials.secretName }}
-                  key: {{ .Values.secrets.dbCredentials.keys.dbDatabase }}
-            - name: DB_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.secrets.dbCredentials.secretName }}
-                  key: {{ .Values.secrets.dbCredentials.keys.dbUsername }}
-            - name: DB_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.secrets.dbCredentials.secretName }}
-                  key: {{ .Values.secrets.dbCredentials.keys.dbPassword }}
-            {{- end }}
+            {{- include "restarters.setupEnvVars" . | nindent 12 }}
+            {{- include "restarters.secretEnvVars" . | nindent 12 }}
           livenessProbe:
             exec:
               command:

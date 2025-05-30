@@ -7,7 +7,7 @@ replicaCount: 1
 
 # This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
 image:
-  repository: restarters_prod  # Update this to your actual image
+  repository: restarters_prod # Update this to your actual image
   # This sets the pull policy for images.
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
@@ -26,15 +26,15 @@ setup:
   skillsJson: ""
   # Example skills JSON
   # skillsJson: |
-    # {
-    #   "1": [
-    #     { "skill_name": "Advertising", "description": "Promoting products" },
-    #     { "skill_name": "Marketing" }
-    #   ],
-    #   "2": [
-    #     { "skill_name": "Repair", "description": "Fixing things" }
-    #   ]
-    # }
+  # {
+  #   "1": [
+  #     { "skill_name": "Advertising", "description": "Promoting products" },
+  #     { "skill_name": "Marketing" }
+  #   ],
+  #   "2": [
+  #     { "skill_name": "Repair", "description": "Fixing things" }
+  #   ]
+  # }
 
 # Nginx sidecar configuration
 nginx:
@@ -43,7 +43,8 @@ nginx:
     repository: nginx
     tag: alpine
     pullPolicy: IfNotPresent
-  resources: {}
+  resources:
+    {}
     # limits:
     #   cpu: 100m
     #   memory: 128Mi
@@ -67,7 +68,8 @@ mysql:
     enabled: true
     size: 8Gi
     storageClass: ""
-  resources: {}
+  resources:
+    {}
     # limits:
     #   cpu: 500m
     #   memory: 512Mi
@@ -78,158 +80,171 @@ mysql:
     [mysqld]
     # Ignore lost+found directory that may exist in persistent volumes
     ignore-db-dir=lost+found
-    
+
     # Use explicit defaults for timestamp to avoid deprecation warnings
     explicit_defaults_for_timestamp=1
-    
+
     # Basic MySQL configuration
     default-storage-engine=innodb
     innodb_buffer_pool_size=128M
     max_allowed_packet=64M
-    
+
     # Character set configuration
     character-set-server=utf8mb4
     collation-server=utf8mb4_unicode_ci
-    
+
     # Logging
     log-error=/var/log/mysql/error.log
-    
+
     [mysql]
     default-character-set=utf8mb4
-    
+
     [client]
     default-character-set=utf8mb4
 
-# Application environment configuration
-env:
-  # Application settings
-  APP_NAME: "Restarters Production"
-  APP_ENV: "production"
-  APP_KEY: "base64:V7Xk5bSPf2okepdpDnXScE8kdWXwlAte4kXXpoK2+3I="
-  APP_DEBUG: "false"
-  APP_URL: "http://localhost:8080"
-  APP_SHOW_BRANCH: "false"
-  APP_SHOW_COMMUNITY_TEST: "false"
-  APP_INSTANCE: "fixitclinic"
+# Environment variable groups - organized by functionality
+envGroups:
+  # Application core settings
+  app:
+    APP_NAME: "Restarters Production"
+    APP_ENV: "production"
+    APP_KEY: "base64:V7Xk5bSPf2okepdpDnXScE8kdWXwlAte4kXXpoK2+3I="
+    APP_DEBUG: "false"
+    APP_URL: "http://localhost:8080"
+    APP_SHOW_BRANCH: "false"
+    APP_SHOW_COMMUNITY_TEST: "false"
+    APP_INSTANCE: "fixitclinic"
+    CALENDAR_HASH: "somehash"
 
   # Feature flags
-  FEATURE__IMAGE_UPLOAD: "false"
-  FEATURE__MATOMO_INTEGRATION: "false"
-  FEATURE__WORDPRESS_INTEGRATION: "false"
-  FEATURE__WIKI_INTEGRATION: "false"
-  FEATURE__DISCOURSE_INTEGRATION: "false"
+  features:
+    FEATURE__IMAGE_UPLOAD: "false"
+    FEATURE__MATOMO_INTEGRATION: "false"
+    FEATURE__WORDPRESS_INTEGRATION: "false"
+    FEATURE__WIKI_INTEGRATION: "false"
+    FEATURE__DISCOURSE_INTEGRATION: "false"
 
-  # Logging
-  LOG_CHANNEL: "stack"
+  # Logging configuration
+  logging:
+    LOG_CHANNEL: "stack"
 
-  # Database (will be overridden if mysql.enabled is true)
-  DB_CONNECTION: "mysql"
-  DB_HOST: "restarters-mysql"
-  DB_PORT: "3306"
-  DB_DATABASE: "restarters_prod"
-  DB_USERNAME: "restarters_user"
-  DB_PASSWORD: "restarters_pass"
+  # Database configuration (will be overridden by mysql config or secrets)
+  database:
+    DB_CONNECTION: "mysql"
+    DB_HOST: "restarters-mysql"
+    DB_PORT: "3306"
+    DB_DATABASE: "restarters_prod"
+    DB_USERNAME: "restarters_user"
+    DB_PASSWORD: "restarters_pass"
 
-  # Session and cache
-  BROADCAST_CONNECTION: "log"
-  CACHE_STORE: "file"
-  SESSION_DRIVER: "file"
-  SESSION_COOKIE: "restarters_session"
-  SESSION_SECURE_COOKIE: "false"
-  SESSION_DOMAIN: ""
-  SESSION_LIFETIME: "120"
-  SESSION_TABLE: "sessions"
-  QUEUE_CONNECTION: "sync"
+  # Database table configuration
+  tables:
+    TBL_USERS: "1"
+    TBL_GROUPS: "2"
+    TBL_EVENTS: "3"
+    TBL_DEVICES: "4"
+    TBL_IMAGES: "5"
+    TBL_LINKS: "6"
 
-  # Sanctum
-  SANCTUM_STATEFUL_DOMAINS: ""
+  # Session and cache configuration
+  session:
+    BROADCAST_CONNECTION: "log"
+    CACHE_STORE: "file"
+    SESSION_DRIVER: "file"
+    SESSION_COOKIE: "restarters_session"
+    SESSION_SECURE_COOKIE: "false"
+    SESSION_DOMAIN: ""
+    SESSION_LIFETIME: "120"
+    SESSION_TABLE: "sessions"
+    QUEUE_CONNECTION: "sync"
+    SANCTUM_STATEFUL_DOMAINS: ""
 
-  # Redis
-  REDIS_HOST: "127.0.0.1"
-  REDIS_PASSWORD: "null"
-  REDIS_PORT: "6379"
+  # Redis configuration
+  redis:
+    REDIS_HOST: "127.0.0.1"
+    REDIS_PASSWORD: "null"
+    REDIS_PORT: "6379"
 
-  # Mail
-  MAIL_MAILER: "smtp"
-  MAIL_HOST: "mailpit"
-  MAIL_PORT: "1025"
-  MAIL_USERNAME: "null"
-  MAIL_PASSWORD: "null"
-  MAIL_SCHEME: "null"
+  # Mail configuration
+  mail:
+    MAIL_MAILER: "smtp"
+    MAIL_HOST: "mailpit"
+    MAIL_PORT: "1025"
+    MAIL_USERNAME: "null"
+    MAIL_PASSWORD: "null"
+    MAIL_SCHEME: "null"
 
-  # Pusher
-  PUSHER_APP_ID: ""
-  PUSHER_APP_KEY: ""
-  PUSHER_APP_SECRET: ""
-  PUSHER_APP_CLUSTER: "mt1"
+  # Pusher configuration
+  pusher:
+    PUSHER_APP_ID: ""
+    PUSHER_APP_KEY: ""
+    PUSHER_APP_SECRET: ""
+    PUSHER_APP_CLUSTER: "mt1"
+    MIX_PUSHER_APP_KEY: ""
+    MIX_PUSHER_APP_CLUSTER: "mt1"
 
-  # Mix
-  MIX_PUSHER_APP_KEY: ""
-  MIX_PUSHER_APP_CLUSTER: "mt1"
+  # Device status configuration
+  devices:
+    DEVICE_FIXED: "1"
+    DEVICE_REPAIRABLE: "2"
+    DEVICE_DEAD: "3"
 
-  # Table names
-  TBL_USERS: "1"
-  TBL_GROUPS: "2"
-  TBL_EVENTS: "3"
-  TBL_DEVICES: "4"
-  TBL_IMAGES: "5"
-  TBL_LINKS: "6"
+  # Device category configuration
+  categories:
+    MISC_CATEGORY_ID: "46"
+    MISC_CATEGORY_ID_POWERED: "46"
+    MISC_CATEGORY_ID_UNPOWERED: "50"
 
-  # Device status
-  DEVICE_FIXED: "1"
-  DEVICE_REPAIRABLE: "2"
-  DEVICE_DEAD: "3"
-
-  # Categories
-  MISC_CATEGORY_ID: "46"
-  MISC_CATEGORY_ID_POWERED: "46"
-  MISC_CATEGORY_ID_UNPOWERED: "50"
-
-  # Environmental
-  DISPLACEMENT_VALUE: "0.5"
-  EMISSION_RATIO_UNPOWERED: ""
+  # Environmental impact configuration
+  environmental:
+    DISPLACEMENT_VALUE: "0.5"
+    EMISSION_RATIO_UNPOWERED: "17.70147059"
+    EMISSION_RATIO_POWERED: "32.06679233"
 
   # WordPress integration
-  WP_XMLRPC_ENDPOINT: ""
-  WP_XMLRPC_USER: ""
-  WP_XMLRPC_PSWD: ""
+  wordpress:
+    WP_XMLRPC_ENDPOINT: ""
+    WP_XMLRPC_USER: ""
+    WP_XMLRPC_PSWD: ""
 
   # Wiki integration
-  WIKI_URL: ""
-  WIKI_DB: ""
-  WIKI_USER: ""
-  WIKI_PASSWORD: ""
-  WIKI_APIUSER: ""
-  WIKI_APIPASSWORD: ""
-  WIKI_COOKIE_PREFIX: ""
-  WIKI_HOST: ""
+  wiki:
+    WIKI_URL: ""
+    WIKI_DB: ""
+    WIKI_USER: ""
+    WIKI_PASSWORD: ""
+    WIKI_APIUSER: ""
+    WIKI_APIPASSWORD: ""
+    WIKI_COOKIE_PREFIX: ""
+    WIKI_HOST: ""
 
   # Discourse integration
-  DISCOURSE_SECRET: ""
-  DISCOURSE_URL: ""
-  DISCOURSE_APIUSER: ""
-  DISCOURSE_APIKEY: ""
+  discourse:
+    DISCOURSE_SECRET: ""
+    DISCOURSE_URL: ""
+    DISCOURSE_APIUSER: ""
+    DISCOURSE_APIKEY: ""
+    SEND_COMMAND_LOGS_TO: ""
 
-  # External services
-  REPAIRDIRECTORY_URL: ""
-  MAPBOX_TOKEN: ""
-  GOOGLE_ANALYTICS_TRACKING_ID: ""
-  GOOGLE_TAG_MANAGER_ID: ""
-  GOOGLE_API_CONSOLE_KEY: ""
+  # Maps integration
+  mapKeys:
+    MAPBOX_TOKEN: ""
+    GOOGLE_API_CONSOLE_KEY: ""
 
-  # Monitoring
-  SEND_COMMAND_LOGS_TO: ""
-  CALENDAR_HASH: ""
-  SENTRY_LARAVEL_DSN: ""
-  SENTRY_TRACES_SAMPLE_RATE: "0.1"
+  # Monitoring and analytics
+  monitoring:
+    SENTRY_LARAVEL_DSN: ""
+    SENTRY_TRACES_SAMPLE_RATE: "1"
+    GOOGLE_ANALYTICS_TRACKING_ID: ""
+    GOOGLE_TAG_MANAGER_ID: ""
 
-  # Security
-  HONEYPOT_DISABLE: "false"
-  L5_SWAGGER_GENERATE_ALWAYS: "false"
-
-  # Meta
-  META_TWITTER_SITE: ""
-  META_TWITTER_IMAGE_ALT: ""
+  # Meta configuration
+  meta:
+    HONEYPOT_DISABLE: "false"
+    L5_SWAGGER_GENERATE_ALWAYS: "false"
+    REPAIRDIRECTORY_URL: ""
+    META_TWITTER_SITE: ""
+    META_TWITTER_IMAGE_ALT: ""
 
 # This is for the secrets for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 imagePullSecrets: []
@@ -241,10 +256,10 @@ fullnameOverride: ""
 # When enabled, the application will read sensitive credentials from a Kubernetes secret
 # This works with ExternalSecrets or manually created secrets
 secrets:
-  apiKeys:
+  mapKeys:
     enabled: false
     createSecret: false
-    secretName: "restarters-api-keys"
+    secretName: "restarters-map-keys"
     keys:
       mapboxToken: "MAPBOX_TOKEN"
       googleApiKey: "GOOGLE_API_CONSOLE_KEY"
@@ -300,7 +315,8 @@ service:
 ingress:
   enabled: false
   className: ""
-  annotations: {}
+  annotations:
+    {}
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   hosts:
@@ -313,7 +329,8 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
-resources: {}
+resources:
+  {}
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
