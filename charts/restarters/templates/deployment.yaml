@@ -27,6 +27,15 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- if and .Values.persistence.enabled .Values.persistence.enableFsGroup }}
+      securityContext:
+        fsGroup: 33  # www-data group ID
+      {{- else }}
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- end }}
       initContainers:
         # Copy public files to shared volume
         - name: copy-public-files
@@ -45,7 +54,7 @@ spec:
             - /bin/sh
             - -c
             - |
-              echo "Setting up storage directory structure and permissions..."
+              echo "Setting up storage directory structure..."
               
               # Create all necessary directories in the mounted storage volume
               mkdir -p /var/www/storage/framework/sessions
@@ -57,20 +66,11 @@ spec:
               # Create uploads directory in public volume
               mkdir -p /var/www/public/uploads
               
-              # Set ownership and permissions for storage directory
-              chown -R 33:33 /var/www/storage
-              chmod -R 755 /var/www/storage
-              
-              # Make sure logs directory is writable
-              chmod -R 777 /var/www/storage/logs
-              
-              # Set permissions for uploads directory
-              chown -R 33:33 /var/www/public/uploads
-              chmod -R 755 /var/www/public/uploads
-              
-              echo "Storage permissions setup complete"
+              echo "Storage directory structure setup complete"
           securityContext:
-            runAsUser: 0  # Run as root to fix permissions
+            runAsUser: 33  # Run as www-data user
+            runAsGroup: 33
+            runAsNonRoot: true
           volumeMounts:
             - name: storage-pvc
               mountPath: /var/www/storage

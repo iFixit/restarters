@@ -265,10 +265,17 @@ podAnnotations: {}
 # For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
 podLabels: {}
 
+podSecurityContext:
+  fsGroup: 33 # www-data group ID - enables proper volume permissions
+  # fsGroupChangePolicy: "OnRootMismatch"  # Commented out for compatibility
+
 securityContext:
-  runAsUser: 33  # www-data user ID
-  runAsGroup: 33  # www-data group ID
-  fsGroup: 33  # www-data group ID
+  runAsUser: 33 # www-data user ID
+  runAsGroup: 33 # www-data group ID
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
 
 # This is for setting up a service more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/
 service:
@@ -331,6 +338,8 @@ persistence:
   storageClassName: ""
   # Set to true to use fsGroup for proper permissions
   useFsGroup: true
+  # Set to false if your cluster doesn't support fsGroup (e.g., some managed Kubernetes services)
+  enableFsGroup: true
 
 nodeSelector: {}
 
