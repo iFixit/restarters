@@ -3,7 +3,7 @@
 version: "3"
 
 vars:
-  DOCKER_NAMESPACE: "{{.DOCKER_NAMESPACE | default \"docker:\"}}"
+  DOCKER_NAMESPACE: "{{.DOCKER_NAMESPACE | default \"docker:dev:\"}}"
 
 tasks:
   # Package management tasks
