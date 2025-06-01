@@ -33,10 +33,7 @@ services:
       restarters_db_prod:
         condition: service_healthy
     environment:
-      - WAIT_FOR_DB=true
-      - INIT_LARAVEL=true
       - MIGRATE=true
-      - OPTIMIZE=true
       - DB_HOST=restarters_db_prod
       - DB_PORT=3306
       - DB_DATABASE=restarters_prod

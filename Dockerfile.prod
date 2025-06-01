@@ -108,9 +108,6 @@ COPY --from=builder --chown=www-data:www-data /var/www/Taskfiles /var/www/Taskfi
 
 COPY --from=go /usr/bin/task /usr/bin/task
 
-# Create a default .env file
-RUN touch /var/www/.env && chmod 666 /var/www/.env
-
 # Configure PHP-FPM to log to stderr
 RUN sed -i 's/;catch_workers_output = yes/catch_workers_output = yes/' /usr/local/etc/php-fpm.d/www.conf && \
     sed -i 's/;php_admin_flag\[log_errors\] = on/php_admin_flag[log_errors] = on/' /usr/local/etc/php-fpm.d/www.conf && \
@@ -118,8 +115,6 @@ RUN sed -i 's/;catch_workers_output = yes/catch_workers_output = yes/' /usr/loca
 
 # Make storage writable
 RUN chown -R www-data:www-data /var/www && \
-    chmod -R 775 /var/www && \
-    chmod -R 777 /var/www/storage /var/www/bootstrap/cache && \
     git config --global --add safe.directory /var/www
 
 # Copy the entrypoint script
