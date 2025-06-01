@@ -1,0 +1,78 @@
+# Production docker-compose file for Restarters
+# This file is designed to test the production image locally
+# 
+# Services:
+# - nginx: Reverse proxy server (port 8001)
+# - restarters_prod: Production PHP-FPM application
+# - restarters_db_prod: MySQL database
+
+version: '3.8'
+
+services:
+  # Nginx reverse proxy
+  nginx:
+    image: nginx:alpine
+    container_name: restarters_nginx_prod
+    restart: unless-stopped
+    ports:
+      - "8001:80"
+    depends_on:
+      - restarters_prod
+    networks:
+      - app-network-prod
+
+  # Production Restarters application
+  restarters_prod:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+      target: production
+    container_name: restarters_prod
+    restart: unless-stopped
+    depends_on:
+      restarters_db_prod:
+        condition: service_healthy
+    environment:
+      - WAIT_FOR_DB=true
+      - INIT_LARAVEL=true
+      - MIGRATE=true
+      - OPTIMIZE=true
+      - DB_HOST=restarters_db_prod
+      - DB_PORT=3306
+      - DB_DATABASE=restarters_prod
+      - DB_USERNAME=restarters_user
+      - DB_PASSWORD=restarters_pass
+    volumes:
+      # Only mount the .env file
+      - ./.env.prod:/var/www/.env:ro
+    networks:
+      - app-network-prod
+
+  # Production MySQL database
+  restarters_db_prod:
+    image: mysql:5.7.33
+    container_name: restarters_db_prod
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: s3cr3t_prod
+      MYSQL_DATABASE: restarters_prod
+      MYSQL_USER: restarters_user
+      MYSQL_PASSWORD: restarters_pass
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-ps3cr3t_prod"]
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - dbdata_prod:/var/lib/mysql
+    networks:
+      - app-network-prod
+
+networks:
+  app-network-prod:
+    driver: bridge
+
+volumes:
+  dbdata_prod:
+    driver: local 
