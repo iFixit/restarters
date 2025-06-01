@@ -123,7 +123,7 @@ RUN chown -R www-data:www-data /var/www && \
     git config --global --add safe.directory /var/www
 
 # Copy the entrypoint script
-COPY docker/entrypoint.prod.sh /usr/local/bin/entrypoint.sh
+COPY docker/production/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Set non-root user
