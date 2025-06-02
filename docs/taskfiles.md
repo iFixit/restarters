@@ -19,13 +19,14 @@ Taskfile.yml              # Main taskfile with includes and environment setup
 
 ### Taskfile.yml
 
-The main taskfile serves as the entry point and orchestrates the modular taskfiles:
+The main taskfile serves as the entry point and orchestrates the modular taskfiles with separate configurations for development and production environments:
 
 #### Includes
-- **docker**: Docker container management tasks
-- **app**: Laravel application-specific tasks  
-- **deps**: Dependency management (Composer, NPM)
 - **build**: Docker image building tasks
+- **docker:dev**: Development Docker container management tasks
+- **docker:prod**: Production Docker container management tasks  
+- **deps**: Dependency management (Composer, NPM) with development Docker namespace
+- **app**: Laravel application-specific tasks with development Docker namespace
 
 #### Environment Configuration
 The taskfile loads environment variables from multiple `.env` files in order of precedence:
@@ -37,11 +38,12 @@ The taskfile loads environment variables from multiple `.env` files in order of 
 #### Available Tasks
 - `task` or `task default`: List all available tasks
 - `task env:generate`: Generate `.env` file from `.env.template`
-- `task setup`: Perform the complete development environment setup
+- `task setup:dev`: Perform the complete development environment setup
+- `task setup:prod`: Perform the production environment setup
 
 ## Docker Tasks (docker.yml)
 
-Manages Docker container lifecycle and operations for the Laravel application.
+Manages Docker container lifecycle and operations for the Laravel application with support for both development and production environments.
 
 ### Container Profiles
 
@@ -55,60 +57,72 @@ The project uses Docker Compose profiles to manage different sets of containers:
 ### Available Tasks
 
 #### Container Management
+The Docker tasks now use wildcard patterns for flexible profile-based operations:
+
 ```bash
 # Start containers by profile
-task docker:up-core        # Start core services only
-task docker:up-debug       # Start core + debug tools
-task docker:up-discourse   # Start core + discourse
-task docker:up-all         # Start all containers
+task docker:dev:up-core        # Start core services only
+task docker:dev:up-debug       # Start core + debug tools
+task docker:dev:up-discourse   # Start core + discourse
+task docker:dev:up-all         # Start all containers
 
 # Stop containers by profile
-task docker:down-core      # Stop core services
-task docker:down-debug     # Stop core + debug tools
-task docker:down-discourse # Stop core + discourse
-task docker:down-all       # Stop all containers
+task docker:dev:down-core      # Stop core services
+task docker:dev:down-debug     # Stop core + debug tools
+task docker:dev:down-discourse # Stop core + discourse
+task docker:dev:down-all       # Stop all containers
 
 # Restart containers by profile
-task docker:restart-core
-task docker:restart-debug
-task docker:restart-discourse
-task docker:restart-all
+task docker:dev:restart-core
+task docker:dev:restart-debug
+task docker:dev:restart-discourse
+task docker:dev:restart-all
 
 # Rebuild containers (removes volumes and images)
-task docker:rebuild-core
-task docker:rebuild-debug
-task docker:rebuild-discourse
-task docker:rebuild-all
+task docker:dev:rebuild-core
+task docker:dev:rebuild-debug
+task docker:dev:rebuild-discourse
+task docker:dev:rebuild-all
+
+# Rebuild just the application container
+task docker:dev:rebuild-app
+
+# Production equivalents
+task docker:prod:up-core
+task docker:prod:down-core
+# ... (same pattern for production)
 ```
 
 #### Container Interaction
 ```bash
 # View application logs
-task docker:logs
+task docker:dev:logs
 
 # Open shell in application container
-task docker:shell
+task docker:dev:shell
 
 # Run bash commands in container
-task docker:run:bash -- ls -la
+task docker:dev:run:bash -- ls -la
 
 # Run artisan commands in container
-task docker:run:artisan -- migrate
+task docker:dev:run:artisan -- migrate
 
 # Run tests in container
-task docker:run:tests
+task docker:dev:run:tests
 ```
 
 #### Database Management
 ```bash
 # Initialize test database
-task docker:db:init-test
+task docker:dev:init:test_db
 ```
 
 ### Key Features
 - **Auto-detection**: Automatically detects `docker-compose` vs `docker compose` command
 - **Profile-based**: Uses Docker Compose profiles for flexible container management
 - **Environment generation**: Automatically generates `.env` file before starting containers
+- **Wildcard patterns**: Uses Task's wildcard feature for dynamic profile-based operations
+- **Dev/Prod separation**: Separate namespaces for development and production environments
 
 ## Application Tasks (app.yml)
 
@@ -124,7 +138,7 @@ task app:artisan -- make:controller UserController
 
 # Run tests
 task app:tests
-task app:tests --filter=UserTest
+task app:tests -- --filter=UserTest
 ```
 
 #### Cache Management
@@ -154,6 +168,12 @@ task app:generate:swagger
 
 # Generate application key
 task app:generate:key
+```
+
+#### User Management
+```bash
+# Create a new user
+task app:user:create -- "John Doe" "john@example.com" "password" "en" "1" --role="2"
 ```
 
 ### Smart Container Detection
@@ -190,8 +210,6 @@ task deps:npm -- run dev
 task deps:npm:install
 ```
 
-
-
 ### Smart Dependency Management
 
 - **Source tracking**: Composer install tracks `composer.json` and `composer.lock` changes
@@ -220,9 +238,9 @@ task build:prod NAME=myapp TAG=prod-v1.0.0
 
 ### Build Configurations
 
-- **Development** (`build:dev`): Uses `Dockerfile` for development builds
-- **Staging** (`build:staging`): Uses `Dockerfile.prod` with staging defaults
-- **Production** (`build:prod`): Uses `Dockerfile.prod` with production defaults
+- **Development** (`build:dev`): Uses `docker/development/Dockerfile` for development builds
+- **Staging** (`build:staging`): Uses `docker/production/Dockerfile.prod` with staging defaults
+- **Production** (`build:prod`): Uses `docker/production/Dockerfile.prod` with production defaults
 
 ### Customization
 
@@ -232,16 +250,16 @@ All build tasks accept optional parameters:
 
 ## Development Environment Setup
 
-The main `Taskfile.yml` includes a comprehensive `setup` task that orchestrates the complete development environment initialization.
+The main `Taskfile.yml` includes comprehensive setup tasks for both development and production environments.
 
-### Setup Task
+### Development Setup Task
 
 ```bash
 # Complete development environment setup
-task setup
+task setup:dev
 ```
 
-The `setup` task performs the following operations in sequence:
+The `setup:dev` task performs the following operations in sequence:
 1. **Install Composer dependencies** (`task deps:composer:install`)
 2. **Run database migrations** (`task app:db:migrate`)
 3. **Generate JavaScript translations** (`task app:generate:translations`)
@@ -250,6 +268,19 @@ The `setup` task performs the following operations in sequence:
 6. **Install NPM dependencies** with legacy peer deps (`task deps:npm:install`)
 7. **Rebuild node-sass** (`task deps:npm`)
 
+### Production Setup Task
+
+```bash
+# Production environment setup
+task setup:prod
+```
+
+The `setup:prod` task performs conditional operations based on environment variables:
+1. **Run database migrations** (if `MIGRATE=true`)
+2. **Seed default skills** (if `SEED_SKILLS=true`)
+3. **Create admin user** (if `CREATE_ADMIN_USER=true`)
+4. **Clear all caches** (`task app:clear:caches`)
+
 ## Usage Examples
 
 ### Common Development Workflows
@@ -257,13 +288,16 @@ The `setup` task performs the following operations in sequence:
 #### Initial Project Setup
 ```bash
 # Start core containers
-task docker:up-core
+task docker:dev:up-core
+
+# Complete development setup
+task setup:dev
 ```
 
 #### Daily Development
 ```bash
 # Start containers with debug tools
-task docker:up-debug
+task docker:dev:up-debug
 
 # Run migrations after pulling changes
 task app:db:migrate
@@ -292,6 +326,15 @@ task app:db:migrate
 
 # Seed database
 task app:db:seed
+
+# Initialize test database
+task docker:dev:init:test_db
+```
+
+#### User Management
+```bash
+# Create admin user
+task app:user:create -- "Admin User" "admin@example.com" "secure_password" "en" "1" --role="2"
 ```
 
 #### Building for Deployment
@@ -313,15 +356,22 @@ The taskfiles support multiple environment configurations with clear precedence:
 ### Task Namespacing
 
 Tasks are organized into logical namespaces:
-- `docker:*` - Container operations
+- `docker:dev:*` - Development container operations
+- `docker:prod:*` - Production container operations
 - `app:*` - Laravel application tasks
 - `deps:*` - Dependency management
 - `build:*` - Image building
 
+### Wildcard Task Patterns
+
+The Docker tasks use Task's wildcard feature for dynamic operations:
+- `up-*`, `down-*`, `restart-*`, `rebuild-*` patterns allow flexible profile-based operations
+- Profile validation ensures only valid profiles (core, debug, discourse, all) are used
+
 ### Variable Inheritance
 
 The taskfiles use variable inheritance and namespacing:
-- `DOCKER_NAMESPACE` allows flexible task composition
+- `DOCKER_NAMESPACE` allows flexible task composition between dev and prod
 - Variables can be overridden at runtime
 - Default values provide sensible fallbacks
 
@@ -334,10 +384,11 @@ The taskfiles use variable inheritance and namespacing:
 ## Best Practices
 
 1. **Use profiles**: Start only the containers you need with appropriate profiles
-2. **Environment files**: Keep sensitive data in `.env.docker.local` (gitignored)
-3. **Task composition**: Leverage task dependencies for complex workflows
-4. **Container awareness**: Let tasks automatically handle Docker execution
-5. **Namespace consistency**: Use consistent namespacing when extending taskfiles
+2. **Environment separation**: Use `docker:dev:*` for development and `docker:prod:*` for production
+3. **Environment files**: Keep sensitive data in `.env.docker.local` (gitignored)
+4. **Task composition**: Leverage task dependencies for complex workflows
+5. **Container awareness**: Let tasks automatically handle Docker execution
+6. **Namespace consistency**: Use consistent namespacing when extending taskfiles
 
 ## Troubleshooting
 
@@ -352,11 +403,27 @@ The taskfiles use variable inheritance and namespacing:
 
 ```bash
 # View container logs
-task docker:logs
+task docker:dev:logs
 
 # View Laravel Logs
 tail -f storage/logs/laravel.log
 
 # Verify environment
+task app:artisan -- env
+
+# Open shell for debugging
+task docker:dev:shell
+```
+
+### Production Debugging
+
+```bash
+# View production container logs
+task docker:prod:logs
+
+# Open shell in production container
+task docker:prod:shell
+
+# Check production environment
 task app:artisan -- env
 ```
