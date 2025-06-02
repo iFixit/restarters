@@ -27,7 +27,26 @@ data:
             try_files $uri $uri/ @php;
         }
 
-        # Handle PHP files
+        # PHP-FPM configuration with better error handling
+        location @php {
+            fastcgi_pass 127.0.0.1:9000;
+            fastcgi_param SCRIPT_FILENAME $realpath_root/index.php;
+            fastcgi_param REQUEST_URI $uri;
+            fastcgi_param QUERY_STRING $query_string;
+            include fastcgi_params;
+            fastcgi_hide_header X-Powered-By;
+
+            # Add timeout and error handling
+            fastcgi_connect_timeout 5s;
+            fastcgi_send_timeout 10s;
+            fastcgi_read_timeout 10s;
+
+            # Better error handling
+            fastcgi_intercept_errors on;
+        }
+
+
+        # Directly handle PHP files
         location ~ \.php$ {
             try_files $uri =404;
             fastcgi_split_path_info ^(.+\.php)(/.+)$;
