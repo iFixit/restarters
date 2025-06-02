@@ -3,7 +3,7 @@
 #
 mkdir storage/framework/cache/data
 
-IN_DOCKER=true task setup
+IN_DOCKER=true task setup:dev
 
 chmod -R 777 public
 
