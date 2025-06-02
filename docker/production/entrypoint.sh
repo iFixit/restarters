@@ -22,7 +22,7 @@ if [ "${CREATE_ADMIN_USER:-false}" = "true" ]; then
   echo "Setting up admin user..."
 
   # Use artisan command to create the admin user
-  php artisan user:create "${ADMIN_NAME}" "${ADMIN_EMAIL}" "${ADMIN_PASSWORD}" "en" "1" --role=${ADMIN_ROLE}
+  task app:user:create -- "${ADMIN_NAME}" "${ADMIN_EMAIL}" "${ADMIN_PASSWORD}" "en" "1" --role=${ADMIN_ROLE}
     
   echo "Admin user setup completed"
 fi

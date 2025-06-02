@@ -7,8 +7,7 @@ IN_DOCKER=true task setup
 
 chmod -R 777 public
 
-# Ensure we have the admin user
-php artisan user:create "Jane Bloggs" "jane@bloggs.net" "passw0rd" "en" "1" --role=2
+task app:user:create -- "Jane Bloggs" "jane@bloggs.net" "passw0rd" "en" "1" --role=2
 
 php artisan dev --no-logs
 
