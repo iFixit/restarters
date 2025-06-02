@@ -1,0 +1,17 @@
+{{- if .Values.phpfpm.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "restarters.fullname" . }}-storage-pvc
+  labels:
+    {{- include "restarters.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  {{- if .Values.phpfpm.persistence.storageClass }}
+  storageClassName: {{ .Values.phpfpm.persistence.storageClass }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.phpfpm.persistence.size | default "1Gi" }}
+{{- end }} 

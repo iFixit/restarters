@@ -1,0 +1,209 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "restarters.fullname" . }}
+  labels:
+    {{- include "restarters.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "restarters.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "restarters.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+      initContainers:
+        # Copy public files to shared volume
+        - name: copy-public-files
+          image: "{{ .Values.phpfpm.image.repository }}:{{ .Values.phpfpm.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.phpfpm.image.pullPolicy }}
+          command: ['sh', '-c', 'cp -r /var/www/public/* /shared-public/ 2>/dev/null || true']
+          volumeMounts:
+            - name: public-files
+              mountPath: /shared-public
+
+        # Fix permissions for the storage directory
+        - name: fix-mounted-directory-permissions
+          image: "{{ .Values.phpfpm.image.repository }}:{{ .Values.phpfpm.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.phpfpm.image.pullPolicy }}
+          command: 
+            - /bin/sh
+            - -c
+            - |
+              echo "Setting up storage directory structure..."
+              
+              # Create all necessary directories in the mounted storage volume
+              mkdir -p /var/www/storage/framework/sessions
+              mkdir -p /var/www/storage/framework/views
+              mkdir -p /var/www/storage/framework/cache/data
+              mkdir -p /var/www/storage/app/public
+              mkdir -p /var/www/storage/logs
+              
+              # Create uploads directory in public volume
+              mkdir -p /var/www/public/uploads
+              
+              echo "Storage directory structure setup complete"
+          volumeMounts:
+            - name: storage-pvc
+              mountPath: /var/www/storage
+              subPath: storage
+            - name: public-files
+              mountPath: /var/www/public
+
+      containers:
+        # Main Restarters PHP-FPM container
+        - name: {{ .Chart.Name }}
+          {{- with .Values.phpfpm.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.phpfpm.image.repository }}:{{ .Values.phpfpm.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.phpfpm.image.pullPolicy }}
+          ports:
+            - name: php-fpm
+              containerPort: 9000
+              protocol: TCP
+          env:
+            {{- include "restarters.setupEnvVars" . | nindent 12 }}
+            {{- include "restarters.secretEnvVars" . | nindent 12 }}
+          livenessProbe:
+            exec:
+              command:
+                - /usr/local/bin/healthcheck.sh
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            exec:
+              command:
+                - /usr/local/bin/healthcheck.sh
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 10
+            failureThreshold: 3
+          {{- with .Values.phpfpm.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: env-config
+              mountPath: /var/www/.env
+              subPath: .env
+              readOnly: true
+            - name: public-files
+              mountPath: /var/www/public
+            {{- if .Values.setup.skillsJson }}
+            - name: skills-json-config
+              mountPath: /var/www/config/skills.json
+              subPath: skills.json
+              readOnly: true
+            {{- end }}
+            {{- if .Values.phpfpm.persistence.enabled }}
+            - name: storage-pvc
+              mountPath: /var/www/storage
+              subPath: storage
+              readOnly: false
+            {{- end }}
+            {{- with .Values.phpfpm.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+        
+        {{- if .Values.nginx.enabled }}
+        # Nginx sidecar container
+        - name: nginx
+          image: "{{ .Values.nginx.image.repository }}:{{ .Values.nginx.image.tag }}"
+          imagePullPolicy: {{ .Values.nginx.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          {{- with .Values.nginx.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/conf.d/default.conf
+              subPath: default.conf
+              readOnly: true
+            - name: public-files
+              mountPath: /var/www/public
+              readOnly: true
+            {{- with .Values.nginx.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 45
+            periodSeconds: 10
+            timeoutSeconds: 10
+            failureThreshold: 3
+        {{- end }}
+      
+      volumes:
+        - name: env-config
+          configMap:
+            name: {{ include "restarters.fullname" . }}-env-config
+        - name: public-files
+          emptyDir: {}
+        {{- if .Values.phpfpm.persistence.enabled }}
+        - name: storage-pvc
+          persistentVolumeClaim:
+            claimName: {{ include "restarters.fullname" . }}-storage-pvc
+        {{- end }}
+        {{- if .Values.setup.skillsJson }}
+        - name: skills-json-config
+          configMap:
+            name: {{ include "restarters.fullname" . }}-skills-json-config
+        {{- end }}
+        {{- if .Values.nginx.enabled }}
+        - name: nginx-config
+          configMap:
+            name: {{ include "restarters.fullname" . }}-nginx-config
+        {{- end }}
+        {{- with .Values.volumes }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

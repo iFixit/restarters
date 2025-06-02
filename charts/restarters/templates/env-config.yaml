@@ -1,0 +1,65 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "restarters.fullname" . }}-env-config
+  labels:
+    {{- include "restarters.labels" . | nindent 4 }}
+data:
+    .env: |
+        # Application Configuration
+        {{- include "restarters.envGroup" (dict "groupName" "app" "context" .) | nindent 8 }}
+
+        # Feature Flags
+        {{- include "restarters.envGroup" (dict "groupName" "features" "context" .) | nindent 8 }}
+
+        # Logging Configuration
+        {{- include "restarters.envGroup" (dict "groupName" "logging" "context" .) | nindent 8 }}
+
+        # Database Configuration
+        {{- include "restarters.dbConfig" . | nindent 8 }}
+
+        # Database Table Configuration
+        {{- include "restarters.envGroup" (dict "groupName" "tables" "context" .) | nindent 8 }}
+
+        # Session and Cache Configuration
+        {{- include "restarters.envGroup" (dict "groupName" "session" "context" .) | nindent 8 }}
+
+        # Redis Configuration
+        {{- include "restarters.envGroup" (dict "groupName" "redis" "context" .) | nindent 8 }}
+
+        # Mail Configuration
+        {{- include "restarters.envGroup" (dict "groupName" "mail" "context" .) | nindent 8 }}
+
+        # Pusher Configuration
+        {{- include "restarters.envGroup" (dict "groupName" "pusher" "context" .) | nindent 8 }}
+
+        # Device Status Configuration
+        {{- include "restarters.envGroup" (dict "groupName" "devices" "context" .) | nindent 8 }}
+
+        # Device Category Configuration
+        {{- include "restarters.envGroup" (dict "groupName" "categories" "context" .) | nindent 8 }}
+
+        # Environmental Impact Configuration
+        {{- include "restarters.envGroup" (dict "groupName" "environmental" "context" .) | nindent 8 }}
+
+        # WordPress Integration
+        {{- include "restarters.envGroup" (dict "groupName" "wordpress" "context" .) | nindent 8 }}
+
+        # Wiki Integration
+        {{- include "restarters.envGroup" (dict "groupName" "wiki" "context" .) | nindent 8 }}
+
+        # Discourse Integration
+        {{- include "restarters.envGroup" (dict "groupName" "discourse" "context" .) | nindent 8 }}
+
+        # Maps Integration
+        {{- if not .Values.secrets.mapKeys.enabled }}
+        {{- include "restarters.envGroup" (dict "groupName" "mapKeys" "context" .) | nindent 8 }}
+        {{- else}}
+        # Excluded map keys, being managed by secrets
+        {{- end }}
+
+        # Monitoring and Analytics
+        {{- include "restarters.envGroup" (dict "groupName" "monitoring" "context" .) | nindent 8 }}
+
+        # Meta Configuration
+        {{- include "restarters.envGroup" (dict "groupName" "meta" "context" .) | nindent 8 }}

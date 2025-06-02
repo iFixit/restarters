@@ -1,0 +1,407 @@
+# Default values for restarters.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
+replicaCount: 1
+
+# =============================================================================
+# PHP-FPM Container Configuration
+# =============================================================================
+phpfpm:
+  # This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
+  image:
+    repository: restarters_prod
+    # This sets the pull policy for images.
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: ""
+
+  # Persistence for the /storage directory
+  persistence:
+    enabled: true
+    size: 1Gi
+    storageClass: "standard"
+
+  # Security context for PHP-FPM container
+  securityContext:
+    {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  # Resource limits and requests for PHP-FPM container
+  resources:
+    {}
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 500m
+    #   memory: 512Mi
+    # requests:
+    #   cpu: 250m
+    #   memory: 256Mi'
+
+  volumeMounts: []
+
+# =============================================================================
+# Nginx Sidecar Container Configuration
+# =============================================================================
+nginx:
+  enabled: true
+  image:
+    repository: nginx
+    tag: alpine
+    pullPolicy: IfNotPresent
+
+  # Security configuration for nginx
+  security:
+    # Content Security Policy configuration
+    csp:
+      enabled: true
+      # Production-safe CSP policy
+      # For local development, you may want to use a more permissive policy or disable CSP entirely
+      policy: "default-src 'self' http: https: data: blob: 'unsafe-inline' 'unsafe-eval'"
+
+  # Resource limits and requests for Nginx container
+  resources:
+    {}
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 50m
+    #   memory: 64Mi
+
+  volumeMounts: []
+
+# =============================================================================
+# Shared Pod Configuration
+# =============================================================================
+# This is for the secrets for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+imagePullSecrets: []
+
+# This is to override the chart name.
+nameOverride: ""
+fullnameOverride: ""
+
+# This is for setting Kubernetes Annotations to a Pod.
+# For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+podAnnotations: {}
+
+# This is for setting Kubernetes Labels to a Pod.
+# For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+podLabels: {}
+
+# Pod-level security context
+podSecurityContext:
+  fsGroup: 33 # www-data group - ensures all mounted volumes are owned by this group
+
+# Additional volumes on the output Deployment definition.
+volumes: []
+
+# Node selector, tolerations, and affinity
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+# =============================================================================
+# Service Configuration
+# =============================================================================
+# This is for setting up a service more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/
+service:
+  # This sets the service type more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
+  type: ClusterIP
+  # This sets the ports more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
+  port: 80
+
+# =============================================================================
+# Ingress Configuration
+# =============================================================================
+# This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
+ingress:
+  enabled: false
+  className: ""
+  annotations:
+    {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+# =============================================================================
+# MySQL Database Configuration
+# =============================================================================
+mysql:
+  enabled: true
+  image:
+    repository: mysql
+    tag: "5.7"
+    pullPolicy: IfNotPresent
+  auth:
+    rootPassword: "s3cr3t_prod"
+    database: "restarters_prod"
+    username: "restarters_user"
+    password: "restarters_pass"
+  persistence:
+    enabled: false
+    size: 8Gi
+    storageClass: ""
+  resources:
+    {}
+    # limits:
+    #   cpu: 500m
+    #   memory: 512Mi
+    # requests:
+    #   cpu: 250m
+    #   memory: 256Mi
+  config: |
+    [mysqld]
+    # Ignore lost+found directory that may exist in persistent volumes
+    ignore-db-dir=lost+found
+
+    # Use explicit defaults for timestamp to avoid deprecation warnings
+    explicit_defaults_for_timestamp=1
+
+    # Basic MySQL configuration
+    default-storage-engine=innodb
+    innodb_buffer_pool_size=128M
+    max_allowed_packet=64M
+
+    # Character set configuration
+    character-set-server=utf8mb4
+    collation-server=utf8mb4_unicode_ci
+
+    [mysql]
+    default-character-set=utf8mb4
+
+    [client]
+    default-character-set=utf8mb4
+
+# =============================================================================
+# Application Environment Configuration
+# =============================================================================
+setup:
+  migrate: "false"
+  seedSkills: "false"
+  # USE WITH CAUTION! This will truncate the skills table and re-seed it with the skills.json file
+  # seedingTruncateSkills: "false
+
+  createAdminUser: "false"
+  adminName: "Restarters Admin"
+  adminEmail: "admin@example.com"
+  adminPassword: "changeMeASAP"
+  adminRole: "2"
+  skillsJson: ""
+  # Example skills JSON
+  # skillsJson: |
+  # {
+  #   "1": [
+  #     { "skill_name": "Advertising", "description": "Promoting products" },
+  #     { "skill_name": "Marketing" }
+  #   ],
+  #   "2": [
+  #     { "skill_name": "Repair", "description": "Fixing things" }
+  #   ]
+  # }
+
+# External secrets configuration
+# When enabled, the application will read sensitive credentials from a Kubernetes secret
+secrets:
+  mapKeys:
+    enabled: false
+    createSecret: false
+    secretName: "restarters-map-keys"
+    keys:
+      mapboxToken: "MAPBOX_TOKEN"
+      googleApiKey: "GOOGLE_API_CONSOLE_KEY"
+    data:
+      mapboxToken: "your-mapbox-token-here"
+      googleApiKey: "your-google-api-key-here"
+
+  # External database credentials (used when mysql.enabled is false)
+  dbCredentials:
+    enabled: false
+    createSecret: false
+    secretName: "restarters-db-credentials"
+    keys:
+      dbHost: "DB_HOST"
+      dbPort: "DB_PORT"
+      dbDatabase: "DB_DATABASE"
+      dbUsername: "DB_USERNAME"
+      dbPassword: "DB_PASSWORD"
+    data:
+      dbHost: "your-db-host-here"
+      dbPort: "your-db-port-here"
+      dbDatabase: "your-db-database-here"
+      dbUsername: "your-db-username-here"
+      dbPassword: "your-db-password-here"
+
+# Environment variable groups - organized by functionality
+envGroups:
+  # Application core settings
+  app:
+    APP_NAME: "Restarters Production"
+    APP_ENV: "production"
+    APP_KEY: "" # One needs to be generated before hand
+    APP_DEBUG: "false"
+    APP_URL: "http://localhost:8001"
+    APP_SHOW_BRANCH: "false"
+    APP_SHOW_COMMUNITY_TEST: "false"
+    APP_INSTANCE: "base"
+    CALENDAR_HASH: "somehash"
+
+  # Feature flags
+  features:
+    FEATURE__IMAGE_UPLOAD: "false"
+    FEATURE__MATOMO_INTEGRATION: "false"
+    FEATURE__WORDPRESS_INTEGRATION: "false"
+    FEATURE__WIKI_INTEGRATION: "false"
+    FEATURE__DISCOURSE_INTEGRATION: "false"
+
+  # Logging configuration
+  logging:
+    LOG_CHANNEL: "stack"
+
+  # Database configuration (will be overridden by mysql config or secrets)
+  database:
+    DB_CONNECTION: "mysql"
+    DB_HOST: "restarters-mysql"
+    DB_PORT: "3306"
+    DB_DATABASE: "restarters_prod"
+    DB_USERNAME: "restarters_user"
+    DB_PASSWORD: "restarters_pass"
+
+  # Database table configuration
+  tables:
+    TBL_USERS: "1"
+    TBL_GROUPS: "2"
+    TBL_EVENTS: "3"
+    TBL_DEVICES: "4"
+    TBL_IMAGES: "5"
+    TBL_LINKS: "6"
+
+  # Session and cache configuration
+  session:
+    BROADCAST_CONNECTION: "log"
+    CACHE_STORE: "file"
+    SESSION_DRIVER: "file"
+    SESSION_COOKIE: "restarters_session"
+    SESSION_SECURE_COOKIE: "false"
+    SESSION_DOMAIN: ""
+    SESSION_LIFETIME: "120"
+    SESSION_TABLE: "sessions"
+    QUEUE_CONNECTION: "sync"
+    SANCTUM_STATEFUL_DOMAINS: ""
+
+  # Redis configuration
+  redis:
+    REDIS_HOST: "127.0.0.1"
+    REDIS_PASSWORD: "null"
+    REDIS_PORT: "6379"
+
+  # Mail configuration
+  mail:
+    MAIL_MAILER: "smtp"
+    MAIL_HOST: "mailpit"
+    MAIL_PORT: "1025"
+    MAIL_USERNAME: "null"
+    MAIL_PASSWORD: "null"
+    MAIL_SCHEME: "null"
+
+  # Pusher configuration
+  pusher:
+    PUSHER_APP_ID: ""
+    PUSHER_APP_KEY: ""
+    PUSHER_APP_SECRET: ""
+    PUSHER_APP_CLUSTER: "mt1"
+    MIX_PUSHER_APP_KEY: ""
+    MIX_PUSHER_APP_CLUSTER: "mt1"
+
+  # Device status configuration
+  devices:
+    DEVICE_FIXED: "1"
+    DEVICE_REPAIRABLE: "2"
+    DEVICE_DEAD: "3"
+
+  # Device category configuration
+  categories:
+    MISC_CATEGORY_ID: "46"
+    MISC_CATEGORY_ID_POWERED: "46"
+    MISC_CATEGORY_ID_UNPOWERED: "50"
+
+  # Environmental impact configuration
+  environmental:
+    DISPLACEMENT_VALUE: "0.5"
+    EMISSION_RATIO_UNPOWERED: "17.70147059"
+    EMISSION_RATIO_POWERED: "32.06679233"
+
+  # WordPress integration
+  wordpress:
+    WP_XMLRPC_ENDPOINT: ""
+    WP_XMLRPC_USER: ""
+    WP_XMLRPC_PSWD: ""
+
+  # Wiki integration
+  wiki:
+    WIKI_URL: ""
+    WIKI_DB: ""
+    WIKI_USER: ""
+    WIKI_PASSWORD: ""
+    WIKI_APIUSER: ""
+    WIKI_APIPASSWORD: ""
+    WIKI_COOKIE_PREFIX: ""
+    WIKI_HOST: ""
+
+  # Discourse integration
+  discourse:
+    DISCOURSE_SECRET: ""
+    DISCOURSE_URL: ""
+    DISCOURSE_APIUSER: ""
+    DISCOURSE_APIKEY: ""
+    SEND_COMMAND_LOGS_TO: ""
+
+  # Maps integration
+  mapKeys:
+    MAPBOX_TOKEN: ""
+    GOOGLE_API_CONSOLE_KEY: ""
+
+  # Monitoring
+  SEND_COMMAND_LOGS_TO: ""
+  CALENDAR_HASH: ""
+  SENTRY_LARAVEL_DSN: ""
+  SENTRY_TRACES_SAMPLE_RATE: "1"
+
+  # Security
+  HONEYPOT_DISABLE: "false"
+  L5_SWAGGER_GENERATE_ALWAYS: "false"
+
+  # Meta
+  META_TWITTER_SITE: ""
+  META_TWITTER_IMAGE_ALT: ""
+  # Monitoring and analytics
+  monitoring:
+    SENTRY_LARAVEL_DSN: ""
+    SENTRY_TRACES_SAMPLE_RATE: "1"
+    GOOGLE_ANALYTICS_TRACKING_ID: ""
+    GOOGLE_TAG_MANAGER_ID: ""
+
+  # Meta configuration
+  meta:
+    HONEYPOT_DISABLE: "false"
+    L5_SWAGGER_GENERATE_ALWAYS: "false"
+    REPAIRDIRECTORY_URL: ""
+    META_TWITTER_SITE: ""
+    META_TWITTER_IMAGE_ALT: ""
