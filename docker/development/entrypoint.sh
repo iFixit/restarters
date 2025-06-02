@@ -1,6 +1,8 @@
-#
-# This is what gets run when we start the restarters Docker container.
-#
+#!/bin/bash
+set -e
+
+export IN_DOCKER=true
+
 mkdir storage/framework/cache/data
 
 IN_DOCKER=true task setup:dev
