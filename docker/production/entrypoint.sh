@@ -27,6 +27,12 @@ if [ "${CREATE_ADMIN_USER:-false}" = "true" ]; then
   echo "Admin user setup completed"
 fi
 
+if [ "${SEED_SKILLS:-false}" = "true" ]; then
+  echo "Seeding skills..."
+  php artisan db:seed --class="DefaultSkills" --force
+  echo "Skills seeded"
+fi
+
 task app:clear:caches
 
 # Pass control to the command
