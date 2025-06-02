@@ -59,6 +59,15 @@ nginx:
     tag: alpine
     pullPolicy: IfNotPresent
 
+  # Security configuration for nginx
+  security:
+    # Content Security Policy configuration
+    csp:
+      enabled: true
+      # Production-safe CSP policy
+      # For local development, you may want to use a more permissive policy or disable CSP entirely
+      policy: "default-src 'self' http: https: data: blob: 'unsafe-inline'"
+
   # Resource limits and requests for Nginx container
   resources:
     {}
