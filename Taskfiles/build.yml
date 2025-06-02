@@ -7,7 +7,7 @@ tasks:
     internal: true
     desc: Build the Docker image with a given name and tag
     vars:
-      DOCKER_FILE: '{{.DOCKER_FILE | default "Dockerfile"}}'
+      DOCKER_FILE: '{{.DOCKER_FILE | default "docker/development/Dockerfile"}}'
       NAME: '{{.NAME | default "restarters"}}'
       TAG: '{{.TAG | default "latest"}}'
     cmds:
@@ -16,7 +16,7 @@ tasks:
   dev:
     desc: Build the Dev Docker image with a given name and tag (Usage - task build:dev NAME=myapp TAG=latest)
     vars:
-      DOCKER_FILE: 'Dockerfile'
+      DOCKER_FILE: "docker/development/Dockerfile"
       NAME: '{{.NAME | default "restarters"}}'
       TAG: '{{.TAG | default "latest"}}'
     cmds:
@@ -29,7 +29,7 @@ tasks:
   staging:
     desc: Build the Staging Docker image with a given name and tag (Usage - task build:staging NAME=myapp TAG=latest)
     vars:
-      DOCKER_FILE: 'Dockerfile.prod'
+      DOCKER_FILE: "docker/production/Dockerfile.prod"
       NAME: '{{.NAME | default "restarters"}}'
       TAG: '{{.TAG | default "staging"}}'
     cmds:
@@ -42,7 +42,7 @@ tasks:
   prod:
     desc: Build the Prod Docker image with a given name and tag (Usage - task build:prod NAME=myapp TAG=latest)
     vars:
-      DOCKER_FILE: 'Dockerfile.prod'
+      DOCKER_FILE: "docker/production/Dockerfile.prod"
       NAME: '{{.NAME | default "restarters"}}'
       TAG: '{{.TAG | default "prod"}}'
     cmds:

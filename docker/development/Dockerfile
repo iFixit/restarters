@@ -30,7 +30,7 @@ RUN install-php-extensions \
     intl \
     gd
 
-# Install composer.  Don't run composer install yet - see docker_run.sh
+# Install composer.  Don't run composer install yet - see entrypoint.sh
 COPY --from=composer/composer:2-bin /composer /usr/bin/composer
 
 # Copy the task binary from the Go stage
@@ -47,4 +47,4 @@ EXPOSE 9000
 
 RUN pecl install channel://pecl.php.net/xmlrpc-1.0.0RC3 xmlrpc
 
-CMD ["bash", "docker_run.sh"]
+CMD ["bash", "docker/development/entrypoint.sh"]

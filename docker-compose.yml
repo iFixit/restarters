@@ -78,7 +78,7 @@ services:
         condition: service_healthy
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: docker/development/Dockerfile
     container_name: restarters
     restart: unless-stopped
     tty: true

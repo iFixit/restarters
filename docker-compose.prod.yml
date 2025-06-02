@@ -29,7 +29,7 @@ services:
   restarters_prod:
     build:
       context: .
-      dockerfile: Dockerfile.prod
+      dockerfile: docker/production/Dockerfile.prod
       target: production
     container_name: restarters_prod
     restart: unless-stopped
