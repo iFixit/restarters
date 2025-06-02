@@ -13,9 +13,18 @@ if ! grep -q "APP_KEY=" /var/www/.env; then
   exit 1
 fi
 
-
 if [ "${MIGRATE:-false}" = "true" ]; then
   task app:db:migrate -- --force
+fi
+
+# Create admin user if enabled
+if [ "${CREATE_ADMIN_USER:-false}" = "true" ]; then
+  echo "Setting up admin user..."
+
+  # Use artisan command to create the admin user
+  php artisan user:create "${ADMIN_NAME}" "${ADMIN_EMAIL}" "${ADMIN_PASSWORD}" "en" "1" --role=${ADMIN_ROLE}
+    
+  echo "Admin user setup completed"
 fi
 
 task app:clear:caches

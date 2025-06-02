@@ -38,6 +38,11 @@ services:
         condition: service_healthy
     environment:
       - MIGRATE=true
+      - CREATE_ADMIN_USER=true
+      - ADMIN_NAME=Restarters Admin
+      - ADMIN_EMAIL=admin@example.com
+      - ADMIN_PASSWORD=password
+      - ADMIN_ROLE=2 # 2 is the Administrator Role ID
       - DB_HOST=restarters_db_prod
       - DB_PORT=3306
       - DB_DATABASE=restarters_prod
