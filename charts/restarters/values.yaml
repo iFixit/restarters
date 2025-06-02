@@ -105,3 +105,28 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+# MySQL database configuration
+mysql:
+  enabled: true
+  image:
+    repository: mysql
+    tag: "5.7"
+    pullPolicy: IfNotPresent
+  auth:
+    rootPassword: "s3cr3t_prod"
+    database: "restarters_prod"
+    username: "restarters_user"
+    password: "restarters_pass"
+  persistence:
+    enabled: false
+    size: 8Gi
+    storageClass: ""
+  resources:
+    {}
+    # limits:
+    #   cpu: 500m
+    #   memory: 512Mi
+    # requests:
+    #   cpu: 250m
+    #   memory: 256Mi
