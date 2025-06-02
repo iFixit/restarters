@@ -30,7 +30,7 @@ data:
         DB_DATABASE="{{ .Values.mysql.auth.database }}"
         DB_USERNAME="{{ .Values.mysql.auth.username }}"
         DB_PASSWORD="{{ .Values.mysql.auth.password }}"
-        {{- else }}
+        {{- else if not .Values.secrets.dbCredentials.enabled }}
         DB_HOST="{{ .Values.env.DB_HOST }}"
         DB_PORT="{{ .Values.env.DB_PORT }}"
         DB_DATABASE="{{ .Values.env.DB_DATABASE }}"
@@ -109,10 +109,15 @@ data:
 
         REPAIRDIRECTORY_URL="{{ .Values.env.REPAIRDIRECTORY_URL }}"
 
+        {{- if not .Values.secrets.mapKeys.enabled }}
         MAPBOX_TOKEN="{{ .Values.env.MAPBOX_TOKEN }}"
+        {{- end }}
+        {{- if not .Values.secrets.mapKeys.enabled }}
+        GOOGLE_API_CONSOLE_KEY="{{ .Values.env.GOOGLE_API_CONSOLE_KEY }}"
+        {{- end }}
         GOOGLE_ANALYTICS_TRACKING_ID="{{ .Values.env.GOOGLE_ANALYTICS_TRACKING_ID }}"
         GOOGLE_TAG_MANAGER_ID="{{ .Values.env.GOOGLE_TAG_MANAGER_ID }}"
-        GOOGLE_API_CONSOLE_KEY="{{ .Values.env.GOOGLE_API_CONSOLE_KEY }}"
+
 
         SEND_COMMAND_LOGS_TO="{{ .Values.env.SEND_COMMAND_LOGS_TO }}"
 

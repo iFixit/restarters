@@ -102,6 +102,47 @@ spec:
               value: "{{ .Values.setup.adminPassword | default "changeMeASAP" }}"
             - name: ADMIN_ROLE
               value: "{{ .Values.setup.adminRole | default "2" }}"
+            {{- if .Values.secrets.mapKeys.enabled }}
+            - name: MAPBOX_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.mapKeys.secretName }}
+                  key: {{ .Values.secrets.mapKeys.keys.mapboxToken }}
+            - name: GOOGLE_API_CONSOLE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.mapKeys.secretName }}
+                  key: {{ .Values.secrets.mapKeys.keys.googleApiKey }}
+            {{- end }}
+            {{- if .Values.secrets.dbCredentials.enabled }}
+            # External database credentials from secret
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.dbCredentials.secretName }}
+                  key: {{ .Values.secrets.dbCredentials.keys.dbHost }}
+            - name: DB_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.dbCredentials.secretName }}
+                  key: {{ .Values.secrets.dbCredentials.keys.dbPort }}
+            - name: DB_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.dbCredentials.secretName }}
+                  key: {{ .Values.secrets.dbCredentials.keys.dbDatabase }}
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.dbCredentials.secretName }}
+                  key: {{ .Values.secrets.dbCredentials.keys.dbUsername }}
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.dbCredentials.secretName }}
+                  key: {{ .Values.secrets.dbCredentials.keys.dbPassword }}
+            {{- end }}
+
           livenessProbe:
             exec:
               command:

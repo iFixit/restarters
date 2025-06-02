@@ -221,6 +221,38 @@ setup:
   #   ]
   # }
 
+# External secrets configuration
+# When enabled, the application will read sensitive credentials from a Kubernetes secret
+secrets:
+  mapKeys:
+    enabled: false
+    createSecret: false
+    secretName: "restarters-map-keys"
+    keys:
+      mapboxToken: "MAPBOX_TOKEN"
+      googleApiKey: "GOOGLE_API_CONSOLE_KEY"
+    data:
+      mapboxToken: "your-mapbox-token-here"
+      googleApiKey: "your-google-api-key-here"
+
+  # External database credentials (used when mysql.enabled is false)
+  dbCredentials:
+    enabled: false
+    createSecret: false
+    secretName: "restarters-db-credentials"
+    keys:
+      dbHost: "DB_HOST"
+      dbPort: "DB_PORT"
+      dbDatabase: "DB_DATABASE"
+      dbUsername: "DB_USERNAME"
+      dbPassword: "DB_PASSWORD"
+    data:
+      dbHost: "your-db-host-here"
+      dbPort: "your-db-port-here"
+      dbDatabase: "your-db-database-here"
+      dbUsername: "your-db-username-here"
+      dbPassword: "your-db-password-here"
+
 env:
   # Application settings
   APP_NAME: "Restarters Production"
