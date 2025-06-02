@@ -1,8 +1,12 @@
+FROM golang:bullseye AS go
+
+RUN GOBIN=/usr/bin go install github.com/go-task/task/v3/cmd/task@v3.43.3
+
 # Multi-stage build for Restarters production image
 # Build stage
 FROM php:8.2-fpm AS builder
 
-# Install build dependencies
+# Install build dependencies in a single layer with cleanup
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         zip \
@@ -14,11 +18,12 @@ RUN apt-get update && \
         libzip-dev \
         libicu-dev && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Install PHP extensions installer and required extensions
 ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/releases/download/2.7.31/install-php-extensions /usr/local/bin/
-RUN install-php-extensions pdo_mysql pcntl bcmath zip xmlrpc intl gd
+RUN install-php-extensions pdo_mysql pcntl bcmath zip xmlrpc intl gd && \
+    rm -f /usr/local/bin/install-php-extensions
 
 # Install composer
 COPY --from=composer/composer:2-bin /composer /usr/bin/composer
@@ -29,18 +34,30 @@ WORKDIR /var/www
 # Copy only composer files first for better caching
 COPY composer.json composer.lock ./
 
-# Install Composer dependencies
-RUN composer install --optimize-autoloader --no-interaction --no-scripts
+# Install Composer dependencies with production optimizations
+RUN composer install \
+    --optimize-autoloader \
+    --no-interaction \
+    --no-scripts \
+    --no-dev \
+    --prefer-dist && \
+    composer clear-cache
+
+# Copy package files for NPM caching
+COPY package*.json ./
+
+# Install NPM dependencies
+RUN npm ci --no-audit --no-fund
 
 # Copy the rest of the application
 COPY . .
 
-# Generate translations and Swagger documentation
+# Generate translations and Swagger documentation, then build assets
 RUN php artisan lang:js --no-lib resources/js/translations.js && \
-    php artisan l5-swagger:generate
-
-# Install NPM dependencies and build assets
-RUN npm ci && npm run production
+    php artisan l5-swagger:generate && \
+    npm run production && \
+    npm cache clean --force && \
+    rm -rf node_modules
 
 # Production stage
 FROM php:8.2-fpm AS production
@@ -49,44 +66,42 @@ FROM php:8.2-fpm AS production
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         default-mysql-client \
-        git \
-        libpng-dev \
-        libjpeg-dev \
-        libfreetype6-dev \
-        libzip-dev \
-        libicu-dev && \
+        libpnglite0 \
+        libjpeg62 \
+        libfreetype6 \
+        libzip4 \
+        libicu72 && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Install PHP extensions installer and required extensions
 ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/releases/download/2.7.31/install-php-extensions /usr/local/bin/
 RUN install-php-extensions pdo_mysql pcntl bcmath zip xmlrpc intl gd && \
     rm -f /usr/local/bin/install-php-extensions
 
-# Configure PHP for production
-RUN echo "display_errors = Off" >> /usr/local/etc/php/conf.d/production.ini && \
-    echo "log_errors = On" >> /usr/local/etc/php/conf.d/production.ini && \
-    echo "error_log = /proc/self/fd/2" >> /usr/local/etc/php/conf.d/production.ini && \
-    echo "memory_limit = 256M" >> /usr/local/etc/php/conf.d/production.ini && \
-    echo "date.timezone = UTC" >> /usr/local/etc/php/conf.d/production.ini && \
-    echo "opcache.enable=1" >> /usr/local/etc/php/conf.d/production.ini && \
-    echo "opcache.validate_timestamps=0" >> /usr/local/etc/php/conf.d/production.ini && \
-    echo "opcache.max_accelerated_files=10000" >> /usr/local/etc/php/conf.d/production.ini && \
-    echo "opcache.memory_consumption=192" >> /usr/local/etc/php/conf.d/production.ini && \
-    echo "opcache.interned_strings_buffer=16" >> /usr/local/etc/php/conf.d/production.ini
+# Use the recommended production PHP configuration
+# -----------------------------------------------------------
+# PHP provides development and production configurations.
+# Here, we replace the default php.ini with the production
+# version to apply settings optimized for performance and
+# security in a live environment.
+# -----------------------------------------------------------
+RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
 # Set working directory
 WORKDIR /var/www
 
-# Create storage directories
-RUN mkdir -p /var/www/storage/framework/sessions \
+# Create all necessary directories in one layer
+RUN mkdir -p \
+    /var/www/storage/framework/sessions \
     /var/www/storage/framework/views \
     /var/www/storage/framework/cache \
     /var/www/storage/framework/cache/data \
     /var/www/storage/app/public \
+    /var/www/storage/logs \
     /var/www/bootstrap/cache
 
-# Copy only necessary files and directories from builder
+# Copy only necessary files and directories from builder with proper ownership
 COPY --from=builder --chown=www-data:www-data /var/www/app /var/www/app
 COPY --from=builder --chown=www-data:www-data /var/www/bootstrap /var/www/bootstrap
 COPY --from=builder --chown=www-data:www-data /var/www/config /var/www/config
@@ -99,24 +114,22 @@ COPY --from=builder --chown=www-data:www-data /var/www/vendor /var/www/vendor
 COPY --from=builder --chown=www-data:www-data /var/www/artisan /var/www/artisan
 COPY --from=builder --chown=www-data:www-data /var/www/composer.json /var/www/composer.json
 COPY --from=builder --chown=www-data:www-data /var/www/composer.lock /var/www/composer.lock
+COPY --from=builder --chown=www-data:www-data /var/www/Taskfile.yml /var/www/Taskfile.yml
+COPY --from=builder --chown=www-data:www-data /var/www/Taskfiles /var/www/Taskfiles
 
-# Create a default .env file
-RUN touch /var/www/.env && chmod 666 /var/www/.env
+# Copy task binary
+COPY --from=go /usr/bin/task /usr/bin/task
 
-# Configure PHP-FPM to log to stderr
-RUN sed -i 's/;catch_workers_output = yes/catch_workers_output = yes/' /usr/local/etc/php-fpm.d/www.conf && \
-    sed -i 's/;php_admin_flag\[log_errors\] = on/php_admin_flag[log_errors] = on/' /usr/local/etc/php-fpm.d/www.conf && \
-    sed -i 's/;php_admin_value\[error_log\] = .*/php_admin_value[error_log] = \/proc\/self\/fd\/2/' /usr/local/etc/php-fpm.d/www.conf
-
-# Make storage writable
-RUN chown -R www-data:www-data /var/www && \
-    chmod -R 775 /var/www && \
-    chmod -R 777 /var/www/storage /var/www/bootstrap/cache && \
-    git config --global --add safe.directory /var/www
+# Set proper permissions
+RUN chown -R www-data:www-data /var/www
 
 # Copy the entrypoint script
-COPY docker/entrypoint.prod.sh /usr/local/bin/entrypoint.sh
+COPY docker/production/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# Copy the healthcheck script
+COPY docker/production/healthcheck.sh /usr/local/bin/healthcheck.sh
+RUN chmod +x /usr/local/bin/healthcheck.sh
 
 # Set non-root user
 USER www-data

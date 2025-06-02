@@ -30,6 +30,7 @@ use App\Http\Controllers\TabicatOraController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\DB;
 
 /*
 |--------------------------------------------------------------------------
@@ -581,6 +582,41 @@ Route::middleware('ensureAPIToken')->group(function () {
         Route::get('/guide', [StyleController::class, 'guide']);
         Route::get('/find', [StyleController::class, 'find']);
     });
+});
+
+// Health check endpoint
+Route::get('/healthz', function () {
+    $checks = [];
+    $allPassed = true;
+    
+    // Database check
+    try {
+        DB::connection()->getPdo();
+        $checks['database'] = 'ok';
+    } catch (Exception $e) {
+        $checks['database'] = 'failed';
+        $allPassed = false;
+    }
+    
+    // Storage check
+    try {
+        $checks['storage'] = is_writable(storage_path()) ? 'ok' : 'failed';
+        if ($checks['storage'] === 'failed') {
+            $allPassed = false;
+        }
+    } catch (Exception $e) {
+        $checks['storage'] = 'failed';
+        $allPassed = false;
+    }
+    
+    $response = [
+        'status' => $allPassed ? 'ok' : 'failed',
+        'timestamp' => now()->toISOString(),
+        'app' => config('app.name'),
+        'checks' => $checks,
+    ];
+    
+    return response()->json($response, $allPassed ? 200 : 503);
 });
 
 // Useful code to log all queries.  This is particularly useful when trying to reduce the number of queries; if

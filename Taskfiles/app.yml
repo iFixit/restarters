@@ -3,7 +3,7 @@
 version: "3"
 
 vars:
-  DOCKER_NAMESPACE: "{{.DOCKER_NAMESPACE | default \"docker:\"}}"
+  DOCKER_NAMESPACE: "{{.DOCKER_NAMESPACE | default \"docker:dev:\"}}"
 
 tasks:
   # Laravel and Artisan tasks
@@ -103,4 +103,15 @@ tasks:
           task {{.DOCKER_NAMESPACE}}run:bash -- "IN_DOCKER=true task {{.TASK}} -- {{.CLI_ARGS}}"
         else
           php artisan key:generate --force
-        fi 
+        fi
+
+  user:create:
+    desc: Create a new user
+    silent: true
+    cmds:
+      - |
+        if [ "{{.IN_DOCKER}}" != "true" ]; then
+          task {{.DOCKER_NAMESPACE}}run:bash -- "IN_DOCKER=true task {{.TASK}} -- {{.CLI_ARGS}}"
+        else
+          php artisan user:create {{.CLI_ARGS}}
+        fi

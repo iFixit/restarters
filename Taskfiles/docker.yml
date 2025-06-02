@@ -5,6 +5,9 @@ version: "3"
 vars:
   DOCKER_CMD:
     sh: command -v docker-compose &> /dev/null && echo "docker-compose" || echo "docker compose"
+  COMPOSE_FILE: "{{.COMPOSE_FILE | default \"docker-compose.yml\"}}"
+  CONTAINER_NAME: "{{.CONTAINER_NAME | default \"restarters\"}}"
+  IS_PROD: "{{.IS_PROD | default \"false\"}}"
   COMPOSE_PROFILES:
     map:
       all: "'*'"
@@ -19,6 +22,19 @@ tasks:
     cmds:
       - task --list
 
+  # Helper task for profile-based operations
+  _profile_operation:
+    desc: Execute a Docker Compose operation for a given profile
+    silent: true
+    internal: true
+    vars:
+      OPERATION: '{{.OPERATION | default "up -d"}}'
+      PROFILE: '{{.PROFILE | default "core"}}'
+    cmds:
+      - task: :env:generate
+        vars:
+          IS_PROD: "{{.IS_PROD}}"
+      - '{{.DOCKER_CMD}} -f {{.COMPOSE_FILE}} --profile {{ index .COMPOSE_PROFILES .PROFILE }} {{.OPERATION}}'
 
   # Docker container management tasks
   up-*:
@@ -46,8 +62,10 @@ tasks:
       PROFILE: "{{index .MATCH 0}}"
 
     cmds:
-      - task env:generate
-      - '{{.DOCKER_CMD}} --profile {{ index .COMPOSE_PROFILES .PROFILE }} up -d'
+      - task: _profile_operation
+        vars:
+          OPERATION: "up -d"
+          PROFILE: "{{.PROFILE}}"
 
   down-*:
     desc: Stop Docker containers for a given profile (Usage - task docker:down-[core|debug|discourse|all])
@@ -70,7 +88,19 @@ tasks:
     vars: *PROFILE_VARS
 
     cmds:
-      - '{{.DOCKER_CMD}} --profile {{ index .COMPOSE_PROFILES .PROFILE }} down'
+      - task: _profile_operation
+        vars:
+          OPERATION: "down"
+          PROFILE: "{{.PROFILE}}"
+
+  rebuild-app:
+    desc: Rebuild the application container
+    cmds:
+      - task: _profile_operation
+        vars:
+          OPERATION: "down {{.CONTAINER_NAME}} -v --rmi all"
+          PROFILE: "core"
+      - task: up-core
 
   rebuild-*:
     desc: Rebuild Docker containers for a given profile (Usage - task docker:rebuild-[core|debug|discourse|all])
@@ -93,8 +123,11 @@ tasks:
     vars: *PROFILE_VARS
 
     cmds:
-      - '{{.DOCKER_CMD}} --profile {{ index .COMPOSE_PROFILES .PROFILE }} down -v --rmi all'
-      - task docker:up-{{ .PROFILE }}
+      - task: _profile_operation
+        vars:
+          OPERATION: "down -v --rmi all"
+          PROFILE: "{{.PROFILE}}"
+      - task: up-{{ .PROFILE }}
 
   restart-*:
     desc: Restart Docker containers for a given profile (Usage - task docker:restart-[core|debug|discourse|all])
@@ -117,42 +150,41 @@ tasks:
     vars: *PROFILE_VARS
 
     cmds:
-      - task env:generate
-      - '{{.DOCKER_CMD}} --profile {{ index .COMPOSE_PROFILES .PROFILE }} restart'
+      - task: _profile_operation
+        vars:
+          OPERATION: "restart"
+          PROFILE: "{{.PROFILE}}"
 
-
+  # Container interaction tasks
   logs:
-    desc: Show the logs for the core application container.
+    desc: Show the logs for the core application container
     cmds:
-      - cmd: docker logs -f restarters
+      - cmd: docker logs -f {{.CONTAINER_NAME}}
         ignore_error: true
 
-
   shell:
-    desc: Open a shell into the core application container.
+    desc: Open a shell into the core application container
     cmds:
-      - cmd: docker exec -it -e IN_DOCKER=true restarters bash
+      - cmd: docker exec -it -e IN_DOCKER=true {{.CONTAINER_NAME}} bash
         ignore_error: true
 
   run:bash:
-    desc: Run a bash command in the core application container.
+    desc: Run a bash command in the core application container
     summary: |
       Run a bash command in the core application container. To pass the arguments, use the -- flag.
       For example, to run the ls command, use:
       task docker:run:bash -- ls -la
-
     cmds:
-      - docker exec -it -e IN_DOCKER=true restarters bash -c {{ .CLI_ARGS }}
+      - docker exec -it -e IN_DOCKER=true {{.CONTAINER_NAME}} bash -c {{ .CLI_ARGS }}
 
   run:artisan:
-    desc: Run an artisan command in the core application container.
+    desc: Run an artisan command in the core application container
     summary: |
       Run an artisan command in the core application container. To pass the arguments, use the -- flag.
       For example, to run the migrate command, use:
       task docker:run:artisan -- migrate
-
     cmds:
-      - docker exec -it -e IN_DOCKER=true restarters php artisan {{ .CLI_ARGS }}
+      - docker exec -it -e IN_DOCKER=true {{.CONTAINER_NAME}} php artisan {{ .CLI_ARGS }}
 
   run:tests:
     desc: Run the tests
@@ -160,6 +192,7 @@ tasks:
     cmds:
       - task docker:run:artisan -- test --env=testing {{.CLI_ARGS}}
 
+  # Database initialization
   init:test_db:
     desc: Initialize the test database in Docker environment
     dotenv:
