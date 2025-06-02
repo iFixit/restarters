@@ -252,122 +252,134 @@ secrets:
       dbUsername: "your-db-username-here"
       dbPassword: "your-db-password-here"
 
-env:
-  # Application settings
-  APP_NAME: "Restarters Production"
-  APP_ENV: "production"
-  APP_KEY: "" # One needs to be generated before hand
-  APP_DEBUG: "false"
-  APP_URL: "http://localhost:8001"
-  APP_SHOW_BRANCH: "false"
-  APP_SHOW_COMMUNITY_TEST: "false"
-  APP_INSTANCE: "base"
+# Environment variable groups - organized by functionality
+envGroups:
+  # Application core settings
+  app:
+    APP_NAME: "Restarters Production"
+    APP_ENV: "production"
+    APP_KEY: "" # One needs to be generated before hand
+    APP_DEBUG: "false"
+    APP_URL: "http://localhost:8001"
+    APP_SHOW_BRANCH: "false"
+    APP_SHOW_COMMUNITY_TEST: "false"
+    APP_INSTANCE: "base"
+    CALENDAR_HASH: "somehash"
 
   # Feature flags
-  FEATURE__IMAGE_UPLOAD: "false"
-  FEATURE__MATOMO_INTEGRATION: "false"
-  FEATURE__WORDPRESS_INTEGRATION: "false"
-  FEATURE__WIKI_INTEGRATION: "false"
-  FEATURE__DISCOURSE_INTEGRATION: "false"
+  features:
+    FEATURE__IMAGE_UPLOAD: "false"
+    FEATURE__MATOMO_INTEGRATION: "false"
+    FEATURE__WORDPRESS_INTEGRATION: "false"
+    FEATURE__WIKI_INTEGRATION: "false"
+    FEATURE__DISCOURSE_INTEGRATION: "false"
 
-  # Logging
-  LOG_CHANNEL: "stack"
+  # Logging configuration
+  logging:
+    LOG_CHANNEL: "stack"
 
-  # Database (will be overridden if mysql.enabled is true)
-  DB_CONNECTION: "mysql"
-  DB_HOST: "restarters-mysql"
-  DB_PORT: "3306"
-  DB_DATABASE: "restarters_prod"
-  DB_USERNAME: "restarters_user"
-  DB_PASSWORD: "restarters_pass"
+  # Database configuration (will be overridden by mysql config or secrets)
+  database:
+    DB_CONNECTION: "mysql"
+    DB_HOST: "restarters-mysql"
+    DB_PORT: "3306"
+    DB_DATABASE: "restarters_prod"
+    DB_USERNAME: "restarters_user"
+    DB_PASSWORD: "restarters_pass"
 
-  # Session and cache
-  BROADCAST_CONNECTION: "log"
-  CACHE_STORE: "file"
-  SESSION_DRIVER: "file"
-  SESSION_COOKIE: "restarters_session"
-  SESSION_SECURE_COOKIE: "false"
-  SESSION_DOMAIN: ""
-  SESSION_LIFETIME: "120"
-  SESSION_TABLE: "sessions"
-  QUEUE_CONNECTION: "sync"
+  # Database table configuration
+  tables:
+    TBL_USERS: "1"
+    TBL_GROUPS: "2"
+    TBL_EVENTS: "3"
+    TBL_DEVICES: "4"
+    TBL_IMAGES: "5"
+    TBL_LINKS: "6"
 
-  # Sanctum
-  SANCTUM_STATEFUL_DOMAINS: ""
+  # Session and cache configuration
+  session:
+    BROADCAST_CONNECTION: "log"
+    CACHE_STORE: "file"
+    SESSION_DRIVER: "file"
+    SESSION_COOKIE: "restarters_session"
+    SESSION_SECURE_COOKIE: "false"
+    SESSION_DOMAIN: ""
+    SESSION_LIFETIME: "120"
+    SESSION_TABLE: "sessions"
+    QUEUE_CONNECTION: "sync"
+    SANCTUM_STATEFUL_DOMAINS: ""
 
-  # Redis
-  REDIS_HOST: "127.0.0.1"
-  REDIS_PASSWORD: "null"
-  REDIS_PORT: "6379"
+  # Redis configuration
+  redis:
+    REDIS_HOST: "127.0.0.1"
+    REDIS_PASSWORD: "null"
+    REDIS_PORT: "6379"
 
-  # Mail
-  MAIL_MAILER: "smtp"
-  MAIL_HOST: "mailpit"
-  MAIL_PORT: "1025"
-  MAIL_USERNAME: "null"
-  MAIL_PASSWORD: "null"
-  MAIL_SCHEME: "null"
+  # Mail configuration
+  mail:
+    MAIL_MAILER: "smtp"
+    MAIL_HOST: "mailpit"
+    MAIL_PORT: "1025"
+    MAIL_USERNAME: "null"
+    MAIL_PASSWORD: "null"
+    MAIL_SCHEME: "null"
 
-  # Pusher
-  PUSHER_APP_ID: ""
-  PUSHER_APP_KEY: ""
-  PUSHER_APP_SECRET: ""
-  PUSHER_APP_CLUSTER: "mt1"
+  # Pusher configuration
+  pusher:
+    PUSHER_APP_ID: ""
+    PUSHER_APP_KEY: ""
+    PUSHER_APP_SECRET: ""
+    PUSHER_APP_CLUSTER: "mt1"
+    MIX_PUSHER_APP_KEY: ""
+    MIX_PUSHER_APP_CLUSTER: "mt1"
 
-  # Mix
-  MIX_PUSHER_APP_KEY: ""
-  MIX_PUSHER_APP_CLUSTER: "mt1"
+  # Device status configuration
+  devices:
+    DEVICE_FIXED: "1"
+    DEVICE_REPAIRABLE: "2"
+    DEVICE_DEAD: "3"
 
-  # Table names
-  TBL_USERS: "1"
-  TBL_GROUPS: "2"
-  TBL_EVENTS: "3"
-  TBL_DEVICES: "4"
-  TBL_IMAGES: "5"
-  TBL_LINKS: "6"
+  # Device category configuration
+  categories:
+    MISC_CATEGORY_ID: "46"
+    MISC_CATEGORY_ID_POWERED: "46"
+    MISC_CATEGORY_ID_UNPOWERED: "50"
 
-  # Device status
-  DEVICE_FIXED: "1"
-  DEVICE_REPAIRABLE: "2"
-  DEVICE_DEAD: "3"
-
-  # Categories
-  MISC_CATEGORY_ID: "46"
-  MISC_CATEGORY_ID_POWERED: "46"
-  MISC_CATEGORY_ID_UNPOWERED: "50"
-
-  # Environmental
-  DISPLACEMENT_VALUE: "0.5"
-  EMISSION_RATIO_UNPOWERED: "17.70147059"
-  EMISSION_RATIO_POWERED: "32.06679233"
+  # Environmental impact configuration
+  environmental:
+    DISPLACEMENT_VALUE: "0.5"
+    EMISSION_RATIO_UNPOWERED: "17.70147059"
+    EMISSION_RATIO_POWERED: "32.06679233"
 
   # WordPress integration
-  WP_XMLRPC_ENDPOINT: ""
-  WP_XMLRPC_USER: ""
-  WP_XMLRPC_PSWD: ""
+  wordpress:
+    WP_XMLRPC_ENDPOINT: ""
+    WP_XMLRPC_USER: ""
+    WP_XMLRPC_PSWD: ""
 
   # Wiki integration
-  WIKI_URL: ""
-  WIKI_DB: ""
-  WIKI_USER: ""
-  WIKI_PASSWORD: ""
-  WIKI_APIUSER: ""
-  WIKI_APIPASSWORD: ""
-  WIKI_COOKIE_PREFIX: ""
-  WIKI_HOST: ""
+  wiki:
+    WIKI_URL: ""
+    WIKI_DB: ""
+    WIKI_USER: ""
+    WIKI_PASSWORD: ""
+    WIKI_APIUSER: ""
+    WIKI_APIPASSWORD: ""
+    WIKI_COOKIE_PREFIX: ""
+    WIKI_HOST: ""
 
   # Discourse integration
-  DISCOURSE_SECRET: ""
-  DISCOURSE_URL: ""
-  DISCOURSE_APIUSER: ""
-  DISCOURSE_APIKEY: ""
+  discourse:
+    DISCOURSE_SECRET: ""
+    DISCOURSE_URL: ""
+    DISCOURSE_APIUSER: ""
+    DISCOURSE_APIKEY: ""
+    SEND_COMMAND_LOGS_TO: ""
 
-  # External services
-  REPAIRDIRECTORY_URL: ""
-  MAPBOX_TOKEN: ""
-  GOOGLE_ANALYTICS_TRACKING_ID: ""
-  GOOGLE_TAG_MANAGER_ID: ""
-  GOOGLE_API_CONSOLE_KEY: ""
+  # Maps integration
+  mapKeys:
+    MAPBOX_TOKEN: ""
+    GOOGLE_API_CONSOLE_KEY: ""
 
   # Monitoring
   SEND_COMMAND_LOGS_TO: ""
@@ -382,3 +394,17 @@ env:
   # Meta
   META_TWITTER_SITE: ""
   META_TWITTER_IMAGE_ALT: ""
+  # Monitoring and analytics
+  monitoring:
+    SENTRY_LARAVEL_DSN: ""
+    SENTRY_TRACES_SAMPLE_RATE: "1"
+    GOOGLE_ANALYTICS_TRACKING_ID: ""
+    GOOGLE_TAG_MANAGER_ID: ""
+
+  # Meta configuration
+  meta:
+    HONEYPOT_DISABLE: "false"
+    L5_SWAGGER_GENERATE_ALWAYS: "false"
+    REPAIRDIRECTORY_URL: ""
+    META_TWITTER_SITE: ""
+    META_TWITTER_IMAGE_ALT: ""
