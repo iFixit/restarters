@@ -3,7 +3,9 @@ set -e
 
 export IN_DOCKER=true
 
-mkdir storage/framework/cache/data
+if [ ! -d "storage/framework/cache/data" ]; then
+  mkdir -p storage/framework/cache/data
+fi
 
 IN_DOCKER=true task setup:dev
 
