@@ -182,6 +182,30 @@ mysql:
 # =============================================================================
 # Application Environment Configuration
 # =============================================================================
+setup:
+  migrate: "false"
+  seedSkills: "false"
+  # USE WITH CAUTION! This will truncate the skills table and re-seed it with the skills.json file
+  # seedingTruncateSkills: "false
+
+  createAdminUser: "false"
+  adminName: "Restarters Admin"
+  adminEmail: "admin@example.com"
+  adminPassword: "changeMeASAP"
+  adminRole: "2"
+  skillsJson: ""
+  # Example skills JSON
+  # skillsJson: |
+  # {
+  #   "1": [
+  #     { "skill_name": "Advertising", "description": "Promoting products" },
+  #     { "skill_name": "Marketing" }
+  #   ],
+  #   "2": [
+  #     { "skill_name": "Repair", "description": "Fixing things" }
+  #   ]
+  # }
+
 env:
   # Application settings
   APP_NAME: "Restarters Production"

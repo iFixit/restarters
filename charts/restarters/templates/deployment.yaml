@@ -53,6 +53,23 @@ spec:
             - name: php-fpm
               containerPort: 9000
               protocol: TCP
+          env:
+            - name: MIGRATE
+              value: "{{ .Values.setup.migrate | default "false" }}"
+            - name: SEED_SKILLS
+              value: "{{ .Values.setup.seedSkills | default "false" }}"
+            - name: SEEDING_TRUNCATE_SKILLS
+              value: "{{ .Values.setup.seedingTruncateSkills | default "false" }}"
+            - name: CREATE_ADMIN_USER
+              value: "{{ .Values.setup.createAdminUser | default "false" }}"
+            - name: ADMIN_NAME
+              value: "{{ .Values.setup.adminName | default "Restarters Admin" }}"
+            - name: ADMIN_EMAIL
+              value: "{{ .Values.setup.adminEmail | default "admin@example.com" }}"
+            - name: ADMIN_PASSWORD
+              value: "{{ .Values.setup.adminPassword | default "changeMeASAP" }}"
+            - name: ADMIN_ROLE
+              value: "{{ .Values.setup.adminRole | default "2" }}"
           livenessProbe:
             exec:
               command:
@@ -80,6 +97,12 @@ spec:
               readOnly: true
             - name: public-files
               mountPath: /var/www/public
+            {{- if .Values.setup.skillsJson }}
+            - name: skills-json-config
+              mountPath: /var/www/config/skills.json
+              subPath: skills.json
+              readOnly: true
+            {{- end }}
             {{- with .Values.phpfpm.volumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
@@ -134,6 +157,11 @@ spec:
             name: {{ include "restarters.fullname" . }}-env-config
         - name: public-files
           emptyDir: {}
+        {{- if .Values.setup.skillsJson }}
+        - name: skills-json-config
+          configMap:
+            name: {{ include "restarters.fullname" . }}-skills-json-config
+        {{- end }}
         {{- if .Values.nginx.enabled }}
         - name: nginx-config
           configMap:
