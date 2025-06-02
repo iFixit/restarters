@@ -2,6 +2,23 @@
 
 version: "3"
 
+includes:
+  build:
+    taskfile: Taskfiles/build.yml
+
+  docker:
+    taskfile: Taskfiles/docker.yml
+
+  deps:
+    taskfile: Taskfiles/deps.yml
+    vars:
+      DOCKER_NAMESPACE: "docker:"
+
+  app:
+    taskfile: Taskfiles/app.yml
+    vars:
+      DOCKER_NAMESPACE: "docker:"
+
 # Load environment-specific .env files
 # Variables from files listed first take precedence over those in later files
 # when the same variable is defined in multiple files
@@ -10,16 +27,6 @@ dotenv:
   - .env.docker
   - .env.local
   - .env.base
-
-vars:
-  DOCKER_CMD:
-    sh: command -v docker-compose &> /dev/null && echo "docker-compose" || echo "docker compose"
-  COMPOSE_PROFILES:
-    map:
-      all: "'*'"
-      core: "core"
-      debug: "debug"
-      discourse: "discourse"
 
 tasks:
   # Default task
@@ -35,159 +42,17 @@ tasks:
     cmds:
       - envsubst < .env.template > .env
 
-  # Docker container management tasks
-  docker:up-*:
-    desc: Start Docker containers for a given profile (Usage - task docker:up-[core|debug|discourse|all])
-    summary: |
-      Start a set of Docker containers at a given time. The core services are always started with any profile.
-      For just the core services, use:
-      task docker:up-core
-
-      To include phpMyAdmin and Mailhog, use:
-      task docker:up-debug
-
-      To include the Discourse set of containers, use:
-      task docker:up-discourse
-
-      If you want to start all containers, use:
-      task docker:up-all
-
-    requires: &PROFILE_REQUIRES
-      vars:
-        - name: PROFILE
-          enum: [core, debug, discourse, all]
-    
-    vars: &PROFILE_VARS
-      PROFILE: "{{index .MATCH 0}}"
-
+  setup:
+    desc: Setup the development environment
     cmds:
-      - task env:generate
-      - '{{.DOCKER_CMD}} --profile {{ index .COMPOSE_PROFILES .PROFILE }} up -d'
-
-  docker:down-*:
-    desc: Stop Docker containers for a given profile (Usage - task docker:down-[core|debug|discourse|all])
-    summary: |
-      Stop a set of Docker containers at a given time. The core services are always stopped with any profile.
-      For just the core services, use:
-      task docker:down-core
-
-      To include phpMyAdmin and Mailhog, use:
-      task docker:down-debug
-
-      To include the Discourse set of containers, use:
-      task docker:down-discourse
-
-      If you want to stop all containers, use:
-      task docker:down-all
-
-    requires: *PROFILE_REQUIRES
-    
-    vars: *PROFILE_VARS
-
-    cmds:
-      - '{{.DOCKER_CMD}} --profile {{ index .COMPOSE_PROFILES .PROFILE }} down'
-
-  docker:rebuild-*:
-    desc: Rebuild Docker containers for a given profile (Usage - task docker:rebuild-[core|debug|discourse|all])
-    summary: |
-      Rebuild a set of Docker containers at a given time. The core services are always rebuilt with any profile.
-      For just the core services, use:
-      task docker:rebuild-core
-
-      To include phpMyAdmin and Mailhog, use:
-      task docker:rebuild-debug
-
-      To include the Discourse set of containers, use:
-      task docker:rebuild-discourse
-
-      To rebuild all containers, use:
-      task docker:rebuild-all
-
-    requires: *PROFILE_REQUIRES
-    
-    vars: *PROFILE_VARS
-
-    cmds:
-      - '{{.DOCKER_CMD}} --profile {{ index .COMPOSE_PROFILES .PROFILE }} down -v --rmi all'
-      - task docker:up-{{ .PROFILE }}
-
-  docker:restart-*:
-    desc: Restart Docker containers for a given profile (Usage - task docker:restart-[core|debug|discourse|all])
-    summary: |
-      Restart a set of Docker containers at a given time. The core services are always restarted with any profile.
-      For just the core services, use:
-      task docker:restart-core
-
-      To include phpMyAdmin and Mailhog, use:
-      task docker:restart-debug
-
-      To include the Discourse set of containers, use:
-      task docker:restart-discourse
-
-      To restart all containers, use:
-      task docker:restart-all
-
-    requires: *PROFILE_REQUIRES
-    
-    vars: *PROFILE_VARS
-
-    cmds:
-      - task env:generate
-      - '{{.DOCKER_CMD}} --profile {{ index .COMPOSE_PROFILES .PROFILE }} restart'
-
-
-  docker:logs:
-    desc: Show the logs for the core application container.
-    cmds:
-      - cmd: docker logs -f restarters
-        ignore_error: true
-
-
-  docker:shell:
-    desc: Open a shell into the core application container.
-    cmds:
-      - cmd: docker exec -it restarters bash
-        ignore_error: true
-
-  docker:run:bash:
-    desc: Run a bash command in the core application container.
-    summary: |
-      Run a bash command in the core application container. To pass the arguments, use the -- flag.
-      For example, to run the ls command, use:
-      task docker:run:bash -- ls -la
-
-    cmds:
-      - docker exec -it restarters bash -c {{ .CLI_ARGS }}
-
-  docker:run:artisan:
-    desc: Run an artisan command in the core application container.
-    summary: |
-      Run an artisan command in the core application container. To pass the arguments, use the -- flag.
-      For example, to run the migrate command, use:
-      task docker:run:artisan -- migrate
-
-    cmds:
-      - docker exec -it restarters php artisan {{ .CLI_ARGS }}
-
-  docker:run:tests:
-    desc: Run the tests
-    silent: true
-    cmds:
-      - task docker:run:artisan -- test --env=testing {{.CLI_ARGS}}
-
-  docker:init:test_db:
-    desc: Initialize the test database in Docker environment
-    dotenv:
-      - .env.testing
-    silent: true
-    cmds:
-      - echo "Creating test database $DB_DATABASE..."
-      - docker exec -it $MYSQL_CONTAINER_NAME mysql -u root -p$MYSQL_ROOT_PASSWORD -e "
-          CREATE DATABASE IF NOT EXISTS $DB_DATABASE;
-          GRANT ALL PRIVILEGES ON $DB_DATABASE.* TO '$DB_USERNAME'@'%';
-          FLUSH PRIVILEGES;
-        "
-      - echo "Test database created and permissions granted."
-      - echo "Running migrations for test database $DB_DATABASE..."
-      - task docker:run:artisan -- migrate --env=testing --no-interaction --force {{.CLI_ARGS}}
-      - echo "Test database migrations complete."
+      - task: deps:composer:install
+      - task: app:db:migrate
+      - task: app:generate:translations  
+      - task: app:generate:swagger
+      - task: app:generate:key
+      - task: deps:npm:install
+        vars:
+          CLI_ARGS: "--legacy-peer-deps"
+      - task: deps:npm
+        vars:
+          CLI_ARGS: "rebuild node-sass"

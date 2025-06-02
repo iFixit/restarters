@@ -1,0 +1,106 @@
+# https://taskfile.dev
+
+version: "3"
+
+vars:
+  DOCKER_NAMESPACE: "{{.DOCKER_NAMESPACE | default \"docker:\"}}"
+
+tasks:
+  # Laravel and Artisan tasks
+  artisan:
+    desc: Run an artisan command in the core application container
+    silent: true
+    summary: |
+      Run an artisan command in the core application container. To pass the arguments, use the -- flag.
+      For example, to run the migrate command, use:
+      task app:artisan -- migrate
+    cmds:
+      - |
+        if [ "{{.IN_DOCKER}}" != "true" ]; then
+          task {{.DOCKER_NAMESPACE}}run:bash -- "IN_DOCKER=true task {{.TASK}} -- {{.CLI_ARGS}}"
+        else
+          php artisan {{.CLI_ARGS}}
+        fi
+
+  tests:
+    desc: Run the tests
+    silent: true
+    cmds:
+      - |
+        if [ "{{.IN_DOCKER}}" != "true" ]; then
+          task {{.DOCKER_NAMESPACE}}run:bash -- "IN_DOCKER=true task {{.TASK}} -- {{.CLI_ARGS}}"
+        else
+          php artisan test --env=testing {{.CLI_ARGS}}
+        fi
+
+  # Cache management
+  clear:caches:
+    desc: Clear the Laravel caches
+    silent: true
+    cmds:
+      - |
+        if [ "{{.IN_DOCKER}}" != "true" ]; then
+          task {{.DOCKER_NAMESPACE}}run:bash -- "IN_DOCKER=true task {{.TASK}} -- {{.CLI_ARGS}}"
+        else
+          php artisan config:clear
+          php artisan cache:clear
+          php artisan route:clear
+          php artisan view:clear
+        fi
+
+  # Database tasks
+  db:migrate:
+    desc: Run Laravel migrations
+    silent: true
+    cmds:
+      - |
+        if [ "{{.IN_DOCKER}}" != "true" ]; then
+          task {{.DOCKER_NAMESPACE}}run:bash -- "IN_DOCKER=true task {{.TASK}} -- {{.CLI_ARGS}}"
+        else
+          php artisan migrate {{.CLI_ARGS}}
+        fi
+
+  db:seed:
+    desc: Run Laravel database seeders
+    silent: true
+    cmds:
+      - |
+        if [ "{{.IN_DOCKER}}" != "true" ]; then
+          task {{.DOCKER_NAMESPACE}}run:bash -- "IN_DOCKER=true task {{.TASK}} -- {{.CLI_ARGS}}"
+        else
+          php artisan db:seed {{.CLI_ARGS}}
+        fi
+
+  # Generation tasks
+  generate:translations:
+    desc: Generate the translations
+    silent: true
+    cmds:
+      - |
+        if [ "{{.IN_DOCKER}}" != "true" ]; then
+          task {{.DOCKER_NAMESPACE}}run:bash -- "IN_DOCKER=true task {{.TASK}} -- {{.CLI_ARGS}}"
+        else
+          php artisan lang:js --no-lib resources/js/translations.js
+        fi
+
+  generate:swagger:
+    desc: Generate the Swagger documentation
+    silent: true
+    cmds:
+      - |
+        if [ "{{.IN_DOCKER}}" != "true" ]; then
+          task {{.DOCKER_NAMESPACE}}run:bash -- "IN_DOCKER=true task {{.TASK}} -- {{.CLI_ARGS}}"
+        else
+          php artisan l5-swagger:generate
+        fi
+
+  generate:key:
+    desc: Generate the application key
+    silent: true
+    cmds:
+      - |
+        if [ "{{.IN_DOCKER}}" != "true" ]; then
+          task {{.DOCKER_NAMESPACE}}run:bash -- "IN_DOCKER=true task {{.TASK}} -- {{.CLI_ARGS}}"
+        else
+          php artisan key:generate --force
+        fi 

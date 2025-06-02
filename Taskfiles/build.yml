@@ -1,0 +1,53 @@
+# https://taskfile.dev
+
+version: "3"
+
+tasks:
+  _build:
+    internal: true
+    desc: Build the Docker image with a given name and tag
+    vars:
+      DOCKER_FILE: '{{.DOCKER_FILE | default "Dockerfile"}}'
+      NAME: '{{.NAME | default "restarters"}}'
+      TAG: '{{.TAG | default "latest"}}'
+    cmds:
+      - docker build -t {{ .NAME }}:{{ .TAG }} -f {{ .DOCKER_FILE }} .
+
+  dev:
+    desc: Build the Dev Docker image with a given name and tag (Usage - task build:dev NAME=myapp TAG=latest)
+    vars:
+      DOCKER_FILE: 'Dockerfile'
+      NAME: '{{.NAME | default "restarters"}}'
+      TAG: '{{.TAG | default "latest"}}'
+    cmds:
+      - task: _build
+        vars:
+          NAME: '{{ .NAME }}'
+          TAG: '{{ .TAG }}'
+          DOCKER_FILE: '{{ .DOCKER_FILE }}'
+
+  staging:
+    desc: Build the Staging Docker image with a given name and tag (Usage - task build:staging NAME=myapp TAG=latest)
+    vars:
+      DOCKER_FILE: 'Dockerfile.prod'
+      NAME: '{{.NAME | default "restarters"}}'
+      TAG: '{{.TAG | default "staging"}}'
+    cmds:
+      - task: _build
+        vars:
+          NAME: '{{ .NAME }}'
+          TAG: '{{ .TAG }}'
+          DOCKER_FILE: '{{ .DOCKER_FILE }}'
+
+  prod:
+    desc: Build the Prod Docker image with a given name and tag (Usage - task build:prod NAME=myapp TAG=latest)
+    vars:
+      DOCKER_FILE: 'Dockerfile.prod'
+      NAME: '{{.NAME | default "restarters"}}'
+      TAG: '{{.TAG | default "prod"}}'
+    cmds:
+      - task: _build
+        vars:
+          NAME: '{{ .NAME }}'
+          TAG: '{{ .TAG }}'
+          DOCKER_FILE: '{{ .DOCKER_FILE }}' 

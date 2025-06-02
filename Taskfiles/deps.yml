@@ -1,0 +1,67 @@
+# https://taskfile.dev
+
+version: "3"
+
+vars:
+  DOCKER_NAMESPACE: "{{.DOCKER_NAMESPACE | default \"docker:\"}}"
+
+tasks:
+  # Package management tasks
+  clear:
+    desc: Clear the dependencies
+    silent: true
+    cmds:
+      - |
+        if [ "{{.IN_DOCKER}}" != "true" ]; then
+          task {{.DOCKER_NAMESPACE}}run:bash -- "IN_DOCKER=true task {{.TASK}} -- {{.CLI_ARGS}}"
+        else
+          rm -rf vendor
+          rm -rf node_modules
+        fi
+
+  composer:
+    desc: Run Composer commands
+    silent: true
+    cmds:
+      - |
+        if [ "{{.IN_DOCKER}}" != "true" ]; then
+          task {{.DOCKER_NAMESPACE}}run:bash -- "IN_DOCKER=true task {{.TASK}} -- {{.CLI_ARGS}}"
+        else
+          composer {{.CLI_ARGS}}
+        fi
+
+  composer:install:
+    desc: Install Composer dependencies
+    silent: true
+    cmds:
+      - task: composer
+        vars:
+          CLI_ARGS: "install"
+    sources:
+      - composer.json
+      - composer.lock
+    generates:
+      - ./vendor/composer/installed.json
+      - ./vendor/autoload.php
+
+  npm:
+    desc: Run npm commands
+    silent: true
+    cmds:
+      - |
+        if [ "{{.IN_DOCKER}}" != "true" ]; then
+          task {{.DOCKER_NAMESPACE}}run:bash -- "IN_DOCKER=true task {{.TASK}} -- {{.CLI_ARGS}}"
+        else
+          npm {{.CLI_ARGS}}
+        fi
+
+  npm:install:
+    desc: Install NPM dependencies
+    silent: true
+    cmds:
+      - task: npm
+        vars:
+          CLI_ARGS: "install {{.CLI_ARGS}}"
+    sources:
+      - package.json
+      - package-lock.json
