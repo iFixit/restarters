@@ -1,0 +1,128 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "restarters.fullname" . }}-env-config
+  labels:
+    {{- include "restarters.labels" . | nindent 4 }}
+data:
+    .env: |
+        APP_NAME="{{ .Values.env.APP_NAME }}"
+        APP_ENV="{{ .Values.env.APP_ENV }}"
+        APP_KEY="{{ .Values.env.APP_KEY }}"
+        APP_DEBUG="{{ .Values.env.APP_DEBUG }}"
+        APP_URL="{{ .Values.env.APP_URL }}"
+        APP_SHOW_BRANCH="{{ .Values.env.APP_SHOW_BRANCH }}"
+        APP_SHOW_COMMUNITY_TEST="{{ .Values.env.APP_SHOW_COMMUNITY_TEST }}"
+        APP_INSTANCE="{{ .Values.env.APP_INSTANCE }}"
+
+        FEATURE__IMAGE_UPLOAD="{{ .Values.env.FEATURE__IMAGE_UPLOAD }}"
+        FEATURE__MATOMO_INTEGRATION="{{ .Values.env.FEATURE__MATOMO_INTEGRATION }}"
+        FEATURE__WORDPRESS_INTEGRATION="{{ .Values.env.FEATURE__WORDPRESS_INTEGRATION }}"
+        FEATURE__WIKI_INTEGRATION="{{ .Values.env.FEATURE__WIKI_INTEGRATION }}"
+        FEATURE__DISCOURSE_INTEGRATION="{{ .Values.env.FEATURE__DISCOURSE_INTEGRATION }}"
+
+        LOG_CHANNEL="{{ .Values.env.LOG_CHANNEL }}"
+
+        DB_CONNECTION="{{ .Values.env.DB_CONNECTION }}"
+        {{- if .Values.mysql.enabled }}
+        DB_HOST="{{ include "restarters.fullname" . }}-mysql"
+        DB_PORT="3306"
+        DB_DATABASE="{{ .Values.mysql.auth.database }}"
+        DB_USERNAME="{{ .Values.mysql.auth.username }}"
+        DB_PASSWORD="{{ .Values.mysql.auth.password }}"
+        {{- else }}
+        DB_HOST="{{ .Values.env.DB_HOST }}"
+        DB_PORT="{{ .Values.env.DB_PORT }}"
+        DB_DATABASE="{{ .Values.env.DB_DATABASE }}"
+        DB_USERNAME="{{ .Values.env.DB_USERNAME }}"
+        DB_PASSWORD="{{ .Values.env.DB_PASSWORD }}"
+        {{- end }}
+
+        SEEDING_TRUNCATE_SKILLS=""
+
+        BROADCAST_CONNECTION="{{ .Values.env.BROADCAST_CONNECTION }}"
+        CACHE_STORE="{{ .Values.env.CACHE_STORE }}"
+        SESSION_DRIVER="{{ .Values.env.SESSION_DRIVER }}"
+        SESSION_COOKIE="{{ .Values.env.SESSION_COOKIE }}"
+        SESSION_SECURE_COOKIE="{{ .Values.env.SESSION_SECURE_COOKIE }}"
+        SESSION_DOMAIN="{{ .Values.env.SESSION_DOMAIN }}"
+        SESSION_LIFETIME="{{ .Values.env.SESSION_LIFETIME }}"
+        SESSION_TABLE="{{ .Values.env.SESSION_TABLE }}"
+        QUEUE_CONNECTION="{{ .Values.env.QUEUE_CONNECTION }}"
+
+        SANCTUM_STATEFUL_DOMAINS="{{ .Values.env.SANCTUM_STATEFUL_DOMAINS }}"
+
+        REDIS_HOST="{{ .Values.env.REDIS_HOST }}"
+        REDIS_PASSWORD="{{ .Values.env.REDIS_PASSWORD }}"
+        REDIS_PORT="{{ .Values.env.REDIS_PORT }}"
+
+        MAIL_MAILER="{{ .Values.env.MAIL_MAILER }}"
+        MAIL_HOST="{{ .Values.env.MAIL_HOST }}"
+        MAIL_PORT="{{ .Values.env.MAIL_PORT }}"
+        MAIL_USERNAME="{{ .Values.env.MAIL_USERNAME }}"
+        MAIL_PASSWORD="{{ .Values.env.MAIL_PASSWORD }}"
+        MAIL_SCHEME="{{ .Values.env.MAIL_SCHEME }}"
+
+        PUSHER_APP_ID="{{ .Values.env.PUSHER_APP_ID }}"
+        PUSHER_APP_KEY="{{ .Values.env.PUSHER_APP_KEY }}"
+        PUSHER_APP_SECRET="{{ .Values.env.PUSHER_APP_SECRET }}"
+        PUSHER_APP_CLUSTER="{{ .Values.env.PUSHER_APP_CLUSTER }}"
+
+        MIX_PUSHER_APP_KEY="{{ .Values.env.MIX_PUSHER_APP_KEY }}"
+        MIX_PUSHER_APP_CLUSTER="{{ .Values.env.MIX_PUSHER_APP_CLUSTER }}"
+
+        TBL_USERS="{{ .Values.env.TBL_USERS }}"
+        TBL_GROUPS="{{ .Values.env.TBL_GROUPS }}"
+        TBL_EVENTS="{{ .Values.env.TBL_EVENTS }}"
+        TBL_DEVICES="{{ .Values.env.TBL_DEVICES }}"
+        TBL_IMAGES="{{ .Values.env.TBL_IMAGES }}"
+        TBL_LINKS="{{ .Values.env.TBL_LINKS }}"
+
+        DEVICE_FIXED="{{ .Values.env.DEVICE_FIXED }}"
+        DEVICE_REPAIRABLE="{{ .Values.env.DEVICE_REPAIRABLE }}"
+        DEVICE_DEAD="{{ .Values.env.DEVICE_DEAD }}"
+
+        MISC_CATEGORY_ID="{{ .Values.env.MISC_CATEGORY_ID }}"
+        MISC_CATEGORY_ID_POWERED="{{ .Values.env.MISC_CATEGORY_ID_POWERED }}"
+        MISC_CATEGORY_ID_UNPOWERED="{{ .Values.env.MISC_CATEGORY_ID_UNPOWERED }}"
+
+        DISPLACEMENT_VALUE="{{ .Values.env.DISPLACEMENT_VALUE }}"
+        EMISSION_RATIO_UNPOWERED="{{ .Values.env.EMISSION_RATIO_UNPOWERED }}"
+
+        WP_XMLRPC_ENDPOINT="{{ .Values.env.WP_XMLRPC_ENDPOINT }}"
+        WP_XMLRPC_USER="{{ .Values.env.WP_XMLRPC_USER }}"
+        WP_XMLRPC_PSWD="{{ .Values.env.WP_XMLRPC_PSWD }}"
+
+        WIKI_URL="{{ .Values.env.WIKI_URL }}"
+        WIKI_DB="{{ .Values.env.WIKI_DB }}"
+        WIKI_USER="{{ .Values.env.WIKI_USER }}"
+        WIKI_PASSWORD="{{ .Values.env.WIKI_PASSWORD }}"
+        WIKI_APIUSER="{{ .Values.env.WIKI_APIUSER }}"
+        WIKI_APIPASSWORD="{{ .Values.env.WIKI_APIPASSWORD }}"
+        WIKI_COOKIE_PREFIX="{{ .Values.env.WIKI_COOKIE_PREFIX }}"
+        WIKI_HOST="{{ .Values.env.WIKI_HOST }}"
+
+        DISCOURSE_SECRET="{{ .Values.env.DISCOURSE_SECRET }}"
+        DISCOURSE_URL="{{ .Values.env.DISCOURSE_URL }}"
+        DISCOURSE_APIUSER="{{ .Values.env.DISCOURSE_APIUSER }}"
+        DISCOURSE_APIKEY="{{ .Values.env.DISCOURSE_APIKEY }}"
+
+        REPAIRDIRECTORY_URL="{{ .Values.env.REPAIRDIRECTORY_URL }}"
+
+        MAPBOX_TOKEN="{{ .Values.env.MAPBOX_TOKEN }}"
+        GOOGLE_ANALYTICS_TRACKING_ID="{{ .Values.env.GOOGLE_ANALYTICS_TRACKING_ID }}"
+        GOOGLE_TAG_MANAGER_ID="{{ .Values.env.GOOGLE_TAG_MANAGER_ID }}"
+        GOOGLE_API_CONSOLE_KEY="{{ .Values.env.GOOGLE_API_CONSOLE_KEY }}"
+
+        SEND_COMMAND_LOGS_TO="{{ .Values.env.SEND_COMMAND_LOGS_TO }}"
+
+        CALENDAR_HASH="{{ .Values.env.CALENDAR_HASH }}"
+
+        SENTRY_LARAVEL_DSN="{{ .Values.env.SENTRY_LARAVEL_DSN }}"
+        SENTRY_TRACES_SAMPLE_RATE="{{ .Values.env.SENTRY_TRACES_SAMPLE_RATE }}"
+
+        HONEYPOT_DISABLE="{{ .Values.env.HONEYPOT_DISABLE }}"
+        L5_SWAGGER_GENERATE_ALWAYS="{{ .Values.env.L5_SWAGGER_GENERATE_ALWAYS }}"
+
+        META_TWITTER_SITE="{{ .Values.env.META_TWITTER_SITE }}"
+        META_TWITTER_IMAGE_ALT="{{ .Values.env.META_TWITTER_IMAGE_ALT }}"
