@@ -103,6 +103,12 @@ spec:
               subPath: skills.json
               readOnly: true
             {{- end }}
+            {{- if .Values.phpfpm.persistence.enabled }}
+            - name: storage-pvc
+              mountPath: /var/www/storage
+              subPath: storage
+              readOnly: false
+            {{- end }}
             {{- with .Values.phpfpm.volumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
@@ -157,6 +163,11 @@ spec:
             name: {{ include "restarters.fullname" . }}-env-config
         - name: public-files
           emptyDir: {}
+        {{- if .Values.phpfpm.persistence.enabled }}
+        - name: storage-pvc
+          persistentVolumeClaim:
+            claimName: {{ include "restarters.fullname" . }}-storage-pvc
+        {{- end }}
         {{- if .Values.setup.skillsJson }}
         - name: skills-json-config
           configMap:

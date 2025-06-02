@@ -17,6 +17,12 @@ phpfpm:
     # Overrides the image tag whose default is the chart appVersion.
     tag: ""
 
+  # Persistence for the /storage directory
+  persistence:
+    enabled: true
+    size: 1Gi
+    storageClass: "standard"
+
   # Security context for PHP-FPM container
   securityContext:
     {}
