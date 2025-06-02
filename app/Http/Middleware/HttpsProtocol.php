@@ -13,6 +13,11 @@ class HttpsProtocol
      */
     public function handle(Request $request, Closure $next): Response
     {
+        // Skip HTTPS redirect for health check endpoints
+        if ($request->is('healthz')) {
+            return $next($request);
+        }
+
         // If we're behind a proxy that sets X-Forwarded-Proto
         if ($request->header('X-Forwarded-Proto') === 'https') {
             // Force URL generation to use HTTPS
