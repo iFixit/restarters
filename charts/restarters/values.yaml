@@ -66,7 +66,7 @@ nginx:
       enabled: true
       # Production-safe CSP policy
       # For local development, you may want to use a more permissive policy or disable CSP entirely
-      policy: "default-src 'self' http: https: data: blob: 'unsafe-inline'"
+      policy: "default-src 'self' http: https: data: blob: 'unsafe-inline' 'unsafe-eval'"
 
   # Resource limits and requests for Nginx container
   resources:
