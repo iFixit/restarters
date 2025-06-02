@@ -39,7 +39,39 @@ spec:
           volumeMounts:
             - name: public-files
               mountPath: /shared-public
-        
+
+        # Fix permissions for the storage directory
+        - name: fix-mounted-directory-permissions
+          image: "{{ .Values.phpfpm.image.repository }}:{{ .Values.phpfpm.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.phpfpm.image.pullPolicy }}
+          command: 
+            - /bin/sh
+            - -c
+            - |
+              echo "Setting up storage directory structure..."
+              
+              # Create all necessary directories in the mounted storage volume
+              mkdir -p /var/www/storage/framework/sessions
+              mkdir -p /var/www/storage/framework/views
+              mkdir -p /var/www/storage/framework/cache/data
+              mkdir -p /var/www/storage/app/public
+              mkdir -p /var/www/storage/logs
+              
+              # Create uploads directory in public volume
+              mkdir -p /var/www/public/uploads
+              
+              echo "Storage directory structure setup complete"
+          securityContext:
+            runAsUser: 33  # Run as www-data user
+            runAsGroup: 33
+            runAsNonRoot: true
+          volumeMounts:
+            - name: storage-pvc
+              mountPath: /var/www/storage
+              subPath: storage
+            - name: public-files
+              mountPath: /var/www/public
+
       containers:
         # Main Restarters PHP-FPM container
         - name: {{ .Chart.Name }}
