@@ -121,7 +121,10 @@ COPY --from=builder --chown=www-data:www-data /var/www/Taskfiles /var/www/Taskfi
 COPY --from=go /usr/bin/task /usr/bin/task
 
 # Set proper permissions
-RUN chown -R www-data:www-data /var/www
+RUN chown -R www-data:www-data /var/www && \
+    # Ensure group read permissions on all files for nginx compatibility
+    find /var/www/public -type f -exec chmod 644 {} \; && \
+    find /var/www/public -type d -exec chmod 755 {} \;
 
 # Copy the entrypoint script
 COPY docker/production/entrypoint.sh /usr/local/bin/entrypoint.sh

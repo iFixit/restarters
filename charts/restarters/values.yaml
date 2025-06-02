@@ -100,8 +100,7 @@ podLabels: {}
 
 # Pod-level security context
 podSecurityContext:
-  {}
-  # fsGroup: 2000
+  fsGroup: 33 # www-data group - ensures all mounted volumes are owned by this group
 
 # Additional volumes on the output Deployment definition.
 volumes: []

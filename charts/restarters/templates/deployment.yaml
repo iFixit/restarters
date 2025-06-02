@@ -61,10 +61,6 @@ spec:
               mkdir -p /var/www/public/uploads
               
               echo "Storage directory structure setup complete"
-          securityContext:
-            runAsUser: 33  # Run as www-data user
-            runAsGroup: 33
-            runAsNonRoot: true
           volumeMounts:
             - name: storage-pvc
               mountPath: /var/www/storage
