@@ -26,6 +26,7 @@
     width: 100%;
     height: auto;
     max-width: 260px;
+    max-height: 64px;
   }
 </style>
 
