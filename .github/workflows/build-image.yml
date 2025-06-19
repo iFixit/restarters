@@ -1,0 +1,41 @@
+name: Build and Push Restarters Image
+
+concurrency:
+  group: build-image
+  cancel-in-progress: false
+
+on:
+  push:
+    branches:
+       - hermes
+
+jobs:
+  build-and-push-image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+           role-to-assume: ${{ secrets.DEPLOY_IAM_ROLE }}
+           aws-region: us-east-1
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, Tag, and Push Image to Amazon ECR
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: restarters
+          DOCKER_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $REGISTRY/$REPOSITORY:$DOCKER_TAG -f docker/production/Dockerfile.prod .
+
+          docker push $REGISTRY/$REPOSITORY:$DOCKER_TAG
