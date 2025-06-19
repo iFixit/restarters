@@ -62,7 +62,7 @@ services:
 
   # Production MySQL database
   restarters_db_prod:
-    image: mysql:5.7.33
+    image: mysql:8.0.42
     container_name: restarters_db_prod
     restart: unless-stopped
     environment:
