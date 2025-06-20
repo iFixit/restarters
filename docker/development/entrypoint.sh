@@ -7,6 +7,10 @@ if [ ! -d "storage/framework/cache/data" ]; then
   mkdir -p storage/framework/cache/data
 fi
 
+if [ ! -d "public/uploads" ]; then
+  mkdir -p public/uploads
+fi
+
 IN_DOCKER=true task setup:dev
 
 chmod -R 777 public
