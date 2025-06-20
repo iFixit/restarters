@@ -5,7 +5,8 @@ namespace App\Helpers;
 use App\Models\Images;
 use App\Models\Xref;
 use Illuminate\Database\Eloquent\Model;
-use Intervention\Image\ImageManagerStatic as Image;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
 use Illuminate\Support\Facades\DB;
 
 class FixometerFile extends Model
@@ -81,10 +82,12 @@ class FixometerFile extends Model
             $this->path = $lpath;
             $data['path'] = $this->file;
 
+            $imageManager = new ImageManager(new Driver());
+
             // In test mode, we skip image manipulations to avoid dependency issues
             if (!FixometerFile::$uploadTesting) {
                 // Fix orientation
-                Image::make($lpath)->orientate()->save($lpath);
+                $imageManager->read($lpath)->save($lpath);
             }
 
             if ($type === 'image') {
@@ -116,25 +119,15 @@ class FixometerFile extends Model
                 } else {
                     // Normal processing with Intervention Image
                     // Let's make images, which we will resize or crop
-                    $thumb = Image::make($lpath);
-                    $mid = Image::make($lpath);
+                    $thumb = $imageManager->read($lpath);
+                    $mid = $imageManager->read($lpath);
 
                     if ($resize_height) { // Resize before crop
-                        $thumb->resize(null, $thumbSize, function ($constraint) {
-                            $constraint->aspectRatio();
-                        });
-
-                        $mid->resize(null, $midSize, function ($constraint) {
-                            $constraint->aspectRatio();
-                        });
+                        $thumb->scale(null, $thumbSize);
+                        $mid->scale(null, $midSize);
                     } else {
-                        $thumb->resize($thumbSize, null, function ($constraint) {
-                            $constraint->aspectRatio();
-                        });
-
-                        $mid->resize($midSize, null, function ($constraint) {
-                            $constraint->aspectRatio();
-                        });
+                        $thumb->scale($thumbSize, null);
+                        $mid->scale($midSize, null);
                     }
 
                     if ($crop) {
@@ -174,7 +167,7 @@ class FixometerFile extends Model
      * */
     public function filename($tmp_name)
     {
-        $finfo = new finfo(FILEINFO_MIME_TYPE);
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
         $lext = array_search(
             $finfo->file($tmp_name),
             [
@@ -204,7 +197,7 @@ class FixometerFile extends Model
         try {
             return DB::select($sql, ['refType' => $of_ref_type, 'refId' => $ref_id]);
         } catch (\Illuminate\Database\QueryException $e) {
-            return db($e);
+            return DB::db($e);
         }
     }
 

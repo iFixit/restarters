@@ -20,7 +20,7 @@ import vue2Dropzone from 'vue2-dropzone'
 export default {
   props: {
     image: {
-      type: String,
+      type: [String, File],
       required: false,
       default: null
     }
@@ -35,14 +35,16 @@ export default {
   },
   computed: {
     imageUploadEnabled() {
-      return window.Laravel && window.Laravel.imageUploadEnabled;
+      return window.Laravel?.imageUploadEnabled;
     },
     src() {
       if (this.image) {
-        return '/uploads/' + this.image
-      } else {
-        return '/images/upload_ico_grey.svg'
+        if (this.image instanceof File) {
+          return URL.createObjectURL(this.image);
+        }
+        return `/uploads/${this.image}`;
       }
+      return '/images/upload_ico_grey.svg';
     },
     dropzoneOptions () {
       return {
