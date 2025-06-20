@@ -49,7 +49,7 @@ return [
         'Encrypter' => Illuminate\Support\Facades\Crypt::class,
         'FixometerHelper' => App\Helpers\Fixometer::class,
         'Honeypot' => Msurguy\Honeypot\HoneypotFacade::class,
-        'Image' => Intervention\Image\Facades\Image::class,
+        'Image' => Intervention\Image\Laravel\Facades\Image::class,
         'LaravelLocalization' => Mcamara\LaravelLocalization\Facades\LaravelLocalization::class,
     ]
 
