@@ -148,7 +148,7 @@ mysql:
   enabled: true
   image:
     repository: mysql
-    tag: "5.7"
+    tag: "8.0.42"
     pullPolicy: IfNotPresent
   auth:
     rootPassword: "s3cr3t_prod"
