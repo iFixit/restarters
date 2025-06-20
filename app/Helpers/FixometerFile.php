@@ -167,7 +167,7 @@ class FixometerFile extends Model
      * */
     public function filename($tmp_name)
     {
-        $finfo = new finfo(FILEINFO_MIME_TYPE);
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
         $lext = array_search(
             $finfo->file($tmp_name),
             [
@@ -197,7 +197,7 @@ class FixometerFile extends Model
         try {
             return DB::select($sql, ['refType' => $of_ref_type, 'refId' => $ref_id]);
         } catch (\Illuminate\Database\QueryException $e) {
-            return db($e);
+            return DB::db($e);
         }
     }
 
