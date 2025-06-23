@@ -66,7 +66,6 @@ Helper to generate environment variables from secrets
       name: {{ .Values.secrets.mapKeys.secretName }}
       key: {{ .Values.secrets.mapKeys.keys.googleApiKey }}
 {{- end }}
-{{- if .Values.secrets.dbCredentials.enabled }}
 - name: DB_HOST
   valueFrom:
     secretKeyRef:
@@ -93,7 +92,6 @@ Helper to generate environment variables from secrets
       name: {{ .Values.secrets.dbCredentials.secretName }}
       key: {{ .Values.secrets.dbCredentials.keys.dbPassword }}
 {{- end }}
-{{- end }}
 
 {{/*
 Helper to generate setup environment variables
@@ -115,30 +113,6 @@ Helper to generate setup environment variables
   value: "{{ .Values.setup.adminPassword | default "changeMeASAP" }}"
 - name: ADMIN_ROLE
   value: "{{ .Values.setup.adminRole | default "2" }}"
-{{- end }}
-
-{{/*
-Helper to generate database configuration based on mysql.enabled
-*/}}
-{{- define "restarters.dbConfig" -}}
-{{- if .Values.mysql.enabled }}
-DB_CONNECTION="mysql"
-DB_HOST="{{ include "restarters.fullname" . }}-mysql"
-DB_PORT="3306"
-DB_DATABASE="{{ .Values.mysql.auth.database }}"
-DB_USERNAME="{{ .Values.mysql.auth.username }}"
-DB_PASSWORD="{{ .Values.mysql.auth.password }}"
-{{- else if not .Values.secrets.dbCredentials.enabled }}
-DB_CONNECTION="mysql"
-DB_HOST="{{ .Values.envGroups.database.DB_HOST }}"
-DB_PORT="{{ .Values.envGroups.database.DB_PORT }}"
-DB_DATABASE="{{ .Values.envGroups.database.DB_DATABASE }}"
-DB_USERNAME="{{ .Values.envGroups.database.DB_USERNAME }}"
-DB_PASSWORD="{{ .Values.envGroups.database.DB_PASSWORD }}"
-{{- else }}
-# Fallback to env values
-{{- include "restarters.envGroup" (dict "groupName" "database" "context" .) | nindent 8 }}
-{{- end }}
 {{- end }}
 
 {{/*

@@ -16,7 +16,7 @@ data:
         {{- include "restarters.envGroup" (dict "groupName" "logging" "context" .) | nindent 8 }}
 
         # Database Configuration
-        {{- include "restarters.dbConfig" . | nindent 8 }}
+        {{- include "restarters.envGroup" (dict "groupName" "database" "context" .) | nindent 8 }}
 
         # Database Table Configuration
         {{- include "restarters.envGroup" (dict "groupName" "tables" "context" .) | nindent 8 }}

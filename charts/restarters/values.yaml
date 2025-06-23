@@ -142,55 +142,6 @@ ingress:
   #      - chart-example.local
 
 # =============================================================================
-# MySQL Database Configuration
-# =============================================================================
-mysql:
-  enabled: true
-  image:
-    repository: mysql
-    tag: "8.0.42"
-    pullPolicy: IfNotPresent
-  auth:
-    rootPassword: "s3cr3t_prod"
-    database: "restarters_prod"
-    username: "restarters_user"
-    password: "restarters_pass"
-  persistence:
-    enabled: false
-    size: 8Gi
-    storageClass: ""
-  resources:
-    {}
-    # limits:
-    #   cpu: 500m
-    #   memory: 512Mi
-    # requests:
-    #   cpu: 250m
-    #   memory: 256Mi
-  config: |
-    [mysqld]
-    # Ignore lost+found directory that may exist in persistent volumes
-    ignore-db-dir=lost+found
-
-    # Use explicit defaults for timestamp to avoid deprecation warnings
-    explicit_defaults_for_timestamp=1
-
-    # Basic MySQL configuration
-    default-storage-engine=innodb
-    innodb_buffer_pool_size=128M
-    max_allowed_packet=64M
-
-    # Character set configuration
-    character-set-server=utf8mb4
-    collation-server=utf8mb4_unicode_ci
-
-    [mysql]
-    default-character-set=utf8mb4
-
-    [client]
-    default-character-set=utf8mb4
-
-# =============================================================================
 # Application Environment Configuration
 # =============================================================================
 setup:
@@ -230,11 +181,11 @@ secrets:
     data:
       mapboxToken: "your-mapbox-token-here"
       googleApiKey: "your-google-api-key-here"
-
-  # External database credentials (used when mysql.enabled is false)
+  # External database credentials
+  # IMPORTANT: For production deployments, create the secret externally and set createSecret: false
+  # For development, you can set createSecret: true and provide values in the data section
   dbCredentials:
-    enabled: false
-    createSecret: false
+    createSecret: true
     secretName: "restarters-db-credentials"
     keys:
       dbHost: "DB_HOST"
@@ -275,14 +226,9 @@ envGroups:
   logging:
     LOG_CHANNEL: "stack"
 
-  # Database configuration (will be overridden by mysql config or secrets)
+  # Database configuration
   database:
-    DB_CONNECTION: "mysql"
-    DB_HOST: "restarters-mysql"
-    DB_PORT: "3306"
-    DB_DATABASE: "restarters_prod"
-    DB_USERNAME: "restarters_user"
-    DB_PASSWORD: "restarters_pass"
+    DB_CONNECTION: mysql
 
   # Database table configuration
   tables:
