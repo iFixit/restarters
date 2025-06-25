@@ -286,7 +286,7 @@ class Group extends JsonResource
         $ret = [
             'id' => $this->idgroups,
             'name' => $this->name,
-            'image' => $this->groupImage && is_object($this->groupImage) && is_object($this->groupImage->image) ? $this->groupImage->image->path : null,
+            'image' => $this->groupImage && is_object($this->groupImage) && is_object($this->groupImage->image) ? \App\Helpers\FixometerFile::getUploadFileUrl($this->groupImage->image->path) : null,
             'website' => $this->website,
             'phone' => $this->phone,
             'description' => $this->free_text,

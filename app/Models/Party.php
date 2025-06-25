@@ -809,7 +809,7 @@ class Party extends Model implements Auditable
         foreach ($volunteers as $volunteer) {
             $volunteer['userSkills'] = [];
             $volunteer['confirmed'] = intval($volunteer->status) === 1;
-            $volunteer['profilePath'] = '/uploads/thumbnail_placeholder.png';
+            $volunteer['profilePath'] = '/images/placeholder-avatar.png';
             $volunteer['fullName'] = $volunteer->getFullName();
 
             if ($volunteer->volunteer) {
@@ -821,7 +821,7 @@ class Party extends Model implements Auditable
 
                 if (! empty($volunteer->volunteer)) {
                     $volunteer['userSkills'] = $volunteer->volunteer->userSkills->all();
-                    $volunteer['profilePath'] = '/uploads/thumbnail_'.$volunteer->volunteer->getProfile($volunteer->volunteer->id)->path;
+                    $volunteer['profilePath'] = \App\Helpers\FixometerFile::getUploadFileUrl($volunteer->volunteer->getProfile($volunteer->volunteer->id)->path, 'thumbnail');
 
                     foreach ($volunteer['userSkills'] as $skill) {
                         // Force expansion

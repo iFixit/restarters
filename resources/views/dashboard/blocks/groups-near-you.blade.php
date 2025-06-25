@@ -13,7 +13,7 @@
                       <td class="table-cell-icon">
                           @php( $group_image = $group->groupImage )
                           @if( is_object($group_image) && is_object($group_image->image) )
-                              <img style="display:inline-block;" src="{{ asset('/uploads/thumbnail_' . $group_image->image->path) }}" alt="{{{ $group->name }}}" title="{{{ $group->name }}}" />
+                              <img style="display:inline-block;" src="@uploadThumbnailUrl($group_image->image->path)" alt="{{{ $group->name }}}" title="{{{ $group->name }}}" />
                           @else
                               <img style="display:inline-block;padding-right:5px" src="{{ asset('/images/placeholder-avatar.png') }}" alt="{{{ $group->name }}}">
                           @endif

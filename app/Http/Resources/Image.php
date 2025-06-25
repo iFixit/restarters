@@ -37,7 +37,7 @@ class Image extends JsonResource
         return [
             'id' => $this->idimages,
             'idxref' => $this->idxref,
-            'path' => $this->path
+            'path' => \App\Helpers\FixometerFile::getUploadFileUrl($this->path) ?: $this->path
         ];
     }
 }

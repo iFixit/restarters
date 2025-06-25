@@ -627,3 +627,50 @@ Route::get('/healthz', function () {
 //    \Log::info($sql->bindings);
 //    \Log::info($sql->time);
 //});
+
+// Test S3 upload functionality (only in non-production environments)
+if (!app()->isProduction()) {
+    Route::get('/test-s3-upload', function () {
+        return view('test.s3-upload');
+    })->name('test.s3.upload');
+    
+    Route::post('/test-s3-upload', function (Illuminate\Http\Request $request) {
+        try {
+            if (!$request->hasFile('test_image')) {
+                return back()->with('error', 'Please select an image file');
+            }
+            
+            $file = $request->file('test_image');
+            
+            // Simulate the file upload array structure
+            $_FILES['test_file'] = [
+                'name' => $file->getClientOriginalName(),
+                'type' => $file->getMimeType(),
+                'size' => $file->getSize(),
+                'tmp_name' => $file->getRealPath(),
+                'error' => $file->getError(),
+            ];
+            
+            $fixometerFile = new App\Helpers\FixometerFile();
+            $filename = $fixometerFile->upload('test_file', 'image');
+            
+            if ($filename) {
+                $originalUrl = App\Helpers\FixometerFile::getUploadFileUrl($filename);
+                $thumbnailUrl = App\Helpers\FixometerFile::getUploadFileUrl($filename, 'thumbnail');
+                $midUrl = App\Helpers\FixometerFile::getUploadFileUrl($filename, 'mid');
+                
+                return back()->with('success', 'Image uploaded successfully!')
+                    ->with('filename', $filename)
+                    ->with('urls', [
+                        'original' => $originalUrl,
+                        'thumbnail' => $thumbnailUrl,
+                        'mid' => $midUrl
+                    ]);
+            } else {
+                return back()->with('error', 'Failed to upload image');
+            }
+        } catch (Exception $e) {
+            return back()->with('error', 'Upload failed: ' . $e->getMessage());
+        }
+    })->name('test.s3.upload.post');
+}

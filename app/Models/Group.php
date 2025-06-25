@@ -364,10 +364,10 @@ class Group extends Model implements Auditable
     public function groupImagePath()
     {
         if (is_object($this->groupImage) && is_object($this->groupImage->image)) {
-            return asset('/uploads/mid_'.$this->groupImage->image->path);
+            return \App\Helpers\FixometerFile::getUploadFileUrl($this->groupImage->image->path, 'mid');
         }
 
-        return url('/uploads/mid_1474993329ef38d3a4b9478841cc2346f8e131842fdcfd073b307.jpg');
+        return \App\Helpers\FixometerFile::getUploadFileUrl('1474993329ef38d3a4b9478841cc2346f8e131842fdcfd073b307.jpg', 'mid');
     }
 
     public function getNextUpcomingEvent()

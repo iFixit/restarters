@@ -504,7 +504,7 @@ class GroupController extends Controller
                     'idgroups' => $group->idgroups,
                     'name' => $group->name,
                     'image' => (is_object($group_image) && is_object($group_image->image)) ?
-                        asset('uploads/mid_'.$group_image->image->path) : null,
+                        FixometerFile::getUploadFileUrl($group_image->image->path, 'mid') : null,
                     'location' => [
                         'location' => rtrim($group->location),
                         'country' => Fixometer::getCountryFromCountryCode($group->country_code),

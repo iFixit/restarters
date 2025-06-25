@@ -52,7 +52,7 @@ class NetworkSummary extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'logo' => $this->logo ? ($request->root() . '/uploads/' . $this->logo) : null,
+            'logo' => $this->logo ? \App\Helpers\FixometerFile::getUploadFileUrl($this->logo) : null,
             'summary' => true
         ];
     }

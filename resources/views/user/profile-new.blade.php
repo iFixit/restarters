@@ -8,7 +8,7 @@
             @if (!isset($user->path) || is_null($user->path))
               <img src="{{ asset('/images/placeholder-avatar.png') }}" alt="Profile Picture" class="img-fluid rounded-circle">
             @else
-              <img src="/uploads/{{ $user->path }}" alt="Profile Picture" class="img-fluid rounded">
+                                      <img src="@uploadUrl($user->path)" alt="Profile Picture" class="img-fluid rounded">
             @endif
           </div>
           <div class="col-9 d-flex">

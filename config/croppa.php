@@ -15,7 +15,7 @@
      *      string  IoC binding name of League\Flysystem\Filesystem
      *      string  IoC binding name of League\Flysystem\Cached\CachedAdapter
      */
-    'src_disk' => 'public_uploads',
+    'src_disk' => env('UPLOADS_DISK', 'local') === 's3' ? 's3_uploads' : 'public_uploads',
 
     /**
      * The directory where cropped images should be saved. The route to the
@@ -26,9 +26,9 @@
      *      string  IoC binding name of League\Flysystem\Filesystem
      *      string  IoC binding name of League\Flysystem\Cached\CachedAdapter
      */
-    'crops_dir' => 'public_uploads',
+    'crops_dir' => env('UPLOADS_DISK', 'local') === 's3' ? 's3_uploads' : 'public_uploads',
 
-    'crops_are_remote' => false,
+    'crops_are_remote' => env('UPLOADS_DISK', 'local') === 's3',
 
     /**
      * Maximum number of sizes to allow for a particular source file. This is to
@@ -74,8 +74,7 @@
      * A string that is prepended to the path captured by the `path` pattern
      * (above) that is used to from the URL to crops.
      */
-    // 'url_prefix' => '//'.Request::getHttpHost().'/uploads/',         // Local
-    // 'url_prefix' => 'https://your-bucket.s3.amazonaws.com/uploads/', // S3
+    'url_prefix' => env('UPLOADS_DISK', 'local') === 's3' ? env('AWS_URL', '') . '/' . env('AWS_UPLOADS_ROOT', 'uploads') . '/' : '//'.Request::getHttpHost().'/uploads/',
 
     /**
      * Reject attempts to maliciously create images by signing the generated

@@ -158,7 +158,7 @@
             <div class="form-group col-lg-4">
             @php ( $path = $user->getProfile($user->id)->path )
             @if ( !is_null($path) )
-                <img width="50" src="{{ asset('/uploads/thumbnail_' . $path) }}" alt="{{{ $user->name }}}'s avatar">
+                <img width="50" src="@uploadThumbnailUrl($path)" alt="{{{ $user->name }}}'s avatar">
             @endif
             </div>
             <div class="form-group col-lg-8">

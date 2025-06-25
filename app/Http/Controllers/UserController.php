@@ -1129,7 +1129,7 @@ class UserController extends Controller
         }
 
         if (isset($user->getProfile($user->id)->path) && ! is_null($user->getProfile($user->id)->path)) {
-            $thumbnailPath = config('app.url').'/uploads/thumbnail_'.$user->getProfile($user->id)->path;
+            $thumbnailPath = FixometerFile::getUploadFileUrl($user->getProfile($user->id)->path, 'thumbnail');
         } else {
             $thumbnailPath = config('app.url').'/images/placeholder-avatar.png';
         }

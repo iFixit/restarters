@@ -1,36 +1,49 @@
 <template>
   <div>
-    <b-img-lazy :src="'/uploads/thumbnail_' + image.path" thumbnail class="mr-2 mb-2 size d-inline clickme" @error.native="brokenImage" @click.native="zoom" />
+    <b-img-lazy :src="thumbnailUrl" thumbnail class="mr-2 mb-2 size d-inline clickme" @error.native="brokenImage" @click.native="zoom" />
     <EventImageModal :image="image" ref="modal" />
   </div>
 </template>
 <script>
-import CollapsibleSection from './CollapsibleSection'
-import { PLACEHOLDER } from '../constants'
-import EventImageModal from './EventImageModal'
+import CollapsibleSection from "./CollapsibleSection";
+import { PLACEHOLDER } from "../constants";
+import EventImageModal from "./EventImageModal";
 
 export default {
-  components: {EventImageModal},
-  props: {
-    image: {
-      type: Object,
-      required: true
-    }
-  },
-  methods: {
-    brokenImage(event) {
-      event.target.src = PLACEHOLDER
-    },
-    zoom() {
-      this.$refs.modal.show()
-    }
-  }
-}
+	components: { EventImageModal },
+	props: {
+		image: {
+			type: Object,
+			required: true,
+		},
+	},
+	computed: {
+		thumbnailUrl() {
+			// Check if we have a full URL (S3) or just a path (local)
+			if (this.image.path.startsWith("http")) {
+				// For S3, we might have a direct URL to the thumbnail
+				return this.image.thumbnail_path || this.image.path;
+			}
+			return `/uploads/thumbnail_${this.image.path}`;
+		},
+	},
+	methods: {
+		brokenImage(e) {
+			e.target.src = "/images/placeholder.png";
+		},
+		zoom() {
+			this.$refs.modal.show();
+		},
+	},
+};
 </script>
-<style scoped>
+<style scoped lang="scss">
 .size {
-  width: 100px;
-  height: 100px;
-  object-fit: cover;
+  width: 80px;
+  height: 80px;
+}
+
+.clickme {
+  cursor: pointer;
 }
 </style>

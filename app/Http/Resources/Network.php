@@ -213,7 +213,7 @@ class Network extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'logo' => $this->logo ? ($request->root() . '/uploads/' . $this->logo) : null,
+            'logo' => $this->logo ? \App\Helpers\FixometerFile::getUploadFileUrl($this->logo) : null,
             'description' => $this->description,
             'website' => $this->website,
             'shortname' => $this->shortname,

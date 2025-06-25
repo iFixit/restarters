@@ -8,7 +8,7 @@
     @if ( is_null($path) )
       <img src="{{ asset('/images/placeholder-avatar.png') }}" alt="Placeholder avatar" class="users-list__icon">
     @else
-      <img src="{{ asset('/uploads/thumbnail_' . $path) }}" alt="{{ $coordinator->name }}'s avatar" class="users-list__icon">
+                  <img src="@uploadThumbnailUrl($path)" alt="{{ $coordinator->name }}'s avatar" class="users-list__icon">
     @endif
 
 </li>

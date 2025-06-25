@@ -27,9 +27,9 @@
                             <div class="network-icon">
                                 @php( $logo = $network->sizedLogo('_x100') )
                                 @if( $logo )
-                                <img style="max-width: 100%; max-height:50px" src="{{ asset("/uploads/$logo") }}" alt="{{{ $network->name }}} logo">
+                                <img style="max-width: 100%; max-height:50px" src="@uploadUrl($logo)" alt="{{{ $network->name }}} logo">
                                 @else
-                                <img src="{{ url('/uploads/mid_1474993329ef38d3a4b9478841cc2346f8e131842fdcfd073b307.jpg') }}" alt="generic network logo">
+                                                                  <img src="@uploadMidUrl('1474993329ef38d3a4b9478841cc2346f8e131842fdcfd073b307.jpg')" alt="generic network logo">
                                 @endif
                             </div>
                         </div>

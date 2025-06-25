@@ -117,7 +117,7 @@
       <li class="nav-item dropdown @if(Str::contains(url()->current(), route('profile'))) active @endif">
           <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-target="#account-nav" aria-controls="account-nav" data-toggle="collapse" aria-haspopup="true" aria-expanded="false" aria-label="Toggle account navigation" v-pre>
               @if ( $user && isset( $user->getProfile($user->id)->path ) && !is_null( $user->getProfile($user->id)->path ) )
-                  <img src="/uploads/thumbnail_{{ $user->getProfile($user->id)->path }}" alt="{{ Auth::user()->name }} Profile Picture" class="avatar">
+                                              <img src="@uploadThumbnailUrl($user->getProfile($user->id)->path)" alt="{{ Auth::user()->name }} Profile Picture" class="avatar">
               @else
                   <img src="{{ asset('/images/placeholder-avatar.png') }}" alt="{{ Auth::user()->name }} Profile Picture" class="avatar">
               @endif

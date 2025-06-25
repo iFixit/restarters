@@ -1,44 +1,34 @@
 <template>
-  <b-modal
-      id="imagemodal"
-      v-model="showModal"
-      no-stacking
-  >
-    <template slot="default">
-      <b-img-lazy class="w-100" :src="'/uploads/' + image.path" @error.native="brokenImage" />
-    </template>
-    <template slot="modal-footer" slot-scope="{ cancel }">
-      <b-button variant="primary" @click="cancel">
-        {{ __('partials.close') }}
-      </b-button>
-    </template>
+  <b-modal ref="modal" :title="__('devices.image_photo')" size="lg" hide-footer>
+    <div class="d-flex justify-content-center">
+      <b-img-lazy class="w-100" :src="imageUrl" @error.native="brokenImage" />
+    </div>
   </b-modal>
 </template>
 <script>
-import { PLACEHOLDER } from '../constants'
-
 export default {
-  props: {
-    image: {
-      type: Object,
-      required: true
-    },
-  },
-  data: function() {
-    return {
-      showModal: false
-    }
-  },
-  methods: {
-    show() {
-      this.showModal = true
-    },
-    hide() {
-      this.showModal = false
-    },
-    brokenImage(event) {
-      event.target.src = PLACEHOLDER
-    }
-  }
-}
+	props: {
+		image: {
+			type: Object,
+			required: true,
+		},
+	},
+	computed: {
+		imageUrl() {
+			// Check if we have a full URL (S3) or just a path (local)
+			if (this.image.path.startsWith("http")) {
+				return this.image.path;
+			}
+			return `/uploads/${this.image.path}`;
+		},
+	},
+	methods: {
+		show() {
+			this.$refs.modal.show();
+		},
+		brokenImage(e) {
+			e.target.src = "/images/placeholder.png";
+		},
+	},
+};
 </script>

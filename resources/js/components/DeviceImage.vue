@@ -1,6 +1,6 @@
 <template>
   <div class="position-relative">
-    <b-img-lazy :src="'/uploads/' + image.path" class="align-self-start clickme" @click.native="zoom" />
+    <b-img-lazy :src="imageUrl" class="align-self-start clickme" @click.native="zoom" />
     <b-btn variant="none" class="remove align-content-center" @click="confirm" v-if="!disabled">
       ╳
     </b-btn>
@@ -9,33 +9,42 @@
   </div>
 </template>
 <script>
-import ConfirmModal from './ConfirmModal'
-import DeviceImageModal from './DeviceImageModal'
+import ConfirmModal from "./ConfirmModal";
+import DeviceImageModal from "./DeviceImageModal";
 export default {
-  components: {DeviceImageModal, ConfirmModal},
-  props: {
-    image: {
-      type: Object,
-      required: true
-    },
-    disabled: {
-      type: Boolean,
-      required: false,
-      default: false
-    },
-  },
-  methods: {
-    remove() {
-      this.$emit('remove')
-    },
-    confirm() {
-      this.$refs.confirm.show()
-    },
-    zoom() {
-      this.$refs.modal.show()
-    }
-  }
-}
+	components: { DeviceImageModal, ConfirmModal },
+	props: {
+		image: {
+			type: Object,
+			required: true,
+		},
+		disabled: {
+			type: Boolean,
+			required: false,
+			default: false,
+		},
+	},
+	computed: {
+		imageUrl() {
+			// Check if we have a full URL (S3) or just a path (local)
+			if (this.image.path.startsWith("http")) {
+				return this.image.path;
+			}
+			return `/uploads/${this.image.path}`;
+		},
+	},
+	methods: {
+		remove() {
+			this.$emit("remove");
+		},
+		confirm() {
+			this.$refs.confirm.show();
+		},
+		zoom() {
+			this.$refs.modal.show();
+		},
+	},
+};
 </script>
 <style scoped lang="scss">
 .remove {

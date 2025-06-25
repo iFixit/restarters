@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class FixometerFile extends Model
 {
@@ -19,6 +20,97 @@ class FixometerFile extends Model
 
     protected $dates = true;
     public static $uploadTesting = false;
+
+    /**
+     * Get the uploads disk configuration
+     */
+    private function getUploadsDisk()
+    {
+        return config('filesystems.disks.uploads.driver', 'local') === 's3' ? 's3_uploads' : 'public_uploads';
+    }
+
+    /**
+     * Check if we're using S3 for uploads
+     */
+    private function isUsingS3()
+    {
+        return config('filesystems.disks.uploads.driver', 'local') === 's3';
+    }
+
+    /**
+     * Get the upload path based on storage type
+     */
+    private function getUploadPath($filename = '')
+    {
+        if ($this->isUsingS3()) {
+            return $filename;
+        }
+        return public_path('uploads') . ($filename ? '/' . $filename : '');
+    }
+
+    /**
+     * Get the URL for uploaded files
+     */
+    private function getUploadUrl($filename)
+    {
+        if ($this->isUsingS3()) {
+            return Storage::disk('s3_uploads')->url($filename);
+        }
+        return '/uploads/' . $filename;
+    }
+
+    /**
+     * Static helper to get upload URL for files
+     * This can be used throughout the application
+     */
+    public static function getUploadFileUrl($filename, $type = 'original')
+    {
+        if (empty($filename)) {
+            return null;
+        }
+
+        $isUsingS3 = config('filesystems.disks.uploads.driver', 'local') === 's3';
+        
+        if ($isUsingS3) {
+            $prefix = '';
+            if ($type === 'thumbnail') {
+                $prefix = 'thumbnail_';
+            } elseif ($type === 'mid') {
+                $prefix = 'mid_';
+            }
+            
+            // Check if CloudFront URL is configured
+            $cloudfrontUrl = config('filesystems.disks.s3_uploads.cloudfront_url');
+            if ($cloudfrontUrl) {
+                // Use CloudFront for serving images
+                $root = config('filesystems.disks.s3_uploads.root');
+                $url = rtrim($cloudfrontUrl, '/') . '/' . ltrim($root, '/') . '/' . $prefix . $filename;
+                return $url;
+            }
+            
+            // Fallback to direct S3 URLs
+            $url = Storage::disk('s3_uploads')->url($prefix . $filename);
+            
+            // Fix for path-style endpoints (LocalStack) - construct proper URL with bucket name
+            if (config('filesystems.disks.s3_uploads.use_path_style_endpoint')) {
+                $bucket = config('filesystems.disks.s3_uploads.bucket');
+                $endpoint = config('filesystems.disks.s3_uploads.endpoint');
+                $root = config('filesystems.disks.s3_uploads.root');
+                
+                // Build correct path-style URL: endpoint/bucket/root/file
+                $url = rtrim($endpoint, '/') . '/' . $bucket . '/' . ltrim($root, '/') . '/' . $prefix . $filename;
+            }
+            
+            return $url;
+        } else {
+            if ($type === 'thumbnail') {
+                return asset('/uploads/thumbnail_' . $filename);
+            } elseif ($type === 'mid') {
+                return asset('/uploads/mid_' . $filename);
+            }
+            return asset('/uploads/' . $filename);
+        }
+    }
 
     public function move($from, $to) {
         // This is for phpunit tests.
@@ -73,26 +165,51 @@ class FixometerFile extends Model
             $filename = $this->filename($tmp_name);
             $this->file = $filename;
             
-            $uploadsPath = public_path('uploads');
-            $lpath = $uploadsPath . '/' . $filename;
-            if (!$this->move($tmp_name, $lpath)) {
-                return false;
+            // Log upload attempt for debugging
+            \Log::info('FixometerFile upload attempt', [
+                'filename' => $filename,
+                'type' => $type,
+                'storage_type' => $this->isUsingS3() ? 's3' : 'local',
+                'reference' => $reference,
+                'reference_type' => $referenceType
+            ]);
+            
+            if ($this->isUsingS3()) {
+                // Upload to S3
+                $fileContents = file_get_contents($tmp_name);
+                Storage::disk('s3_uploads')->put($filename, $fileContents);
+                $this->path = $filename;
+            } else {
+                // Upload to local storage
+                $uploadsPath = public_path('uploads');
+                $lpath = $uploadsPath . '/' . $filename;
+                if (!$this->move($tmp_name, $lpath)) {
+                    return false;
+                }
+                $this->path = $lpath;
             }
+            
             $data = [];
-            $this->path = $lpath;
             $data['path'] = $this->file;
 
             $imageManager = new ImageManager(new Driver());
 
             // In test mode, we skip image manipulations to avoid dependency issues
             if (!FixometerFile::$uploadTesting) {
-                // Fix orientation
-                $imageManager->read($lpath)->save($lpath);
+                if (!$this->isUsingS3()) {
+                    // Fix orientation for local files
+                    $imageManager->read($this->path)->save($this->path);
+                }
             }
 
             if ($type === 'image') {
                 // Get image dimensions
-                $size = getimagesize($this->path);
+                if ($this->isUsingS3()) {
+                    // For S3, we need to get dimensions from the temporary file
+                    $size = getimagesize($tmp_name);
+                } else {
+                    $size = getimagesize($this->path);
+                }
                 $data['width'] = $size[0];
                 $data['height'] = $size[1];
 
@@ -113,30 +230,69 @@ class FixometerFile extends Model
 
                 // In test mode, we create empty thumbnails to satisfy the code without Intervention
                 if (FixometerFile::$uploadTesting) {
-                    // Just copy the original file as thumbnails for testing
-                    copy($lpath, $uploadsPath . '/thumbnail_' . $filename);
-                    copy($lpath, $uploadsPath . '/mid_' . $filename);
+                    if ($this->isUsingS3()) {
+                        // For S3 testing, just store the same file as thumbnails
+                        Storage::disk('s3_uploads')->put('thumbnail_' . $filename, $fileContents);
+                        Storage::disk('s3_uploads')->put('mid_' . $filename, $fileContents);
+                    } else {
+                        // Just copy the original file as thumbnails for testing
+                        copy($this->path, $this->getUploadPath('thumbnail_' . $filename));
+                        copy($this->path, $this->getUploadPath('mid_' . $filename));
+                    }
                 } else {
                     // Normal processing with Intervention Image
-                    // Let's make images, which we will resize or crop
-                    $thumb = $imageManager->read($lpath);
-                    $mid = $imageManager->read($lpath);
+                    if ($this->isUsingS3()) {
+                        // For S3, process from temporary file and upload results
+                        $thumb = $imageManager->read($tmp_name);
+                        $mid = $imageManager->read($tmp_name);
 
-                    if ($resize_height) { // Resize before crop
-                        $thumb->scale(null, $thumbSize);
-                        $mid->scale(null, $midSize);
+                        if ($resize_height) { // Resize before crop
+                            $thumb->scale(null, $thumbSize);
+                            $mid->scale(null, $midSize);
+                        } else {
+                            $thumb->scale($thumbSize, null);
+                            $mid->scale($midSize, null);
+                        }
+
+                        if ($crop) {
+                            $thumb->crop($thumbSize, $thumbSize);
+                            $mid->crop($midSize, $midSize);
+                        }
+
+                        // Save to temporary files and upload to S3
+                        $thumbTemp = tempnam(sys_get_temp_dir(), 'thumb_');
+                        $midTemp = tempnam(sys_get_temp_dir(), 'mid_');
+                        
+                        $thumb->save($thumbTemp, 85);
+                        $mid->save($midTemp, 85);
+                        
+                        Storage::disk('s3_uploads')->put('thumbnail_' . $filename, file_get_contents($thumbTemp));
+                        Storage::disk('s3_uploads')->put('mid_' . $filename, file_get_contents($midTemp));
+                        
+                        // Clean up temporary files
+                        unlink($thumbTemp);
+                        unlink($midTemp);
                     } else {
-                        $thumb->scale($thumbSize, null);
-                        $mid->scale($midSize, null);
-                    }
+                        // Local processing as before
+                        $thumb = $imageManager->read($this->path);
+                        $mid = $imageManager->read($this->path);
 
-                    if ($crop) {
-                        $thumb->crop($thumbSize, $thumbSize);
-                        $mid->crop($midSize, $midSize);
-                    }
+                        if ($resize_height) { // Resize before crop
+                            $thumb->scale(null, $thumbSize);
+                            $mid->scale(null, $midSize);
+                        } else {
+                            $thumb->scale($thumbSize, null);
+                            $mid->scale($midSize, null);
+                        }
 
-                    $thumb->save($uploadsPath . '/thumbnail_' . $filename, 85);
-                    $mid->save($uploadsPath . '/mid_' . $filename, 85);
+                        if ($crop) {
+                            $thumb->crop($thumbSize, $thumbSize);
+                            $mid->crop($midSize, $midSize);
+                        }
+
+                        $thumb->save($this->getUploadPath('thumbnail_' . $filename), 85);
+                        $mid->save($this->getUploadPath('mid_' . $filename), 85);
+                    }
                 }
 
                 $this->table = 'images';

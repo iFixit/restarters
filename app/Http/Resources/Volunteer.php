@@ -93,7 +93,7 @@ class Volunteer extends JsonResource
         }
 
         $image = User::getProfile($this->user)->path;
-        $image = $image ? "/uploads/thumbnail_$image" : "/images/placeholder-avatar.png";
+        $image = $image ? \App\Helpers\FixometerFile::getUploadFileUrl($image, 'thumbnail') :"/images/placeholder-avatar.png";
 
         $u = User::find($this->user);
 

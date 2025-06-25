@@ -58,6 +58,27 @@
       window.appDebug = "{{ env('APP_DEBUG', '0') }}";
       window.Laravel = {
         imageUploadEnabled: @json(config('restarters.features.image_upload_enabled', false)),
+        uploadsUsingS3: @json(config('filesystems.disks.uploads.driver', 'local') === 's3'),
+      };
+      
+      // Global helper for upload URLs
+      window.getUploadUrl = function(filename, type = 'original') {
+          if (!filename) return null;
+          
+          // Check if it's already a full URL (S3)
+          if (filename.startsWith('http')) {
+              return filename;
+          }
+          
+          // For local storage, construct the asset URL
+          let prefix = '';
+          if (type === 'thumbnail') {
+              prefix = 'thumbnail_';
+          } else if (type === 'mid') {
+              prefix = 'mid_';
+          }
+          
+          return `/uploads/${prefix}${filename}`;
       };
     </script>
   </head>

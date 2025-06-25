@@ -15,78 +15,82 @@
   </b-form-group>
 </template>
 <script>
-import vue2Dropzone from 'vue2-dropzone'
+import vue2Dropzone from "vue2-dropzone";
 
 export default {
-  props: {
-    image: {
-      type: [String, File],
-      required: false,
-      default: null
-    }
-  },
-  data () {
-    return {
-      currentimage: null,
-    }
-  },
-  components: {
-    vueDropzone: vue2Dropzone
-  },
-  computed: {
-    imageUploadEnabled() {
-      return window.Laravel?.imageUploadEnabled;
-    },
-    src() {
-      if (this.image) {
-        if (this.image instanceof File) {
-          return URL.createObjectURL(this.image);
-        }
-        return `/uploads/${this.image}`;
-      }
-      return '/images/upload_ico_grey.svg';
-    },
-    dropzoneOptions () {
-      return {
-        url: 'thisisrequired',
-        paramName: 'file',
-        uploadMultiple: false,
-        maxFiles: 1,
-        createImageThumbnails: true,
-        resizeWidth: 800,
-        resizeHeight: 800,
-        thumbnailMethod: 'contain',
-        previewsContainer: this.previewsContainer,
-        dictRemoveFile: null,
-        acceptedFiles: '.jpeg,.jpg,.png,.gif',
-        manuallyAddFile: true,
-        autoProcessQueue: false,
-        previewTemplate:
-            '<div>' +
-            ' <div class="dz-preview dz-file-preview">' +
-            '   <div class="dz-image"><img data-dz-thumbnail /></div>' +
-            '   <div class="dz-progress">' +
-            '     <span data-dz-uploadprogress="" class="dz-upload"></span>' +
-            '   </div> ' +
-            '   <div class="dz-error-message">' +
-            '   <span data-dz-errormessage=""></span>' +
-            ' </div> ' +
-            '</div>'
-      }
-    }
-  },
-  methods: {
-    fileAdded (file) {
-      console.log("Got file", file)
-      this.currentimage = file
-      this.$emit('update:image', this.currentimage)
-    },
-    deleteMe () {
-      this.$refs.dropzone.removeAllFiles()
-      this.currentimage = null
-    }
-  }
-}
+	props: {
+		image: {
+			type: [String, File],
+			required: false,
+			default: null,
+		},
+	},
+	data() {
+		return {
+			currentimage: null,
+		};
+	},
+	components: {
+		vueDropzone: vue2Dropzone,
+	},
+	computed: {
+		imageUploadEnabled() {
+			return window.Laravel?.imageUploadEnabled;
+		},
+		src() {
+			if (this.image) {
+				if (this.image instanceof File) {
+					return URL.createObjectURL(this.image);
+				}
+				// Check if we have a full URL (S3) or just a path (local)
+				if (this.image.startsWith("http")) {
+					return this.image;
+				}
+				return `/uploads/${this.image}`;
+			}
+			return "/images/upload_ico_grey.svg";
+		},
+		dropzoneOptions() {
+			return {
+				url: "thisisrequired",
+				paramName: "file",
+				uploadMultiple: false,
+				maxFiles: 1,
+				createImageThumbnails: true,
+				resizeWidth: 800,
+				resizeHeight: 800,
+				thumbnailMethod: "contain",
+				previewsContainer: this.previewsContainer,
+				dictRemoveFile: null,
+				acceptedFiles: ".jpeg,.jpg,.png,.gif",
+				manuallyAddFile: true,
+				autoProcessQueue: false,
+				previewTemplate:
+					"<div>" +
+					' <div class="dz-preview dz-file-preview">' +
+					'   <div class="dz-image"><img data-dz-thumbnail /></div>' +
+					'   <div class="dz-progress">' +
+					'     <span data-dz-uploadprogress="" class="dz-upload"></span>' +
+					"   </div> " +
+					'   <div class="dz-error-message">' +
+					'   <span data-dz-errormessage=""></span>' +
+					" </div> " +
+					"</div>",
+			};
+		},
+	},
+	methods: {
+		fileAdded(file) {
+			console.log("Got file", file);
+			this.currentimage = file;
+			this.$emit("update:image", this.currentimage);
+		},
+		deleteMe() {
+			this.$refs.dropzone.removeAllFiles();
+			this.currentimage = null;
+		},
+	},
+};
 </script>
 <style scoped lang="scss">
 ::v-deep(.dz-progress) {
