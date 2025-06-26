@@ -388,7 +388,7 @@ class UserController extends Controller
         // The user may have previously been removed from the group, which will mean they have an entry in
         // users_groups with deleted_at set.  Zap that if present so that sync() then works.  sync() doesn't
         // handle soft deletes itself.
-        $groups = $request->input('assigned_groups');
+        $groups = $request->input('assigned_groups', []);
 
         foreach ($groups as $idgroups) {
             $in_group = UserGroups::where('user', $user_id)->where('group', $idgroups)->withTrashed()->first();
