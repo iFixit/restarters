@@ -199,6 +199,18 @@ secrets:
       dbDatabase: "your-db-database-here"
       dbUsername: "your-db-username-here"
       dbPassword: "your-db-password-here"
+  # Mail credentials
+  # IMPORTANT: For production deployments, create the secret externally and set createSecret: false
+  # For development, you can set createSecret: true and provide values in the data section
+  mailCredentials:
+    createSecret: true
+    secretName: "restarters-mail-credentials"
+    keys:
+      mailUsername: "MAIL_USERNAME"
+      mailPassword: "MAIL_PASSWORD"
+    data:
+      mailUsername: "your-mail-username-here"
+      mailPassword: "your-mail-password-here"
 
 # Environment variable groups - organized by functionality
 envGroups:
@@ -263,8 +275,6 @@ envGroups:
     MAIL_MAILER: "smtp"
     MAIL_HOST: "mailpit"
     MAIL_PORT: "1025"
-    MAIL_USERNAME: "null"
-    MAIL_PASSWORD: "null"
     MAIL_ENCRYPTION: "null"
     MAIL_FROM_ADDRESS: "noreply@restarters.test"
     MAIL_FROM_NAME: "Restarters"
