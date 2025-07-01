@@ -91,6 +91,16 @@ Helper to generate environment variables from secrets
     secretKeyRef:
       name: {{ .Values.secrets.dbCredentials.secretName }}
       key: {{ .Values.secrets.dbCredentials.keys.dbPassword }}
+- name: MAIL_USERNAME
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.secrets.mailCredentials.secretName }}
+      key: {{ .Values.secrets.mailCredentials.keys.mailUsername }}
+- name: MAIL_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.secrets.mailCredentials.secretName }}
+      key: {{ .Values.secrets.mailCredentials.keys.mailPassword }}
 {{- end }}
 
 {{/*
