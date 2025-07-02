@@ -1,8 +1,12 @@
 @component('mail::layout')
 {{-- Header --}}
 @slot('header')
+@php
+  $instance = config('app.instance', 'base');
+  $logoConfig = config("mail.logos.{$instance}", config('mail.logos.base'));
+@endphp
 @component('mail::header', ['url' => config('app.url')])
-<img src="{{ asset('/images/restart_logo_complete_black1.png')}}" width="147" height="40" alt="Restarters.net">
+<img src="{{ asset("/images/{$logoConfig['file']}") }}" width="{{ $logoConfig['width'] }}" height="{{ $logoConfig['height'] }}" alt="{{ $logoConfig['alt'] }}">
 @endcomponent
 @endslot
 
