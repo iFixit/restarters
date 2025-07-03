@@ -869,7 +869,7 @@ class GroupController extends Controller
         }
 
         // Check if groups should be auto-approved
-        if (env('FEATURE__AUTO_APPROVE_GROUPS', false)) {
+        if (env('FEATURE__AUTO_APPROVE_GROUPS', false) && $user->role <= ROLE::RESTARTER) {
             // Auto-approve the group
             $group->update(['approved' => true]);
             
@@ -882,7 +882,7 @@ class GroupController extends Controller
                 'group_url' => url('/group/view/'.$idGroup),
             ]));
             
-            Log::info("Auto-approved group: $idGroup");
+            Log::info("Auto-approved group: $idGroup for user {$user->id} (role {$user->role})");
         } else {
             // Notify relevant admins for moderation.
             $notify_admins = Fixometer::usersWhoHavePreference('admin-moderate-group');

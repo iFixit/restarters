@@ -543,8 +543,9 @@ class EventController extends Controller
             }
         }
 
-        if ($autoapprove) {
-            Log::info("Auto-approve event $idParty");
+        // Only auto-approve if the feature is enabled AND the user has privileged role (Root, Admin, Host)
+        if ($autoapprove && $user->role <= ROLE::HOST) {
+            Log::info("Auto-approve event $idParty for user {$user->id} (role {$user->role})");
             Party::find($idParty)->approve();
         }
 
