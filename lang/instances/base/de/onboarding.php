@@ -1,13 +1,13 @@
 <?php
 
 return [
-  'slide1_heading' => 'Welcome!',
-  'slide1_content' => '<p>Thank you for being a part of our community space.</p><p>And <strong>thank you</strong> for being a beta tester!  With your feedback we can help improve the platform for everyone.</p>',
-  'slide2_heading' => 'Your gateway to community repair',
-  'slide2_content' => '<p>In the community space you can:</p> <ul><li>chat with other Restarters</li><li>join repair groups</li><li>share your repair knowledge</li><li>create and RSVP to events</li><li>log the devices you fix at events</li><li>help bring down the barriers to repair</li><p></p></ul>',
-  'slide3_heading' => 'Let\'s get started!',
-  'slide3_content' => '<p>Your starting point is the <strong>community dashboard</strong>.</p><p>Your dashboard gives you at a glance info on the latest happenings in the community, as well as quick access to common actions.</p><p>A good place to start is the <strong>Getting Started</strong> section.</p>',
-  'finishing_action' => 'To the dashboard',
-  'previous' => 'Previous',
-  'next' => 'Next',
+  'slide1_content' => '<p>Vielen Dank, dass Sie unserem Gemeinschaftsraum beigetreten sind.</p>',
+  'slide2_content' => '<p>Im Gemeinschaftsbereich können Sie:</p><ul><li>Chatten Sie mit anderen Freiwilligen</li><li>Schließen Sie sich Reparaturgruppen an</li><li>Teilen Sie Ihr Reparaturwissen</li><li>Erstellen Sie Veranstaltungen und melden Sie sich dazu an</li><li>Protokollieren Sie die Geräte, die Sie bei Veranstaltungen reparieren</li><li>Helfen Sie dabei, die Barrieren zur Reparatur abzubauen</li><p></p></ul>',
+  'slide3_content' => '<p>Ihr Ausgangspunkt ist das<strong>Community Dashboard</strong>.</p><p>Ihr Dashboard gibt Ihnen auf einen Blick Informationen über die neuesten Ereignisse in der Community, sowie schnellen Zugriff auf gemeinsame Aktionen.</p><p>Ein guter Startpunkt ist der <strong>Einstieg</strong> Bereich.</p>',
+  'previous' => 'Vorherige',
+  'slide1_heading' => 'Herzlich willkommen!',
+  'slide2_heading' => 'Ihr Tor zur Gemeinschaftsreparatur',
+  'slide3_heading' => 'Fangen wir an!',
+  'finishing_action' => 'Zum Armaturenbrett',
+  'next' => 'Weiter',
 ];

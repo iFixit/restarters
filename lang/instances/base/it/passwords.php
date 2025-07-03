@@ -1,9 +1,11 @@
 <?php
 
 return [
-  'reset' => 'La tua password e\' stata resettata!',
-  'sent' => 'Ti abbiamo inviato una email contentente un link per reimpostarti la password!',
-  'token' => 'Questo token di reimpostazione della password non è valido.',
-  'user' => 'Non troviamo alcun utente con quell\'indirizzo email',
-  'password' => 'Le password devono contenere almeno sei caratteri e corrispondere alla conferma.',
+  'sent' => 'Abbiamo inviato per e-mail il link per la reimpostazione della password!',
+  'user' => 'Non riusciamo a trovare un utente con quell\'indirizzo e-mail.',
+  'invalid' => 'Inserire un\'e-mail valida.',
+  'recover_title' => 'Recupero del conto',
+  'match' => 'Le password non corrispondono',
+  'updated' => 'Password aggiornata, effettuare il login per continuare.',
+  'failed' => 'Impossibile aggiornare la password.',
 ];
