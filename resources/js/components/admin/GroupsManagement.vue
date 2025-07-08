@@ -23,7 +23,8 @@
 
     <GroupsTable :groups="groups" :loading="loading" :selected-groups="selectedGroups" :pagination="pagination"
       :sort-field="sortField" :sort-direction="sortDirection" @action="handleAction" @select="handleGroupSelect"
-      @select-all="handleSelectAll" @page-change="handlePageChange" @sort-change="handleSortChange" />
+      @select-all="handleSelectAll" @page-change="handlePageChange" @page-size-change="handlePageSizeChange"
+      @sort-change="handleSortChange" />
 
     <ConfirmationModal :show="confirmationModal.show" :action="confirmationModal.action"
       :groups="confirmationModal.groups" :error="confirmationModal.error" @confirm="handleModalConfirm"
@@ -76,6 +77,8 @@ export default {
         perPage: 25,
         totalPages: 0,
         total: 0,
+        from: 0,
+        to: 0,
       },
       sortField: "name",
       sortDirection: "asc",
@@ -111,6 +114,9 @@ export default {
         this.groups = response.data;
         this.pagination.total = response.total;
         this.pagination.totalPages = response.last_page;
+        this.pagination.currentPage = response.current_page;
+        this.pagination.from = response.from || 0;
+        this.pagination.to = response.to || 0;
         this.totalCount = response.total;
       } catch (error) {
         console.error("Error loading groups:", error);
@@ -143,6 +149,12 @@ export default {
 
     handlePageChange(page) {
       this.pagination.currentPage = page;
+      this.loadGroups();
+    },
+
+    handlePageSizeChange(newPageSize) {
+      this.pagination.perPage = newPageSize;
+      this.pagination.currentPage = 1; // Reset to first page when changing page size
       this.loadGroups();
     },
 
