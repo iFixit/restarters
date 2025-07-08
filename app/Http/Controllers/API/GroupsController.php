@@ -16,6 +16,30 @@ class GroupsController extends Controller
             $query = Group::with(['networks', 'group_tags'])
                 ->withCount(['allConfirmedHosts', 'allConfirmedRestarters']);
 
+            // Handle sorting
+            $sortBy = $request->input('sort_by', 'name');
+            $sortDirection = $request->input('sort_direction', 'asc');
+            
+            // Validate sort direction
+            if (!in_array(strtolower($sortDirection), ['asc', 'desc'])) {
+                $sortDirection = 'asc';
+            }
+            
+            // Map frontend column names to database columns
+            $sortableColumns = [
+                'name' => 'name',
+                'location' => 'location',
+                'confirmed_hosts_count' => 'all_confirmed_hosts_count',
+                'confirmed_restarters_count' => 'all_confirmed_restarters_count',
+                'approved' => 'approved',
+                'created_at' => 'created_at',
+            ];
+            
+            // Default to name if invalid sort field
+            $sortColumn = $sortableColumns[$sortBy] ?? 'name';
+            
+            $query->orderBy($sortColumn, $sortDirection);
+
             $perPage = min($request->input('per_page', 100), 500);
             $groups = $query->paginate($perPage);
 
@@ -27,14 +51,12 @@ class GroupsController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => $transformedGroups,
-                'pagination' => [
-                    'current_page' => $groups->currentPage(),
-                    'last_page' => $groups->lastPage(),
-                    'per_page' => $groups->perPage(),
-                    'total' => $groups->total(),
-                    'from' => $groups->firstItem(),
-                    'to' => $groups->lastItem(),
-                ]
+                'current_page' => $groups->currentPage(),
+                'last_page' => $groups->lastPage(),
+                'per_page' => $groups->perPage(),
+                'total' => $groups->total(),
+                'from' => $groups->firstItem(),
+                'to' => $groups->lastItem(),
             ]);
 
         } catch (\Exception $e) {
@@ -71,8 +93,8 @@ class GroupsController extends Controller
             'created_at' => $group->created_at,
             'networks' => $group->networks,
             'group_tags' => $group->group_tags,
-            'all_confirmed_hosts_count' => $group->all_confirmed_hosts_count,
-            'all_confirmed_restarters_count' => $group->all_confirmed_restarters_count,
+            'confirmed_hosts_count' => $group->all_confirmed_hosts_count,
+            'confirmed_restarters_count' => $group->all_confirmed_restarters_count,
         ];
     }
 } 

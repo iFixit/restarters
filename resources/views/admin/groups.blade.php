@@ -15,9 +15,3 @@ Groups Management
     </div>
 </div>
 @endsection
-
-@section('scripts')
-<script>
-// Add any additional JavaScript configuration here if needed
-</script>
-@endsection 
