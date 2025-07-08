@@ -33,6 +33,11 @@
     <ImportResultsModal :show="importResults.show" :type="importResults.type" :created="importResults.created"
       :errors="importResults.errors" @close="closeImportResults" />
 
+    <!-- Floating Scroll to Top Button -->
+    <div class="scroll-to-top-btn" :class="{ 'show': showScrollToTop }" @click="scrollToTop" title="Scroll to top">
+      <span class="chevron-up">▲</span>
+    </div>
+
   </div>
 </template>
 
@@ -92,11 +97,18 @@ export default {
         created: 0,
         errors: [],
       },
+
+      showScrollToTop: false,
     };
   },
 
   mounted() {
     this.loadGroups();
+    window.addEventListener('scroll', this.handleScroll);
+  },
+
+  beforeDestroy() {
+    window.removeEventListener('scroll', this.handleScroll);
   },
 
   methods: {
@@ -315,6 +327,19 @@ export default {
     closeImportResults() {
       this.importResults.show = false;
     },
+
+    handleScroll() {
+      // Show scroll-to-top button when user scrolls down more than 300px
+      this.showScrollToTop = window.scrollY > 300;
+    },
+
+    scrollToTop() {
+      // Smooth scroll to top of page
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    },
   },
 };
 </script>
@@ -322,5 +347,46 @@ export default {
 <style scoped>
 .groups-management {
   padding: 20px;
+}
+
+.scroll-to-top-btn {
+  box-shadow: 5px 5px 0 0 #222;
+  border: solid 1px #222;
+  padding: 10px;
+  border-radius: 0;
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 50px;
+  height: 50px;
+  background-color: white;
+  color: #222;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(20px);
+  z-index: 1000;
+}
+
+.scroll-to-top-btn:hover {
+  background-color: white;
+  transform: translateY(0);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.scroll-to-top-btn.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.scroll-to-top-btn .chevron-up {
+  font-size: 16px;
+  font-weight: bold;
+  line-height: 1;
 }
 </style>
