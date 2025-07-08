@@ -1,116 +1,153 @@
 <template>
-    <div class="groups-management">
-      <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Groups Management</h2>
-      </div>
-
-      <GroupsTable
-        :groups="groups"
-        :loading="loading"
-        :selected-groups="selectedGroups"
-        :pagination="pagination"
-        :sort-field="sortField"
-        :sort-direction="sortDirection"
-        @select="handleGroupSelect"
-        @select-all="handleSelectAll"
-        @page-change="handlePageChange"
-        @sort-change="handleSortChange"
-      />
-
+  <div class="groups-management">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2>Groups Management</h2>
     </div>
+
+    <GroupsTable :groups="groups" :loading="loading" :selected-groups="selectedGroups" :pagination="pagination"
+      :sort-field="sortField" :sort-direction="sortDirection" @action="handleAction" @select="handleGroupSelect"
+      @select-all="handleSelectAll" @page-change="handlePageChange" @sort-change="handleSortChange" />
+
+    <ConfirmationModal :show="confirmationModal.show" :action="confirmationModal.action"
+      :groups="confirmationModal.groups" @confirm="handleModalConfirm" @cancel="handleModalCancel" />
+
+  </div>
 </template>
-  
+
 <script>
 import GroupsTable from "./GroupsTable.vue";
+import ConfirmationModal from "./ConfirmationModal.vue";
 import groupsApi from "../../api/groups.js";
 
 export default {
-	name: "GroupsManagement",
-	components: {
-		GroupsTable,
-	},
+  name: "GroupsManagement",
+  components: {
+    GroupsTable,
+    ConfirmationModal,
+  },
 
-	data() {
-		return {
-			groups: [],
-			loading: false,
-			selectedGroups: [],
-			pagination: {
-				currentPage: 1,
-				perPage: 25,
-				totalPages: 0,
-				total: 0,
-			},
-			sortField: "name",
-			sortDirection: "asc",
-		};
-	},
+  data() {
+    return {
+      groups: [],
+      loading: false,
+      selectedGroups: [],
 
-	mounted() {
-		this.loadGroups();
-	},
+      confirmationModal: {
+        show: false,
+        action: null,
+        groups: [],
+      },
 
-	methods: {
-		async loadGroups() {
-			this.loading = true;
-			try {
-				const params = {
-					page: this.pagination.currentPage,
-					per_page: this.pagination.perPage,
-					sort_by: this.sortField,
-					sort_direction: this.sortDirection,
-				};
 
-				const response = await groupsApi.fetchGroups(params);
-				this.groups = response.data;
-				this.pagination.total = response.total;
-				this.pagination.totalPages = response.last_page;
-				this.totalCount = response.total;
-			} catch (error) {
-				console.error("Error loading groups:", error);
-			} finally {
-				this.loading = false;
-			}
-		},
+      pagination: {
+        currentPage: 1,
+        perPage: 25,
+        totalPages: 0,
+        total: 0,
+      },
+      sortField: "name",
+      sortDirection: "asc",
+    };
+  },
 
-		handleGroupSelect(group, selected) {
-			if (selected) {
-				this.selectedGroups.push(group);
-			} else {
-				this.selectedGroups = this.selectedGroups.filter(
-					(g) => g.idgroups !== group.idgroups,
-				);
-			}
-		},
+  mounted() {
+    this.loadGroups();
+  },
 
-		handleSelectAll(selected) {
-			if (selected) {
-				this.selectedGroups = [...this.groups];
-			} else {
-				this.selectedGroups = [];
-			}
-		},
+  methods: {
+    async loadGroups() {
+      this.loading = true;
+      try {
+        const params = {
+          page: this.pagination.currentPage,
+          per_page: this.pagination.perPage,
+          sort_by: this.sortField,
+          sort_direction: this.sortDirection,
+        };
 
-		clearSelection() {
-			this.selectedGroups = [];
-		},
+        const response = await groupsApi.fetchGroups(params);
+        this.groups = response.data;
+        this.pagination.total = response.total;
+        this.pagination.totalPages = response.last_page;
+        this.totalCount = response.total;
+      } catch (error) {
+        console.error("Error loading groups:", error);
+      } finally {
+        this.loading = false;
+      }
+    },
 
-		handlePageChange(page) {
-			this.pagination.currentPage = page;
-			this.loadGroups();
-		},
+    handleGroupSelect(group, selected) {
+      if (selected) {
+        this.selectedGroups.push(group);
+      } else {
+        this.selectedGroups = this.selectedGroups.filter(
+          (g) => g.idgroups !== group.idgroups,
+        );
+      }
+    },
 
-		handleSortChange(field, direction) {
-			this.sortField = field;
-			this.sortDirection = direction;
-			this.loadGroups();
-		},
-	},
+    handleSelectAll(selected) {
+      if (selected) {
+        this.selectedGroups = [...this.groups];
+      } else {
+        this.selectedGroups = [];
+      }
+    },
+
+    clearSelection() {
+      this.selectedGroups = [];
+    },
+
+    handlePageChange(page) {
+      this.pagination.currentPage = page;
+      this.loadGroups();
+    },
+
+    handleSortChange(field, direction) {
+      this.sortField = field;
+      this.sortDirection = direction;
+      this.loadGroups();
+    },
+
+    handleAction(group, action) {
+      this.confirmationModal = {
+        show: true,
+        action: action,
+        groups: [group],
+      };
+    },
+
+    async handleModalConfirm(data) {
+      try {
+        this.loading = true;
+
+        await groupsApi.performAction(
+          this.confirmationModal.groups[0].idgroups,
+          this.confirmationModal.action,
+        );
+
+        this.confirmationModal.show = false;
+        this.clearSelection();
+        this.loadGroups();
+      } catch (error) {
+        console.error("Error performing action:", error);
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    handleModalCancel() {
+      this.confirmationModal.show = false;
+      this.confirmationModal.action = null;
+      this.confirmationModal.groups = [];
+    },
+  },
 };
 </script>
-  
+
 <style scoped>
-  .groups-management {
-    padding: 20px;
-  }
-</style> 
+.groups-management {
+  padding: 20px;
+}
+</style>

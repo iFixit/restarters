@@ -95,32 +95,32 @@
                                 </button>
                                     <ul class="dropdown-menu dropdown-menu-right" :aria-labelledby="'dropdown-' + group.idgroups">
                                     <li>
-                                        <a class="dropdown-item" href="#">
+                                        <a class="dropdown-item" :href="'/group/edit/' + group.idgroups">
                                             Edit
                                         </a>
                                     </li>
                                     <li v-if="!group.archived_at">
-                                        <a class="dropdown-item" href="#">
+                                        <a class="dropdown-item" @click="handleAction(group, 'archive')">
                                             Archive
                                         </a>
                                     </li>
                                     <li v-if="group.archived_at">
-                                        <a class="dropdown-item" href="#">
+                                        <a class="dropdown-item" @click="handleAction(group, 'unarchive')">
                                             Unarchive
                                         </a>
                                     </li>
                                     <li v-if="!group.approved">
-                                        <a class="dropdown-item" href="#">
+                                        <a class="dropdown-item" @click="handleAction(group, 'approve')">
                                             Approve
                                         </a>
                                     </li>
                                     <li v-if="group.approved">
-                                        <a class="dropdown-item" href="#">
+                                        <a class="dropdown-item" @click="handleAction(group, 'unapprove')">
                                             Unapprove
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item text-danger" href="#">
+                                        <a class="dropdown-item text-danger" @click="handleAction(group, 'delete')">
                                             Delete
                                         </a>
                                     </li>
@@ -243,6 +243,10 @@ export default {
 					? "desc"
 					: "asc";
 			this.$emit("sort-change", field, direction);
+		},
+
+		handleAction(group, action) {
+			this.$emit("action", group, action);
 		},
 
 		getSortIcon(field) {

@@ -69,6 +69,77 @@ class GroupsController extends Controller
         }
     }
 
+    public static function performAction(int $group_id, string $action): JsonResponse
+    {
+        try {
+            $group = Group::findOrFail($group_id);
+     
+            switch ($action) {
+                case 'approve':
+                    $group->approved = true;
+                    $group->save();
+                    $message = "Group '{$group->name}' has been approved successfully.";
+                    break;
+
+                case 'unapprove':
+                    $group->approved = false;
+                    $group->save();
+                    $message = "Group '{$group->name}' has been unapproved successfully.";
+                    break;
+    
+                case 'archive':
+                    $group->archived_at = now();
+                    $group->save();
+                    $message = "Group '{$group->name}' has been archived successfully.";
+                    break;
+    
+                case 'unarchive':
+                    $group->archived_at = null;
+                    $group->save();
+                    $message = "Group '{$group->name}' has been unarchived successfully.";
+                    break;
+    
+                case 'delete':
+                    $groupName = $group->name;
+                    if (!$group->canDelete()) {
+                        throw new \Exception("Group '{$groupName}' cannot be deleted because it has events with devices.");
+                    }
+                    $group->delete();
+                    $message = "Group '{$groupName}' has been deleted successfully.";
+                    break;
+    
+                default:
+                    throw new \Exception("Invalid action: {$action}");
+            }
+    
+            $result = [
+                'message' => $message,
+                'group' => $action === 'delete' ? 
+                    ['id' => $group->idgroups, 'deleted' => true] : 
+                    [
+                        'id' => $group->idgroups,
+                        'name' => $group->name,
+                        'approved' => (bool) $group->approved,
+                        'archived' => $group->archived_at !== null,
+                        'deleted' => false
+                    ]
+            ];
+
+            return response()->json([
+                'success' => true,
+                'message' => $result['message'],
+                'group' => $result['group']
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error performing action: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to perform action'
+            ], 500);
+        }
+    }
+
     /**
      * Transform group data for frontend
      */

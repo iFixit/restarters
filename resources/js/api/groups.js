@@ -8,4 +8,10 @@ export default {
 		const response = await axios.get(API_BASE, { params });
 		return response.data;
 	},
+
+	// Perform single action on a group
+	async performAction(groupId, action) {
+		const response = await axios.post(`${API_BASE}/${groupId}/${action}`);
+		return response.data;
+	},
 };
