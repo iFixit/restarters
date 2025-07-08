@@ -133,6 +133,7 @@
                                   <li><a href="{{ route('brands') }}">Brands</a></li>
                                   <li><a href="{{ route('skills') }}">Skills</a></li>
                                   <li><a href="{{ route('tags') }}">Group tags</a></li>
+                                  <li><a href="{{ route('admin.groups') }}">Groups Management</a></li>
                                   <li><a href="{{ route('category') }}">Categories</a></li>
                                   <li><a href="{{ route('users') }}">Users</a></li>
                                   <li><a href="{{ route('roles') }}">Roles</a></li>
