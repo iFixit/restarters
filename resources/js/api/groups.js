@@ -14,4 +14,11 @@ export default {
 		const response = await axios.post(`${API_BASE}/${groupId}/${action}`);
 		return response.data;
 	},
+
+	async performBulkActions(groupIds, action) {
+		const response = await axios.post(`${API_BASE}/bulk/${action}`, {
+			group_ids: groupIds,
+		});
+		return response.data;
+	},
 };

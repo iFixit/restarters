@@ -26,6 +26,10 @@
                     </div>
                 </div>
 
+                <div v-if="error" class="alert alert-danger">
+                    {{ error }}
+                </div>
+
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" @click="$emit('cancel')">
                         Cancel
@@ -57,6 +61,10 @@ export default {
         groups: {
             type: Array,
             default: () => [],
+        },
+        error: {
+            type: String,
+            default: null,
         },
     },
 

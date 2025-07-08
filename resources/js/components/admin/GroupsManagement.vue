@@ -4,18 +4,23 @@
       <h2>Groups Management</h2>
     </div>
 
+    <GroupsBulkAction :selected-groups="selectedGroups" :total-count="totalCount" @action="handleBulkAction"
+      @clear-selection="clearSelection" />
+
     <GroupsTable :groups="groups" :loading="loading" :selected-groups="selectedGroups" :pagination="pagination"
       :sort-field="sortField" :sort-direction="sortDirection" @action="handleAction" @select="handleGroupSelect"
       @select-all="handleSelectAll" @page-change="handlePageChange" @sort-change="handleSortChange" />
 
     <ConfirmationModal :show="confirmationModal.show" :action="confirmationModal.action"
-      :groups="confirmationModal.groups" @confirm="handleModalConfirm" @cancel="handleModalCancel" />
+      :groups="confirmationModal.groups" :error="confirmationModal.error" @confirm="handleModalConfirm"
+      @cancel="handleModalCancel" />
 
   </div>
 </template>
 
 <script>
 import GroupsTable from "./GroupsTable.vue";
+import GroupsBulkAction from "./GroupsBulkAction.vue";
 import ConfirmationModal from "./ConfirmationModal.vue";
 import groupsApi from "../../api/groups.js";
 
@@ -23,6 +28,7 @@ export default {
   name: "GroupsManagement",
   components: {
     GroupsTable,
+    GroupsBulkAction,
     ConfirmationModal,
   },
 
@@ -31,11 +37,13 @@ export default {
       groups: [],
       loading: false,
       selectedGroups: [],
+      totalCount: 0,
 
       confirmationModal: {
         show: false,
         action: null,
         groups: [],
+        error: null,
       },
 
 
@@ -118,20 +126,34 @@ export default {
       };
     },
 
+    handleBulkAction(action) {
+      this.confirmationModal = {
+        show: true,
+        action: action,
+        groups: [...this.selectedGroups],
+      };
+    },
+
     async handleModalConfirm(data) {
       try {
         this.loading = true;
 
-        await groupsApi.performAction(
-          this.confirmationModal.groups[0].idgroups,
-          this.confirmationModal.action,
-        );
+        if (this.confirmationModal.groups.length === 1) {
+          await groupsApi.performAction(
+            this.confirmationModal.groups[0].idgroups,
+            this.confirmationModal.action,
+          );
+        } else {
+          const groupIds = this.confirmationModal.groups.map((g) => g.idgroups);
+          await groupsApi.performBulkActions(groupIds, this.confirmationModal.action);
+        }
 
         this.confirmationModal.show = false;
         this.clearSelection();
         this.loadGroups();
       } catch (error) {
         console.error("Error performing action:", error);
+        this.confirmationModal.error = error.response?.data?.message || "Failed to perform action";
       } finally {
         this.loading = false;
       }
