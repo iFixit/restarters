@@ -112,6 +112,7 @@ Route::prefix('v2')->group(function() {
         // Admin Groups Management API
         Route::prefix('/admin/groups')->middleware(['auth:api', App\Http\Middleware\AdminMiddleware::class])->group(function() {
             Route::get('/', [App\Http\Controllers\API\GroupsController::class, 'index']);
+            Route::post('import', [App\Http\Controllers\API\GroupsController::class, 'importGroups']);
             Route::post('bulk/{action}', [App\Http\Controllers\API\GroupsController::class, 'performBulkActions']);
             Route::post('{id}/{action}', [App\Http\Controllers\API\GroupsController::class, 'performSingleAction']);
         });

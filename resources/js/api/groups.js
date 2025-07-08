@@ -21,4 +21,17 @@ export default {
 		});
 		return response.data;
 	},
+
+	async importGroups(file, onUploadProgress) {
+		const formData = new FormData();
+		formData.append("csv_file", file);
+
+		const response = await axios.post(`${API_BASE}/import`, formData, {
+			headers: {
+				"Content-Type": "multipart/form-data",
+			},
+			onUploadProgress: onUploadProgress,
+		});
+		return response.data;
+	},
 };

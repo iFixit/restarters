@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 use App\Models\Group;
+use Illuminate\Support\Facades\DB;
+use App\Models\Network;
 
 class GroupsController extends Controller
 {
@@ -164,6 +166,100 @@ class GroupsController extends Controller
             'name' => $group->name,
             'message' => "Group '{$group->name}' has been {$action} successfully."
         ];
+    }
+
+    public static function importGroups(Request $request): JsonResponse
+    {
+        try {
+            $file = $request->file('csv_file');
+            $path = $file->getRealPath();
+            $data = array_map('str_getcsv', file($path));
+            $headers = array_shift($data);
+
+            // Validate headers
+            $requiredHeaders = ['Name', 'Location'];
+            $missingHeaders = array_diff($requiredHeaders, $headers);
+            
+            if (!empty($missingHeaders)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Missing required columns: ' . implode(', ', $missingHeaders)
+                ], 422);
+            }
+
+            $created = 0;
+            $errors = [];
+
+            DB::transaction(function() use ($data, $headers, &$created, &$errors) {
+                foreach ($data as $rowIndex => $row) {
+                    if (empty(array_filter($row))) continue; // Skip empty rows
+
+                    try {
+                        $groupData = array_combine($headers, $row);
+                        
+                        // Validate required fields
+                        if (empty($groupData['Name']) || empty($groupData['Location'])) {
+                            $errors[] = "Row " . ($rowIndex + 2) . ": Name and Location are required";
+                            continue;
+                        }
+
+                        // Create group
+                        $group = new Group();
+                        $group->name = $groupData['Name'];
+                        $group->location = $groupData['Location'];
+                        $group->postcode = $groupData['Postcode'] ?? null;
+                        $group->area = $groupData['Area'] ?? null;
+                        $group->country_code = $groupData['Country Code'] ?? null;
+                        $group->latitude = $groupData['Latitude'] ?? null;
+                        $group->longitude = $groupData['Longitude'] ?? null;
+                        $group->website = $groupData['Website'] ?? null;
+                        $group->phone = $groupData['Phone'] ?? null;
+                        $group->email = $groupData['Email'] ?? null;
+                        $group->free_text = $groupData['Description'] ?? null;
+                        $group->approved = false; // New groups require approval
+                        $group->save();
+
+                        // Handle networks if provided
+                        if (!empty($groupData['Networks'])) {
+                            $networkNames = array_map('trim', explode(',', $groupData['Networks']));
+                            $networkIds = Network::whereIn('name', $networkNames)->pluck('id');
+                            if ($networkIds->isNotEmpty()) {
+                                $group->networks()->attach($networkIds);
+                            }
+                        }
+
+                        $created++;
+
+                    } catch (\Exception $e) {
+                        $errors[] = "Row " . ($rowIndex + 2) . ": " . $e->getMessage();
+                    }
+                }
+            });
+
+            if (count($errors) > 0) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to process CSV file. ' . implode(', ', $errors),
+                    'errors' => $errors
+                ], 422);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => "Successfully created {$created} groups.",
+                'data' => [
+                    'created' => $created,
+                    'errors' => $errors
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error uploading CSV: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to process CSV file'
+            ], 500);
+        }
     }
 
     /**

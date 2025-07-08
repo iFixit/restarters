@@ -1,8 +1,22 @@
 <template>
   <div class="groups-management">
     <div class="d-flex justify-content-between align-items-center mb-4">
-      <h2>Groups Management</h2>
+      <div>
+        <h2>Groups Management</h2>
+        <span class="text-muted"> {{ totalCount }} groups</span>
+      </div>
+      <button class="btn btn-primary" @click="showCsvUploadModal = true">Import Groups</button>
     </div>
+
+    <div v-if="alert.message" :class="`alert alert-${alert.type}`" class="alert-dismissible fade show">
+      {{ alert.message }}
+      <button type="button" class="close" @click="clearAlert">
+        <span>&times;</span>
+      </button>
+    </div>
+
+    <GroupsCsvUploadModal :show="showCsvUploadModal" @close="showCsvUploadModal = false" @upload="handleUpload"
+      :upload-progress="uploadProgress" :uploading="uploading" />
 
     <GroupsBulkAction :selected-groups="selectedGroups" :total-count="totalCount" @action="handleBulkAction"
       @clear-selection="clearSelection" />
@@ -15,6 +29,9 @@
       :groups="confirmationModal.groups" :error="confirmationModal.error" @confirm="handleModalConfirm"
       @cancel="handleModalCancel" />
 
+    <ImportResultsModal :show="importResults.show" :type="importResults.type" :created="importResults.created"
+      :errors="importResults.errors" @close="closeImportResults" />
+
   </div>
 </template>
 
@@ -22,6 +39,8 @@
 import GroupsTable from "./GroupsTable.vue";
 import GroupsBulkAction from "./GroupsBulkAction.vue";
 import ConfirmationModal from "./ConfirmationModal.vue";
+import GroupsCsvUploadModal from "./GroupsCsvUploadModal.vue";
+import ImportResultsModal from "./ImportResultsModal.vue";
 import groupsApi from "../../api/groups.js";
 
 export default {
@@ -30,6 +49,8 @@ export default {
     GroupsTable,
     GroupsBulkAction,
     ConfirmationModal,
+    GroupsCsvUploadModal,
+    ImportResultsModal,
   },
 
   data() {
@@ -38,14 +59,17 @@ export default {
       loading: false,
       selectedGroups: [],
       totalCount: 0,
-
+      showCsvUploadModal: false,
       confirmationModal: {
         show: false,
         action: null,
         groups: [],
         error: null,
       },
-
+      alert: {
+        message: "",
+        type: "success",
+      },
 
       pagination: {
         currentPage: 1,
@@ -55,6 +79,16 @@ export default {
       },
       sortField: "name",
       sortDirection: "asc",
+
+      uploadProgress: 0,
+      uploading: false,
+
+      importResults: {
+        show: false,
+        type: 'success', // 'success', 'partial', 'error'
+        created: 0,
+        errors: [],
+      },
     };
   },
 
@@ -163,6 +197,111 @@ export default {
       this.confirmationModal.show = false;
       this.confirmationModal.action = null;
       this.confirmationModal.groups = [];
+    },
+
+    async handleUpload(file) {
+      if (!file) return;
+
+      this.uploadProgress = 0;
+      this.uploading = true;
+
+      try {
+        const response = await groupsApi.importGroups(
+          file,
+          (progressEvent) => {
+            // Update progress based on actual upload progress
+            this.uploadProgress = Math.round(
+              (progressEvent.loaded * 100) / progressEvent.total,
+            );
+          },
+        );
+
+        this.showCsvUploadModal = false;
+
+        if (response.success) {
+          const { created, errors } = response?.data ?? {};
+
+          if (errors && errors.length > 0) {
+            // Partial success - some groups created, some failed
+            this.showImportResults({
+              type: 'partial',
+              created: created || 0,
+              errors: errors,
+            });
+          } else {
+            // Complete success
+            this.showAlert(response.message, "success");
+          }
+
+          this.loadGroups();
+        } else {
+          // Complete failure
+          this.showImportResults({
+            type: 'error',
+            created: 0,
+            errors: [response.message || 'Import failed'],
+          });
+        }
+      } catch (error) {
+        console.error("CSV Upload Error:", error);
+        this.showCsvUploadModal = false;
+
+        // Extract meaningful error message from response
+        let errorMessage = 'Upload failed. Please try again.';
+        let errors = [];
+
+        if (error.response?.data) {
+          errorMessage = error.response.data.message || errorMessage;
+
+          // Check if there are detailed errors in the response
+          if (error.response.data.errors) {
+            if (Array.isArray(error.response.data.errors)) {
+              errors = error.response.data.errors;
+            } else if (typeof error.response.data.errors === 'object') {
+              // Laravel validation errors format
+              errors = Object.values(error.response.data.errors).flat();
+            }
+          }
+        } else if (error.message) {
+          errorMessage = error.message;
+        }
+
+        if (errors.length > 0) {
+          this.showImportResults({
+            type: 'error',
+            created: 0,
+            errors: errors,
+          });
+        } else {
+          this.showAlert(errorMessage, "danger");
+        }
+      } finally {
+        this.uploading = false;
+        this.uploadProgress = 0;
+      }
+    },
+
+    clearAlert() {
+      this.alert.message = "";
+      this.alert.type = "success";
+    },
+
+    showAlert(message, type) {
+      this.alert.message = message;
+      this.alert.type = type;
+    },
+
+    showImportResults(results) {
+      this.importResults = {
+        show: true,
+        type: results.type,
+        created: results.created,
+        errors: results.errors || [],
+      };
+    },
+
+    closeImportResults() {
+      this.importResults.show = false;
     },
   },
 };
