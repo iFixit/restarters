@@ -249,7 +249,7 @@ envGroups:
     # Set to 's3' for S3/CloudFront uploads, 'public_uploads' for local storage
     FILESYSTEM_DISK: "public_uploads"
     # AWS S3 configuration (only required when FILESYSTEM_DISK=s3)
-    # These values will be overridden by secrets.awsCredentials if enabled
+    # These values will be overridden by secrets.awsS3Credentials if enabled
     AWS_ACCESS_KEY_ID: ""
     AWS_SECRET_ACCESS_KEY: ""
     AWS_DEFAULT_REGION: "us-east-1"

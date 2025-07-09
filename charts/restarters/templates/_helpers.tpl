@@ -66,27 +66,27 @@ Helper to generate environment variables from secrets
       name: {{ .Values.secrets.mapKeys.secretName }}
       key: {{ .Values.secrets.mapKeys.keys.googleApiKey }}
 {{- end }}
-{{- if .Values.secrets.awsCredentials.enabled }}
+{{- if .Values.secrets.awsS3Credentials.enabled }}
 - name: AWS_ACCESS_KEY_ID
   valueFrom:
     secretKeyRef:
-      name: {{ .Values.secrets.awsCredentials.secretName }}
-      key: {{ .Values.secrets.awsCredentials.keys.awsAccessKeyId }}
+      name: {{ .Values.secrets.awsS3Credentials.secretName }}
+      key: {{ .Values.secrets.awsS3Credentials.keys.awsAccessKeyId }}
 - name: AWS_SECRET_ACCESS_KEY
   valueFrom:
     secretKeyRef:
-      name: {{ .Values.secrets.awsCredentials.secretName }}
-      key: {{ .Values.secrets.awsCredentials.keys.awsSecretAccessKey }}
+      name: {{ .Values.secrets.awsS3Credentials.secretName }}
+      key: {{ .Values.secrets.awsS3Credentials.keys.awsSecretAccessKey }}
 - name: AWS_DEFAULT_REGION
   valueFrom:
     secretKeyRef:
-      name: {{ .Values.secrets.awsCredentials.secretName }}
-      key: {{ .Values.secrets.awsCredentials.keys.awsDefaultRegion }}
+      name: {{ .Values.secrets.awsS3Credentials.secretName }}
+      key: {{ .Values.secrets.awsS3Credentials.keys.awsDefaultRegion }}
 - name: AWS_BUCKET
   valueFrom:
     secretKeyRef:
-      name: {{ .Values.secrets.awsCredentials.secretName }}
-      key: {{ .Values.secrets.awsCredentials.keys.awsBucket }}
+      name: {{ .Values.secrets.awsS3Credentials.secretName }}
+      key: {{ .Values.secrets.awsS3Credentials.keys.awsBucket }}
 {{- end }}
 - name: DB_HOST
   valueFrom:

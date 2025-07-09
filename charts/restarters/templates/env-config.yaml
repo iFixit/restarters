@@ -16,7 +16,7 @@ data:
         {{- include "restarters.envGroup" (dict "groupName" "logging" "context" .) | nindent 8 }}
 
         # File Storage Configuration
-        {{- if not .Values.secrets.awsCredentials.enabled }}
+        {{- if not .Values.secrets.awsS3Credentials.enabled }}
         {{- include "restarters.envGroup" (dict "groupName" "storage" "context" .) | nindent 8 }}
         {{- else}}
         # AWS credentials managed by secrets, only including non-sensitive storage config
