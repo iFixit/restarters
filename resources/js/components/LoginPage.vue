@@ -2,60 +2,21 @@
   <div>
     <div class="row row-expanded pb-3">
       <div class="col-lg-6 d-flex">
-        <form id="login-form" action="/login" method="post" class="card card__login col-12 panel">
-
-          <input type="hidden" name="_token" :value="CSRF" />
-
-          <div id="my_name_wrap" style="display:none;">
-            <input name="my_name" type="text" value="" id="my_name">
-            <input name="my_time" type="text" :value="time">
-          </div>
-
+        <div class="card card__login col-12 panel">
           <legend>{{ translatedLoginTitle }}</legend>
 
-          <div class="form-group">
-            <label for="fp_email">{{ translatedEmailAddress }}:</label>
-            <b-form-input type="email" name="email" id="fp_email" :value="email" required autofocus />
-          </div>
+          <div class="text-center">
+            <p class="mb-4 text-muted">{{ translatedLoginDescription }}</p>
 
-          <div class="form-group">
-            <label for="password">{{ translatedPassword }}:</label>
-            <b-form-input type="password" name="password" id="password" required />
-          </div>
+            <b-button variant="primary" @click="loginWithIFixit" class="btn-lg btn-block" size="lg">
+              {{ translatedLoginWithIFixit }}
+            </b-button>
 
-          <div v-if="error">
-            <div class="alert alert-danger" role="alert">
-              {{ translatedAuthFailed }}
-            </div>
+            <p class="mt-3 text-muted small">
+              {{ translatedLoginHelp }}
+            </p>
           </div>
-          <div class="row entry-panel__actions">
-            <div class="col-6 col-md-8 align-content-center flex-column d-flex">
-              <div class="row">
-                <div class="col-12">
-                  <a class="entry-panel__link" href="/user/recover">{{ translatedForgotPassword }}</a>
-                </div>
-                <div class="col-12">
-                  <a class="entry-panel__link" href="/user/register">{{ translatedCreateAccount }}</a>
-                </div>
-              </div>
-            </div>
-            <div class="col-6 col-md-4 align-content-center flex-column justify-content-end d-flex">
-              <b-button id="login-form-submit" type="submit" variant="primary" @click="login" :disabled="disabled">{{
-                translatedLogin }}</b-button>
-            </div>
-          </div>
-
-          <!-- iFixit Login Option -->
-          <div class="row mt-3" v-if="iFixitEnabled">
-            <div class="col-12 text-center">
-              <hr class="my-3">
-              <p class="mb-2 text-muted">{{ translatedOrLoginWith }}</p>
-              <b-button variant="outline-primary" @click="loginWithIFixit" class="btn-block">
-                {{ translatedLoginWithIFixit }}
-              </b-button>
-            </div>
-          </div>
-        </form>
+        </div>
       </div>
       <div class="col-lg-6">
         <div class="card card__content col-12 panel panel__orange">
@@ -69,56 +30,27 @@
   </div>
 </template>
 <script>
-import auth from '../mixins/auth'
-
 export default {
   components: {},
-  mixins: [auth],
   props: {
-    error: {
-      type: Boolean,
-      required: true
-    },
-    time: {
-      type: String,
-      required: true
-    },
-    email: {
-      type: String,
-      required: true
-    },
     iFixitEnabled: {
       type: Boolean,
       required: false,
       default: true
     }
   },
-  data() {
-    return {
-      disabled: false,
-    }
-  },
   computed: {
-    CSRF() {
-      return this.$store.getters['auth/CSRF']
-    },
     translatedLoginTitle() {
       return this.$lang.get('login.login_title')
     },
-    translatedEmailAddress() {
-      return this.$lang.get('auth.email_address')
+    translatedLoginDescription() {
+      return this.$lang.get('auth.ifixit_login_description') || 'Sign in with your iFixit account to access the Restarters platform.'
     },
-    translatedPassword() {
-      return this.$lang.get('auth.password')
+    translatedLoginWithIFixit() {
+      return this.$lang.get('auth.login_with_ifixit')
     },
-    translatedForgotPassword() {
-      return this.$lang.get('auth.forgot_password')
-    },
-    translatedCreateAccount() {
-      return this.$lang.get('auth.create_account')
-    },
-    translatedLogin() {
-      return this.$lang.get('auth.login')
+    translatedLoginHelp() {
+      return this.$lang.get('auth.ifixit_login_help') || 'Don\'t have an iFixit account? You can create one for free on iFixit.com'
     },
     translatedWhatIs() {
       return this.$lang.get('login.whatis')
@@ -128,35 +60,24 @@ export default {
     },
     translatedMore() {
       return this.$lang.get('login.more')
-    },
-    translatedAuthFailed() {
-      return this.$lang.get('auth.failed')
-    },
-    translatedOrLoginWith() {
-      return this.$lang.get('auth.or_login_with')
-    },
-    translatedLoginWithIFixit() {
-      return this.$lang.get('auth.login_with_ifixit')
     }
   },
   methods: {
-    login() {
-      // We've seen double submits of the login form, leading to 419 errors.  Prevent the user submitting twice by
-      // double-clicking.
-      //
-      // The default event handler will proceed to validate the form (because of the required attributes) and
-      // submit or show a native error.
-      this.submitDisabled = true
-    },
     loginWithIFixit() {
       // Get the current URL for redirect after login
-      const currentUrl = window.location.href
+      const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || '/dashboard'
 
       // Construct the iFixit login URL with redirect
-      const iFixitLoginUrl = `/auth/ifixit/login?redirect=${encodeURIComponent(currentUrl)}`
+      const iFixitLoginUrl = `/auth/ifixit/login?redirect=${encodeURIComponent(redirectUrl)}`
 
       // Redirect to iFixit login
       window.location.href = iFixitLoginUrl
+    }
+  },
+  mounted() {
+    // If iFixit auth is disabled, show error
+    if (!this.iFixitEnabled) {
+      console.error('iFixit authentication is disabled')
     }
   }
 }

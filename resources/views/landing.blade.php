@@ -123,7 +123,7 @@
         {!! __('landing.intro') !!}
       </div>
       <div class="hero-buttons">
-        <a href="/user/register" class="btn btn-primary">{{ __('landing.join') }}</a>
+        <a href="https://www.ifixit.com/Join" class="btn btn-primary">{{ __('landing.join') }}</a>
         <a href="/login" class="btn btn-primary">{{ __('landing.login') }}</a>
       </div>
     </div>
@@ -144,7 +144,7 @@
               <img class="landing-icon" src="{{ asset('/images/landing/icon-drill.svg') }}" /> {{ __('landing.organise_publicise') }}
             </p>
             <div class="d-flex justify-content-around justify-content-md-start">
-              <a href="/user/register" class="btn btn-primary">{{ __('landing.organise_start') }}</a>
+              <a href="https://www.ifixit.com/Join" class="btn btn-primary">{{ __('landing.organise_start') }}</a>
             </div>
           </div>
         </div>
@@ -166,7 +166,7 @@
               <img class="landing-icon" src="{{ asset('/images/landing/icon-microscope.svg') }}" /> {{ __('landing.campaign_data') }}
             </p>
             <div class="d-flex justify-content-around justify-content-md-start">
-              <a href="/user/register" class="btn btn-primary">{{ __('landing.campaign_start') }}</a>
+              <a href="https://www.ifixit.com/Join" class="btn btn-primary">{{ __('landing.campaign_start') }}</a>
             </div>
           </div>
           <img src="{{ asset('/images/landing/'. $instance .'/landing2.jpg') }}" alt="{{ __('landing.landing_2_alt') }}" class="d-none d-md-block" />
@@ -190,7 +190,7 @@
               <img class="landing-icon" src="{{ asset('/images/landing/icon-group.svg') }}" /> {{ __('landing.repair_group') }}
             </p>
             <div class="d-flex justify-content-around justify-content-md-start">
-              <a href="/user/register" class="btn btn-primary">{{ __('landing.repair_start') }}</a>
+              <a href="https://www.ifixit.com/Join" class="btn btn-primary">{{ __('landing.repair_start') }}</a>
             </div>
           </div>
         </div>

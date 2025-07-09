@@ -43,571 +43,9 @@ use Illuminate\Support\Facades\DB;
 |
 */
 
-Route::middleware('ensureAPIToken')->group(function () {
-    Route::prefix('user')->group(function () {
-        Route::get('/', [HomeController::class, 'index']);
-        Route::get('reset', [UserController::class, 'reset']);
-        Route::post('reset', [UserController::class, 'reset']);
-        Route::get('recover', [UserController::class, 'recover']);
-        Route::post('recover', [UserController::class, 'recover']);
-        Route::get('register/{hash?}', [UserController::class, 'getRegister'])->name('registration');
-        Route::post('register/check-valid-email', [UserController::class, 'postEmail']);
-        Route::post('register/{hash?}', [UserController::class, 'postRegister']);
-        Route::get('/thumbnail/', [UserController::class, 'getThumbnail']);
-        Route::get('/menus/', [UserController::class, 'getUserMenus']);
-    });
-
-    Route::get('/user/forbidden', function () {
-        return view('user.forbidden', [
-            'title' => 'Oops',
-        ]);
-    });
-
-// We use the Laravel login route.
-    Auth::routes();
-
-    // iFixit external authentication routes
-    Route::get('/auth/ifixit/login', function (App\Services\IFixitAuthService $iFixitAuthService) {
-        $callbackUrl = request()->get('redirect', '/');
-        $iFixitLoginUrl = $iFixitAuthService->getLoginUrl($callbackUrl);
-        return redirect($iFixitLoginUrl);
-    })->name('auth.ifixit.login');
-
-    Route::post('/auth/ifixit/logout', function (App\Services\IFixitAuthService $iFixitAuthService) {
-        \Log::info('Logging out from iFixit');
-        $callbackUrl = url('/auth/ifixit/logout-callback');
-        
-        return redirect($iFixitAuthService->getLogoutUrl($callbackUrl));
-    })->name('auth.ifixit.logout');
-
-    Route::get('/auth/ifixit/logout-callback', function () {
-        \Log::info('Logging out from iFixit callback');
-        // Clear any local session data
-        session()->flush();
-        
-        // Clear session cookie
-        return redirect('/login')->withCookie(cookie('session', null, -1, '/'));
-    })->name('auth.ifixit.logout-callback');
-
-    Route::middleware('guest')->group(function ()
-    {
-        Route::get('/', [HomeController::class, 'index'])->name('home');
-    });
-
-// We are not using Laravel's default registration methods. So we redirect /register to /user/register.
-    Route::redirect('register', '/user/register');
-    Route::get('/logout', [UserController::class, 'logout']);
-
-    Route::get('/about/cookie-policy', function () {
-        return View::make('features.cookie-policy');
-    });
-
-// Temp
-    Route::get('/visualisations', function () {
-        return View::make('visualisations');
-    });
-
-    Route::get('/party/view/{id}', [PartyController::class, 'view']);
-
-    // Device export is also called from https://therestartproject.org/download-dataset,
-    // so we allow anonymous access.
-    Route::prefix('export')->group(function() {
-        Route::get('/devices/event/{id}', [ExportController::class, 'devicesEvent']);
-        Route::get('/devices/group/{id}', [ExportController::class, 'devicesGroup']);
-        Route::get('/devices', [ExportController::class, 'devices']);
-        Route::get('/groups/{id}/events', [ExportController::class, 'groupEvents']);
-        Route::get('/networks/{id}/events', [ExportController::class, 'networkEvents']);
-    });
-
-    // Calendar routes do not require authentication.
-    // (You would not be able to subscribe from a calendar application if they did.)
-    Route::prefix('calendar')->group(function () {
-        Route::get('/user/{calendar_hash}', [CalendarEventsController::class, 'allEventsByUser'])->name('calendar-events-by-user');
-        Route::get('/group/{group}', [CalendarEventsController::class, 'allEventsByGroup'])->name('calendar-events-by-group');
-        Route::get('/network/{network}', [CalendarEventsController::class, 'allEventsByNetwork'])->name('calendar-events-by-network');
-        Route::get('/group-area/{area}', [CalendarEventsController::class, 'allEventsByArea'])->name('calendar-events-by-area');
-        Route::get('/all-events/{hash_env}', [CalendarEventsController::class, 'allEvents'])->name('calendar-events-all');
-    });
-
-    Route::prefix('FaultCat')->group(function () {
-        Route::get('/', function() {
-            if (config('restarters.features.discourse_integration')) {
-                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
-            } else {
-                return redirect()->route('home');
-            }
-        });
-        Route::get('/{any}', function() {
-            if (config('restarters.features.discourse_integration')) {
-                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
-            } else {
-                return redirect()->route('home');
-            }
-        });
-    });
-
-    Route::prefix('faultcat')->group(function () {
-        Route::get('/', function() {
-            if (config('restarters.features.discourse_integration')) {
-                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
-            } else {
-                return redirect()->route('home');
-            }
-        });
-        Route::get('/{any}', function() {
-            if (config('restarters.features.discourse_integration')) {
-                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
-            } else {
-                return redirect()->route('home');
-            }
-        });
-    });
-
-    Route::prefix('MiscCat')->group(function () {
-        Route::get('/', function() {
-            if (config('restarters.features.discourse_integration')) {
-                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
-            } else {
-                return redirect()->route('home');
-            }
-        });
-        Route::get('/{any}', function() {
-            if (config('restarters.features.discourse_integration')) {
-                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
-            } else {
-                return redirect()->route('home');
-            }
-        });
-    });
-
-    Route::prefix('misccat')->group(function () {
-        Route::get('/', function() {
-            if (config('restarters.features.discourse_integration')) {
-                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
-            } else {
-                return redirect()->route('home');
-            }
-        });
-        Route::get('/{any}', function() {
-            if (config('restarters.features.discourse_integration')) {
-                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
-            } else {
-                return redirect()->route('home');
-            }
-        });
-    });
-
-    Route::prefix('MobiFix')->group(function () {
-        Route::get('/', function() {
-            if (config('restarters.features.discourse_integration')) {
-                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
-            } else {
-                return redirect()->route('home');
-            }
-        });
-        Route::get('/{any}', function() {
-            if (config('restarters.features.discourse_integration')) {
-                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
-            } else {
-                return redirect()->route('home');
-            }
-        });
-    });
-
-    Route::prefix('mobifix')->group(function () {
-        Route::get('/', function() {
-            if (config('restarters.features.discourse_integration')) {
-                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
-            } else {
-                return redirect()->route('home');
-            }
-        });
-        Route::get('/{any}', function() {
-            if (config('restarters.features.discourse_integration')) {
-                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
-            } else {
-                return redirect()->route('home');
-            }
-        });
-    });
-
-    Route::prefix('MobiFixOra')->group(function () {
-        Route::get('/', function() {
-            if (config('restarters.features.discourse_integration')) {
-                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
-            } else {
-                return redirect()->route('home');
-            }
-        });
-        Route::get('/{any}', function() {
-            if (config('restarters.features.discourse_integration')) {
-                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
-            } else {
-                return redirect()->route('home');
-            }
-        });
-    });
-
-    Route::prefix('mobifixora')->group(function () {
-        Route::get('/', function() {
-            if (config('restarters.features.discourse_integration')) {
-                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
-            } else {
-                return redirect()->route('home');
-            }
-        });
-        Route::get('/{any}', function() {
-            if (config('restarters.features.discourse_integration')) {
-                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
-            } else {
-                return redirect()->route('home');
-            }
-        });
-    });
-
-    Route::prefix('TabiCat')->group(function () {
-        Route::get('/', function() {
-            if (config('restarters.features.discourse_integration')) {
-                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
-            } else {
-                return redirect()->route('home');
-            }
-        });
-        Route::get('/{any}', function() {
-            if (config('restarters.features.discourse_integration')) {
-                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
-            } else {
-                return redirect()->route('home');
-            }
-        });
-    });
-
-    Route::prefix('tabicat')->group(function () {
-        Route::get('/', function() {
-            if (config('restarters.features.discourse_integration')) {
-                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
-            } else {
-                return redirect()->route('home');
-            }
-        });
-        Route::get('/{any}', function() {
-            if (config('restarters.features.discourse_integration')) {
-                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
-            } else {
-                return redirect()->route('home');
-            }
-        });
-    });
-
-    Route::prefix('PrintCat')->group(function () {
-        Route::get('/', function() {
-            if (config('restarters.features.discourse_integration')) {
-                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
-            } else {
-                return redirect()->route('home');
-            }
-        });
-        Route::get('/{any}', function() {
-            if (config('restarters.features.discourse_integration')) {
-                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
-            } else {
-                return redirect()->route('home');
-            }
-        });
-    });
-
-    Route::prefix('printcat')->group(function () {
-        Route::get('/', function() {
-            if (config('restarters.features.discourse_integration')) {
-                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
-            } else {
-                return redirect()->route('home');
-            }
-        });
-        Route::get('/{any}', function() {
-            if (config('restarters.features.discourse_integration')) {
-                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
-            } else {
-                return redirect()->route('home');
-            }
-        });
-    });
-
-    Route::prefix('BattCat')->group(function () {
-        Route::get('/', function() {
-            if (config('restarters.features.discourse_integration')) {
-                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
-            } else {
-                return redirect()->route('home');
-            }
-        });
-        Route::get('/{any}', function() {
-            if (config('restarters.features.discourse_integration')) {
-                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
-            } else {
-                return redirect()->route('home');
-            }
-        });
-    });
-
-    Route::prefix('battcat')->group(function () {
-        Route::get('/', function() {
-            if (config('restarters.features.discourse_integration')) {
-                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
-            } else {
-                return redirect()->route('home');
-            }
-        });
-        Route::get('/{any}', function() {
-            if (config('restarters.features.discourse_integration')) {
-                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
-            } else {
-                return redirect()->route('home');
-            }
-        });
-    });
-
-    Route::prefix('DustUp')->group(function () {
-        Route::get('/', function() {
-            if (config('restarters.features.discourse_integration')) {
-                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
-            } else {
-                return redirect()->route('home');
-            }
-        });
-        Route::get('/{any}', function() {
-            if (config('restarters.features.discourse_integration')) {
-                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
-            } else {
-                return redirect()->route('home');
-            }
-        });
-    });
-
-    Route::prefix('dustup')->group(function () {
-        Route::get('/{any}', function() {
-            if (config('restarters.features.discourse_integration')) {
-                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
-            } else {
-                return redirect()->route('home');
-            }
-        });
-    });
-
-    Route::middleware('guest')->group(function () {
-        Route::get('/', [HomeController::class, 'index'])->name('home');
-        Route::get('/about', [HomeController::class, 'index'])->name('home');
-    });
-});
-
-Route::middleware('unifiedAuth')->group(function () {
-    //Dashboard Controller
-    Route::prefix('dashboard')->group(function () {
-        Route::get('/', [DashboardController::class, 'index'])->name('dashboard')->middleware('AcceptUserInvites');
-        Route::get('/host', [DashboardController::class, 'getHostDash']);
-    });
-});
-
-Route::middleware('auth', 'verifyUserConsent', 'ensureAPIToken')->group(function () {
-    //User Controller
-    Route::prefix('profile')->group(function () {
-        Route::get('/', [UserController::class, 'index'])->name('profile');
-        Route::get('/notifications', [UserController::class, 'getNotifications'])->name('notifications');
-        Route::get('/edit/{id?}', [UserController::class, 'getProfileEdit'])->name('edit-profile');
-        Route::get('/{id}', [UserController::class, 'index']);
-        Route::post('/edit-info', [UserController::class, 'postProfileInfoEdit']);
-        Route::post('/edit-password', [UserController::class, 'postProfilePasswordEdit']);
-        Route::post('/edit-language', [UserController::class, 'storeLanguage']);
-        Route::post('/edit-preferences', [UserController::class, 'postProfilePreferencesEdit']);
-        Route::post('/edit-tags', [UserController::class, 'postProfileTagsEdit']);
-        Route::post('/edit-photo', [UserController::class, 'postProfilePictureEdit']);
-        Route::post('/edit-admin-settings', [UserController::class, 'postAdminEdit']);
-        Route::post('/edit-repair-directory', [UserController::class, 'postProfileRepairDirectory']);
-    });
-
-    Route::prefix('user')->group(function () {
-        Route::post('/create', [UserController::class, 'create']);
-        Route::get('/all', [UserController::class, 'all'])->name('users');
-        Route::get('/all/search', [UserController::class, 'search']);
-        Route::get('/edit/{id}', [UserController::class, 'getProfileEdit']);
-        Route::post('/edit/{id}', [UserController::class, 'edit']);
-        Route::post('/soft-delete', [UserController::class, 'postSoftDeleteUser']);
-        Route::get('/onboarding-complete', [UserController::class, 'getOnboardingComplete']);
-    });
-
-    //Admin Controller
-    Route::prefix('admin')->group(function () {
-        Route::get('/stats', [AdminController::class, 'stats']);
-    });
-
-    //Category Controller
-    Route::prefix('category')->group(function () {
-        Route::get('/', [CategoryController::class, 'index'])->name('category');
-        Route::get('/edit/{id}', [CategoryController::class, 'getEditCategory']);
-        Route::post('/edit/{id}', [CategoryController::class, 'postEditCategory']);
-    });
-
-    Route::prefix('fixometer')->group(function () {
-        Route::get('/', [DeviceController::class, 'index'])->name('devices');
-    });
-
-    // TODO: the rest of these to be redirected properly.
-    Route::prefix('device')->group(function () {
-        Route::get('/', function () {
-            return redirect('/fixometer');
-        });
-        Route::get('/search', [DeviceController::class, 'search']);
-        Route::post('/image-upload/{id}', [DeviceController::class, 'imageUpload']);
-        Route::get('/image/delete/{iddevices}/{idxref}', [DeviceController::class, 'deleteImage']);
-    });
-
-    Route::resource('networks', NetworkController::class)->only([
-        'index', 'show', 'edit', 'update'
-                                                           ]);
-    Route::prefix('networks')->group(function () {
-        Route::post('/{network}/groups', [NetworkController::class, 'associateGroup'])->name('networks.associate-group');
-    });
-
-    //Group Controller
-    Route::prefix('group')->group(function () {
-        Route::get('/create', [GroupController::class, 'create'])->name('create-group');
-        Route::post('/create', [GroupController::class, 'create']);
-        Route::get('/edit/{id}', [GroupController::class, 'edit']);
-        Route::post('/edit/{id}', [GroupController::class, 'edit']);
-        Route::get('/view/{id}', [GroupController::class, 'view'])->name('group.show');
-        Route::post('/invite', [GroupController::class, 'postSendInvite']);
-        Route::get('/accept-invite/{id}/{hash}', [GroupController::class, 'confirmInvite']);
-        Route::get('/join/{id}', [GroupController::class, 'getJoinGroup']);
-        Route::post('/image-upload/{id}', [GroupController::class, 'imageUpload']);
-        Route::get('/image/delete/{idgroups}/{id}/{path}', [GroupController::class, 'ajaxDeleteImage']);
-        Route::get('/', [GroupController::class, 'mine'])->name('groups');
-        Route::get('/all', [GroupController::class, 'all']);
-        Route::get('/mine', [GroupController::class, 'mine']);
-        Route::get('/nearby', [GroupController::class, 'nearby']);
-        Route::get('/network/{id}', [GroupController::class, 'network']);
-        Route::get('/nearbyinvite/{groupId}/{userId}', [GroupController::class, 'inviteNearbyRestarter']);
-        Route::get('/delete/{id}', [GroupController::class, 'delete']);
-    });
-
-    //Outbound Controller
-    Route::get('/outbound', [OutboundController::class, 'index']);
-
-    //Party Controller
-    Route::prefix('party')->group(function () {
-        Route::get('/', [PartyController::class, 'index'])->name('events');
-        Route::get('/all', [PartyController::class, 'allUpcoming'])->name('all-upcoming-events');
-        Route::get('/all-past', [PartyController::class, 'allPast'])->name('all-past-events');
-        Route::get('/group/{group_id?}', [PartyController::class, 'index'])->name('group-events');
-        Route::get('/create/{group_id?}', [PartyController::class, 'create']);
-        Route::get('/edit/{id}', [PartyController::class, 'edit']);
-        Route::post('/edit/{id}', [PartyController::class, 'edit']);
-        Route::get('/duplicate/{id}', [PartyController::class, 'duplicate']);
-        Route::post('/delete/{id}', [PartyController::class, 'deleteEvent']);
-        Route::get('/deleteimage', [PartyController::class, 'deleteimage']);
-        Route::get('/join/{id}', [PartyController::class, 'getJoinEvent']);
-        Route::post('/invite', [PartyController::class, 'postSendInvite']);
-        Route::get('/accept-invite/{id}/{hash}', [PartyController::class, 'confirmInvite']);
-        Route::get('/cancel-invite/{id}', [PartyController::class, 'cancelInvite']);
-        Route::post('/remove-volunteer', [PartyController::class, 'removeVolunteer']);
-        Route::get('/get-group-emails-with-names/{event_id}', [PartyController::class, 'getGroupEmailsWithNames']);
-        Route::post('/update-quantity', [PartyController::class, 'updateQuantity']);
-        Route::post('/image-upload/{id}', [PartyController::class, 'imageUpload']);
-        Route::get('/image/delete/{idevents}/{id}/{path}', [PartyController::class, 'deleteImage']);
-        Route::get('/contribution/{id}', [PartyController::class, 'getContributions']);
-        Route::post('/update-volunteerquantity', [PartyController::class, 'updateVolunteerQuantity']);
-    });
-
-    //Role Controller
-    Route::prefix('role')->group(function () {
-        Route::get('/', [RoleController::class, 'index'])->name('roles');
-        Route::get('/edit/{id}', [RoleController::class, 'edit']);
-        Route::post('/edit/{id}', [RoleController::class, 'edit']);
-    });
-
-    //Brand Controller
-    Route::prefix('brands')->group(function () {
-        Route::get('/', [BrandsController::class, 'index'])->name('brands');
-        Route::get('/create', [BrandsController::class, 'getCreateBrand']);
-        Route::post('/create', [BrandsController::class, 'postCreateBrand']);
-        Route::get('/edit/{id}', [BrandsController::class, 'getEditBrand']);
-        Route::post('/edit/{id}', [BrandsController::class, 'postEditBrand']);
-        Route::get('/delete/{id}', [BrandsController::class, 'getDeleteBrand']);
-    });
-
-    //Skills Controller
-    Route::prefix('skills')->group(function () {
-        Route::get('/', [SkillsController::class, 'index'])->name('skills');
-        Route::post('/create', [SkillsController::class, 'postCreateSkill']);
-        Route::get('/edit/{id}', [SkillsController::class, 'getEditSkill']);
-        Route::post('/edit/{id}', [SkillsController::class, 'postEditSkill']);
-        Route::get('/delete/{id}', [SkillsController::class, 'getDeleteSkill']);
-    });
-
-    //GroupTags Controller
-    Route::prefix('tags')->group(function () {
-        Route::get('/', [GroupTagsController::class, 'index'])->name('tags');
-        Route::post('/create', [GroupTagsController::class, 'postCreateTag']);
-        Route::get('/edit/{id}', [GroupTagsController::class, 'getEditTag']);
-        Route::post('/edit/{id}', [GroupTagsController::class, 'postEditTag']);
-        Route::get('/delete/{id}', [GroupTagsController::class, 'getDeleteTag']);
-    });
-});
-
-Route::middleware('ensureAPIToken')->group(function () {
-    Route::get('/party/invite/{code}', [PartyController::class, 'confirmCodeInvite']);
-    Route::get('/group/invite/{code}', [GroupController::class, 'confirmCodeInvite']);
-
-//iFrames
-    Route::get('/outbound/info/{type}/{id}/{format?}', function ($type, $id, $format = 'fixometer') {
-        return App\Http\Controllers\OutboundController::info($type, $id, $format);
-    });
-
-    Route::get('/group/stats/{id}/{format?}', function ($id, $format = 'row') {
-        return App\Http\Controllers\GroupController::stats($id, $format);
-    });
-
-    Route::get('/group-tag/stats/{group_tag_id}/{format?}', function ($group_tag_id, $format = 'row') {
-        return App\Http\Controllers\GroupController::statsByGroupTag($group_tag_id, $format);
-    });
-
-    Route::get('/admin/stats/1', function () {
-        return App\Http\Controllers\AdminController::stats();
-    });
-
-    Route::get('/admin/stats/2', function () {
-        return App\Http\Controllers\AdminController::stats(2);
-    });
-
-    Route::get('/party/stats/{id}/wide', function ($id) {
-        return App\Http\Controllers\PartyController::stats($id);
-    });
-
-    Route::get('markAsRead/{id?}', function ($id = null) {
-        $notifications = auth()->user()->unReadNotifications;
-
-        if ($id) {
-            $notifications = $notifications->where('id', $id);
-        }
-
-        $notifications->markAsRead();
-
-        return redirect()->back();
-    })->name('markAsRead');
-
-    Route::get('/set-lang/{locale}', [LocaleController::class, 'setLang']);
-
-    Route::post('/set-cookie', InformationAlertCookieController::class);
-
-    Route::get('/test/check-auth', function () {
-        return new \App\Services\CheckAuthService;
-    });
-
-    Route::prefix('style')->group(function () {
-        Route::get('/', [StyleController::class, 'index']);
-        Route::get('/guide', [StyleController::class, 'guide']);
-        Route::get('/find', [StyleController::class, 'find']);
-    });
-});
+// =============================================================================
+// PUBLIC ROUTES (No authentication required)
+// =============================================================================
 
 // Health check endpoint
 Route::get('/healthz', function () {
@@ -642,6 +80,328 @@ Route::get('/healthz', function () {
     ];
     
     return response()->json($response, $allPassed ? 200 : 503);
+});
+
+// Export endpoints (publicly accessible)
+Route::prefix('export')->group(function() {
+    Route::get('/devices/event/{id}', [ExportController::class, 'devicesEvent']);
+    Route::get('/devices/group/{id}', [ExportController::class, 'devicesGroup']);
+    Route::get('/devices', [ExportController::class, 'devices']);
+    Route::get('/groups/{id}/events', [ExportController::class, 'groupEvents']);
+    Route::get('/networks/{id}/events', [ExportController::class, 'networkEvents']);
+});
+
+// Calendar routes (publicly accessible)
+Route::prefix('calendar')->group(function () {
+    Route::get('/user/{calendar_hash}', [CalendarEventsController::class, 'allEventsByUser'])->name('calendar-events-by-user');
+    Route::get('/group/{group}', [CalendarEventsController::class, 'allEventsByGroup'])->name('calendar-events-by-group');
+    Route::get('/network/{network}', [CalendarEventsController::class, 'allEventsByNetwork'])->name('calendar-events-by-network');
+    Route::get('/group-area/{area}', [CalendarEventsController::class, 'allEventsByArea'])->name('calendar-events-by-area');
+    Route::get('/all-events/{hash_env}', [CalendarEventsController::class, 'allEvents'])->name('calendar-events-all');
+});
+
+// Discourse redirects (publicly accessible)
+$discourseRedirects = ['FaultCat', 'faultcat', 'MiscCat', 'misccat', 'MobiFix', 'mobifix', 'MobiFixOra', 'mobifixora', 'TabiCat', 'tabicat', 'PrintCat', 'printcat', 'BattCat', 'battcat', 'DustUp', 'dustup'];
+foreach ($discourseRedirects as $prefix) {
+    Route::prefix($prefix)->group(function () {
+        Route::get('/{any?}', function() {
+            if (config('restarters.features.discourse_integration')) {
+                return redirect('https://talk.restarters.net/t/our-work-on-repair-data/1150');
+            } else {
+                return redirect()->route('home');
+            }
+        });
+    });
+}
+
+// =============================================================================
+// BASIC ROUTES (require ensureAPIToken only)
+// =============================================================================
+
+Route::middleware('ensureAPIToken')->group(function () {
+    
+    // Style guide
+    Route::prefix('style')->group(function () {
+        Route::get('/', [StyleController::class, 'index']);
+        Route::get('/guide', [StyleController::class, 'guide']);
+        Route::get('/find', [StyleController::class, 'find']);
+    });
+    
+    // Locale and cookies
+    Route::get('/set-lang/{locale}', [LocaleController::class, 'setLang']);
+    Route::post('/set-cookie', InformationAlertCookieController::class);
+    Route::get('/test/check-auth', function () {
+        return new \App\Services\CheckAuthService;
+    });
+    
+    // Iframe/embed routes
+    Route::prefix('outbound')->group(function () {
+        Route::get('/info/{type}/{id}/{format?}', [OutboundController::class, 'info']);
+    });
+    
+    Route::get('/group/stats/{id}/{format?}', [GroupController::class, 'stats']);
+    Route::get('/group-tag/stats/{group_tag_id}/{format?}', [GroupController::class, 'statsByGroupTag']);
+    Route::get('/admin/stats/{type?}', [AdminController::class, 'stats']);
+    Route::get('/party/stats/{id}/wide', [PartyController::class, 'stats']);
+    
+    // Mark notifications as read
+    Route::get('markAsRead/{id?}', function ($id = null) {
+        $notifications = auth()->user()->unReadNotifications;
+        if ($id) {
+            $notifications = $notifications->where('id', $id);
+        }
+        $notifications->markAsRead();
+        return redirect()->back();
+    })->name('markAsRead');
+    
+    // Invite routes
+    Route::get('/party/invite/{code}', [PartyController::class, 'confirmCodeInvite']);
+    Route::get('/group/invite/{code}', [GroupController::class, 'confirmCodeInvite']);
+    
+    // About pages
+    Route::get('/about/cookie-policy', function () {
+        return View::make('features.cookie-policy');
+    });
+    
+    Route::get('/visualisations', function () {
+        return View::make('visualisations');
+    });
+    
+    Route::get('/party/view/{id}', [PartyController::class, 'view']);
+    
+    // Registration and user management (guest accessible)
+    Route::prefix('user')->group(function () {
+        Route::get('/', [HomeController::class, 'index']);
+        Route::get('reset', [UserController::class, 'reset']);
+        Route::post('reset', [UserController::class, 'reset']);
+        Route::get('recover', [UserController::class, 'recover']);
+        Route::post('recover', [UserController::class, 'recover']);
+        Route::get('register/{hash?}', [UserController::class, 'getRegister'])->name('registration');
+        Route::post('register/check-valid-email', [UserController::class, 'postEmail']);
+        Route::post('register/{hash?}', [UserController::class, 'postRegister']);
+        Route::get('/thumbnail/', [UserController::class, 'getThumbnail']);
+        Route::get('/menus/', [UserController::class, 'getUserMenus']);
+        Route::get('/forbidden', function () {
+            return view('user.forbidden', ['title' => 'Oops']);
+        });
+    });
+    
+    // Home routes for guests
+    Route::middleware('guest')->group(function () {
+        Route::get('/', [HomeController::class, 'index'])->name('home');
+        Route::get('/about', [HomeController::class, 'index']);
+    });
+    
+    // Redirect Laravel auth routes to iFixit
+    Route::get('/login', function () {
+        $redirectUrl = request()->get('redirect', '/dashboard');
+        return redirect()->route('auth.ifixit.login', ['redirect' => $redirectUrl]);
+    })->name('login');
+    
+    Route::get('/register', function () {
+        $redirectUrl = request()->get('redirect', '/dashboard');
+        return redirect()->route('auth.ifixit.login', ['redirect' => $redirectUrl]);
+    })->name('register');
+    
+    // Redirect legacy routes
+    Route::redirect('user/register', '/login');
+    
+    // iFixit authentication routes
+    Route::get('/auth/ifixit/login', function (App\Services\IFixitAuthService $iFixitAuthService) {
+        $callbackUrl = request()->get('redirect', '/');
+        $iFixitLoginUrl = $iFixitAuthService->getLoginUrl($callbackUrl);
+        return redirect($iFixitLoginUrl);
+    })->name('auth.ifixit.login');
+    
+    Route::get('/auth/ifixit/logout-callback', function () {
+        \Log::info('iFixit logout callback completed');
+        
+        // Clear any remaining local session data
+        session()->flush();
+        
+        // Get redirect URL from query parameter
+        $redirectUrl = request()->get('redirect', '/');
+        
+        // Clear session cookie and redirect
+        return redirect($redirectUrl)->withCookie(cookie('session', null, -1, '/'));
+    })->name('auth.ifixit.logout-callback');
+    
+    // iFixit logout route
+    Route::match(['GET', 'POST'], '/logout', function (App\Services\IFixitAuthService $iFixitService) {
+        \Log::info('iFixit logout initiated', [
+            'user_authenticated' => Auth::check(),
+            'has_session_cookie' => request()->hasCookie('session'),
+        ]);
+        
+        $redirectUrl = request()->get('redirect', '/');
+        
+        // Clear local session first
+        session()->flush();
+        Auth::logout();
+        
+        // Always redirect to iFixit logout with callback (if external auth is enabled)
+        if (config('external_auth.enabled', true)) {
+            \Log::info('Redirecting to iFixit logout');
+            $callbackUrl = url('/auth/ifixit/logout-callback?redirect=' . urlencode($redirectUrl));
+            return redirect($iFixitService->getLogoutUrl($callbackUrl));
+        }
+        
+        // Fallback if external auth is disabled
+        return redirect($redirectUrl);
+    });
+});
+
+// =============================================================================
+// AUTHENTICATED ROUTES (require unified authentication)
+// =============================================================================
+
+Route::middleware(['iFixitAuth', 'ensureAPIToken'])->group(function () {
+    
+    // Dashboard routes
+    Route::prefix('dashboard')->group(function () {
+        Route::get('/', [DashboardController::class, 'index'])->name('dashboard')->middleware('AcceptUserInvites');
+        Route::get('/host', [DashboardController::class, 'getHostDash']);
+    });
+    
+    // Profile routes
+    Route::prefix('profile')->group(function () {
+        Route::get('/', [UserController::class, 'index'])->name('profile');
+        Route::get('/notifications', [UserController::class, 'getNotifications'])->name('notifications');
+        Route::get('/edit/{id?}', [UserController::class, 'getProfileEdit'])->name('edit-profile');
+        Route::get('/{id}', [UserController::class, 'index']);
+        Route::post('/edit-info', [UserController::class, 'postProfileInfoEdit']);
+        Route::post('/edit-password', [UserController::class, 'postProfilePasswordEdit']);
+        Route::post('/edit-language', [UserController::class, 'storeLanguage']);
+        Route::post('/edit-preferences', [UserController::class, 'postProfilePreferencesEdit']);
+        Route::post('/edit-tags', [UserController::class, 'postProfileTagsEdit']);
+        Route::post('/edit-photo', [UserController::class, 'postProfilePictureEdit']);
+        Route::post('/edit-admin-settings', [UserController::class, 'postAdminEdit']);
+        Route::post('/edit-repair-directory', [UserController::class, 'postProfileRepairDirectory']);
+    });
+    
+    // User management routes
+    Route::prefix('user')->group(function () {
+        Route::post('/create', [UserController::class, 'create']);
+        Route::get('/all', [UserController::class, 'all'])->name('users');
+        Route::get('/all/search', [UserController::class, 'search']);
+        Route::get('/edit/{id}', [UserController::class, 'getProfileEdit']);
+        Route::post('/edit/{id}', [UserController::class, 'edit']);
+        Route::post('/soft-delete', [UserController::class, 'postSoftDeleteUser']);
+        Route::get('/onboarding-complete', [UserController::class, 'getOnboardingComplete']);
+    });
+    
+    // Admin routes
+    Route::prefix('admin')->group(function () {
+        Route::get('/stats', [AdminController::class, 'stats']);
+    });
+    
+    // Category routes
+    Route::prefix('category')->group(function () {
+        Route::get('/', [CategoryController::class, 'index'])->name('category');
+        Route::get('/edit/{id}', [CategoryController::class, 'getEditCategory']);
+        Route::post('/edit/{id}', [CategoryController::class, 'postEditCategory']);
+    });
+    
+    // Device/Fixometer routes
+    Route::prefix('fixometer')->group(function () {
+        Route::get('/', [DeviceController::class, 'index'])->name('devices');
+    });
+    
+    Route::prefix('device')->group(function () {
+        Route::get('/', function () {
+            return redirect('/fixometer');
+        });
+        Route::get('/search', [DeviceController::class, 'search']);
+        Route::post('/image-upload/{id}', [DeviceController::class, 'imageUpload']);
+        Route::get('/image/delete/{iddevices}/{idxref}', [DeviceController::class, 'deleteImage']);
+    });
+    
+    // Network routes
+    Route::resource('networks', NetworkController::class)->only(['index', 'show', 'edit', 'update']);
+    Route::prefix('networks')->group(function () {
+        Route::post('/{network}/groups', [NetworkController::class, 'associateGroup'])->name('networks.associate-group');
+    });
+    
+    // Group routes
+    Route::prefix('group')->group(function () {
+        Route::get('/create', [GroupController::class, 'create'])->name('create-group');
+        Route::post('/create', [GroupController::class, 'create']);
+        Route::get('/edit/{id}', [GroupController::class, 'edit']);
+        Route::post('/edit/{id}', [GroupController::class, 'edit']);
+        Route::get('/view/{id}', [GroupController::class, 'view'])->name('group.show');
+        Route::post('/invite', [GroupController::class, 'postSendInvite']);
+        Route::get('/accept-invite/{id}/{hash}', [GroupController::class, 'confirmInvite']);
+        Route::get('/join/{id}', [GroupController::class, 'getJoinGroup']);
+        Route::post('/image-upload/{id}', [GroupController::class, 'imageUpload']);
+        Route::get('/image/delete/{idgroups}/{id}/{path}', [GroupController::class, 'ajaxDeleteImage']);
+        Route::get('/', [GroupController::class, 'mine'])->name('groups');
+        Route::get('/all', [GroupController::class, 'all']);
+        Route::get('/mine', [GroupController::class, 'mine']);
+        Route::get('/nearby', [GroupController::class, 'nearby']);
+        Route::get('/network/{id}', [GroupController::class, 'network']);
+        Route::get('/nearbyinvite/{groupId}/{userId}', [GroupController::class, 'inviteNearbyRestarter']);
+        Route::get('/delete/{id}', [GroupController::class, 'delete']);
+    });
+    
+    // Events/Party routes
+    Route::prefix('party')->group(function () {
+        Route::get('/', [PartyController::class, 'index'])->name('events');
+        Route::get('/all', [PartyController::class, 'allUpcoming'])->name('all-upcoming-events');
+        Route::get('/all-past', [PartyController::class, 'allPast'])->name('all-past-events');
+        Route::get('/group/{group_id?}', [PartyController::class, 'index'])->name('group-events');
+        Route::get('/create/{group_id?}', [PartyController::class, 'create']);
+        Route::get('/edit/{id}', [PartyController::class, 'edit']);
+        Route::post('/edit/{id}', [PartyController::class, 'edit']);
+        Route::get('/duplicate/{id}', [PartyController::class, 'duplicate']);
+        Route::post('/delete/{id}', [PartyController::class, 'deleteEvent']);
+        Route::get('/deleteimage', [PartyController::class, 'deleteimage']);
+        Route::get('/join/{id}', [PartyController::class, 'getJoinEvent']);
+        Route::post('/invite', [PartyController::class, 'postSendInvite']);
+        Route::get('/accept-invite/{id}/{hash}', [PartyController::class, 'confirmInvite']);
+        Route::get('/cancel-invite/{id}', [PartyController::class, 'cancelInvite']);
+        Route::post('/remove-volunteer', [PartyController::class, 'removeVolunteer']);
+        Route::get('/get-group-emails-with-names/{event_id}', [PartyController::class, 'getGroupEmailsWithNames']);
+        Route::post('/update-quantity', [PartyController::class, 'updateQuantity']);
+        Route::post('/image-upload/{id}', [PartyController::class, 'imageUpload']);
+        Route::get('/image/delete/{idevents}/{id}/{path}', [PartyController::class, 'deleteImage']);
+        Route::get('/contribution/{id}', [PartyController::class, 'getContributions']);
+        Route::post('/update-volunteerquantity', [PartyController::class, 'updateVolunteerQuantity']);
+    });
+    
+    // Admin management routes
+    Route::prefix('role')->group(function () {
+        Route::get('/', [RoleController::class, 'index'])->name('roles');
+        Route::get('/edit/{id}', [RoleController::class, 'edit']);
+        Route::post('/edit/{id}', [RoleController::class, 'edit']);
+    });
+    
+    Route::prefix('brands')->group(function () {
+        Route::get('/', [BrandsController::class, 'index'])->name('brands');
+        Route::get('/create', [BrandsController::class, 'getCreateBrand']);
+        Route::post('/create', [BrandsController::class, 'postCreateBrand']);
+        Route::get('/edit/{id}', [BrandsController::class, 'getEditBrand']);
+        Route::post('/edit/{id}', [BrandsController::class, 'postEditBrand']);
+        Route::get('/delete/{id}', [BrandsController::class, 'getDeleteBrand']);
+    });
+    
+    Route::prefix('skills')->group(function () {
+        Route::get('/', [SkillsController::class, 'index'])->name('skills');
+        Route::post('/create', [SkillsController::class, 'postCreateSkill']);
+        Route::get('/edit/{id}', [SkillsController::class, 'getEditSkill']);
+        Route::post('/edit/{id}', [SkillsController::class, 'postEditSkill']);
+        Route::get('/delete/{id}', [SkillsController::class, 'getDeleteSkill']);
+    });
+    
+    Route::prefix('tags')->group(function () {
+        Route::get('/', [GroupTagsController::class, 'index'])->name('tags');
+        Route::post('/create', [GroupTagsController::class, 'postCreateTag']);
+        Route::get('/edit/{id}', [GroupTagsController::class, 'getEditTag']);
+        Route::post('/edit/{id}', [GroupTagsController::class, 'postEditTag']);
+        Route::get('/delete/{id}', [GroupTagsController::class, 'getDeleteTag']);
+    });
+    
+    // Outbound controller
+    Route::get('/outbound', [OutboundController::class, 'index']);
 });
 
 // Useful code to log all queries.  This is particularly useful when trying to reduce the number of queries; if

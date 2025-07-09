@@ -85,13 +85,12 @@ return Application::configure(basePath: dirname(__DIR__))
             'AcceptUserInvites' => \App\Http\Middleware\AcceptUserInvites::class,
             'ensureAPIToken' => \App\Http\Middleware\EnsureAPIToken::class,
             'customApiAuth' => \App\Http\Middleware\CustomApiTokenAuth::class,
-            'externalAuth' => \App\Http\Middleware\ExternalAuth::class,
             'localeSessionRedirect' => \Mcamara\LaravelLocalization\Middleware\LocaleSessionRedirect::class,
             'localeViewPath' => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationViewPath::class,
             'localizationRedirect' => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRedirectFilter::class,
             'localize' => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRoutes::class,
             'verifyUserConsent' => \App\Http\Middleware\VerifyUserConsent::class,
-            'unifiedAuth' => \App\Http\Middleware\UnifiedAuth::class,
+            'iFixitAuth' => \App\Http\Middleware\IFixitAuth::class,
         ]);
 
         $middleware->priority([

@@ -34,4 +34,6 @@ this is a permanent action.',
   'login_before_using_shareable_link' => 'To complete your invitation please create an account below, or if you already have an account <a href=":login_url">login here</a>.',
   'or_login_with' => 'Or login with',
   'login_with_ifixit' => 'Login with iFixit',
+  'ifixit_login_description' => 'Sign in with your iFixit account to access the Restarters platform.',
+  'ifixit_login_help' => 'Don\'t have an iFixit account? You can create one for free on iFixit.com',
 ];
