@@ -1,13 +1,13 @@
 <?php
 
 return [
-  'slide1_heading' => 'Benvenuto!',
-  'slide1_content' => '<p> Grazie per far parte del nostro spazio comunitario. </p> <p> E <strong> grazie </strong> per essere un beta tester! Con il tuo feedback possiamo aiutare a migliorare la piattaforma per tutti. </p>',
-  'slide2_heading' => 'La tua porta d\'ingresso per la riparazione comunitaria',
-  'slide2_content' => '<p> Nello spazio della community puoi: </p> <ul> <li> chattare con altri Restarter </li> <li> partecipare a gruppi di riparazione </li> <li> condividere le tue conoscenze di riparazione </li> < li> crea e invia inviti agli eventi </li> <li> registra i dispositivi riparati durante gli eventi </li> <li> aiuta a ridurre gli ostacoli alla riparazione </li> <p> </p> </ul>',
-  'slide3_heading' => 'Iniziamo!',
-  'slide3_content' => '<p> Il tuo punto di partenza è il <strong> pannello di controllo (dashboard) della community </strong>. </p> <p> La dashboard ti offre a colpo d\'occhio informazioni sugli ultimi avvenimenti della community, nonché un rapido accesso alle azioni comuni. </p> <p> Un buon punto di partenza è la sezione <strong> Introduzione </strong>. </p>',
-  'finishing_action' => 'Al pannello di controllo',
+  'slide1_content' => '<p>Grazie per esserti unito al nostro spazio comunitario.</p>',
+  'slide2_content' => '<p>Nello spazio della comunità è possibile:</p><ul><li>chattare con altri volontari</li><li>partecipare a gruppi di riparazione</li><li>condividere le proprie conoscenze in materia di riparazione</li><li>creare e RSVP agli eventi</li><li>registrare i dispositivi riparati durante gli eventi</li><li>aiutare ad abbattere le barriere alla riparazione</li><p></p></ul>',
+  'slide3_content' => '<p>Il punto di partenza è la dashboard della comunità<strong></strong>.</p><p>La vostra dashboard vi fornisce a colpo d\'occhio informazioni sugli ultimi avvenimenti della comunità, nonché un accesso rapido alle azioni più comuni.</p><p>Un buon punto di partenza è la sezione <strong>Iniziare</strong>.</p>',
   'previous' => 'Precedente',
-  'next' => 'Prossimo',
+  'slide1_heading' => 'Benvenuti!',
+  'slide2_heading' => 'La vostra porta d\'accesso alla riparazione comunitaria',
+  'slide3_heading' => 'Iniziamo!',
+  'finishing_action' => 'Al cruscotto',
+  'next' => 'Avanti',
 ];

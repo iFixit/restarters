@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'create_success' => 'Marque créée avec succès!',
-    'update_success' => 'Marque mise à jour avec succès!',
-    'delete_success' => 'Marque supprimée!',
+  'create_success' => 'Création d\'une marque réussie !',
+  'update_success' => 'La marque a été mise à jour avec succès !',
+  'delete_success' => 'Marque supprimée !',
 ];

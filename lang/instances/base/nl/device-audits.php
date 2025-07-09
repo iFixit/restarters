@@ -1,0 +1,46 @@
+<?php
+
+return [
+  'unavailable_audits' => 'Er zijn geen wijzigingen aangebracht aan dit apparaat!',
+  'created' => [
+    'metadata' => 'Op :audit_created_at, :user_name aangemaakt record<strong>:audit_url</strong>',
+    'modified' => [
+      'event' => '<strong>Gebeurtenis</strong>ingesteld als \"<strong>:new</strong>\"',
+      'category' => '<strong>Categorie</strong>ingesteld als \"<strong>:new</strong>\"',
+      'category_creation' => '<strong>Categorie creatie</strong>ingesteld als \"<strong>:new</strong>\"',
+      'estimate' => '<strong>Schat</strong>in als \"<strong>:new</strong>\"',
+      'repair_status' => '<strong>Reparatiestatus</strong>ingesteld als \"<strong>:nieuw</strong>\"',
+      'spare_parts' => '<strong>Onderdelen</strong>ingesteld als \"<strong>:nieuw</strong>\"',
+      'brand' => '<strong>Merk</strong>ingesteld als \"<strong>:new</strong>\"',
+      'model' => '<strong>Model</strong>ingesteld als \"<strong>:new</strong>\"',
+      'age' => '<strong>Leeftijd</strong>ingesteld als \"<strong>:new</strong>\"',
+      'problem' => '<strong>Probleem</strong>ingesteld als \"<strong>:new</strong>\"',
+      'repaired_by' => '<strong>Gerepareerd door</strong>ingesteld als \"<strong>:new</strong>\"',
+      'do_it_yourself' => '<strong>Doe het zelf</strong>ingesteld als \"<strong>:new</strong>\"',
+      'professional_help' => '<strong>Professionele hulp</strong>ingesteld als \"<strong>:new</strong>\"',
+      'more_time_needed' => '<strong>Meer tijd nodig</strong>ingesteld als \"<strong>:new</strong>\"',
+      'wiki' => 'wIKI<strong>Wiki</strong>ingesteld als \"<strong>:new</strong>\"',
+      'iddevices' => '<strong>Apparaat-ID</strong>ingesteld als \"<strong>:new</strong>\"',
+    ],
+  ],
+  'updated' => [
+    'metadata' => 'Op :audit_created_at, :user_name bijgewerkte record<strong>:audit_url</strong>',
+    'modified' => [
+      'event' => '<strong>Gebeurtenis</strong>is gewijzigd van \"<strong>:oud</strong>\" in \"<strong>:nieuw</strong>\"',
+      'category' => '<strong>Categorie</strong>is gewijzigd van \"<strong>:oud</strong>\" naar \"<strong>:nieuw</strong>\"',
+      'category_creation' => '<strong>Categoriewijziging</strong>is gewijzigd van \"<strong>:oud</strong>\" naar \"<strong>:nieuw</strong>\"',
+      'estimate' => '<strong>Schat</strong>werd gewijzigd van \"<strong>:oud</strong>\" in \"<strong>:nieuw</strong>\"',
+      'repair_status' => '<strong>Reparatiestatus</strong>is gewijzigd van \"<strong>:oud</strong>\" in \"<strong>:nieuw</strong>\"',
+      'spare_parts' => '<strong>Onderdelen</strong>is gewijzigd van \"<strong>:oud</strong>\" in \"<strong>:nieuw</strong>\"',
+      'brand' => '<strong>Merk</strong>is gewijzigd van \"<strong>:oud</strong>\" in \"<strong>:nieuw</strong>\"',
+      'model' => '<strong>Model</strong>is gewijzigd van \"<strong>:oud</strong>\" in \"<strong>:nieuw</strong>\"',
+      'age' => '<strong>Leeftijd</strong>is gewijzigd van \"<strong>:oud</strong>\" in \"<strong>:nieuw</strong>\"',
+      'problem' => '<strong>Probleem</strong>is gewijzigd van \"<strong>:oud</strong>\" naar \"<strong>:nieuw</strong>\"',
+      'repaired_by' => '<strong>Gerepareerd door</strong>werd gewijzigd van \"<strong>:oud</strong>\" in \"<strong>:nieuw</strong>\"',
+      'do_it_yourself' => '<strong>Doe het zelf</strong>is gewijzigd van \"<strong>:oud</strong>\" in \"<strong>:nieuw</strong>\"',
+      'professional_help' => '<strong>Professionele hulp</strong>is gewijzigd van \"<strong>:oud</strong>\" in \"<strong>:nieuw</strong>\"',
+      'more_time_needed' => '<strong>Meer tijd nodig</strong>is gewijzigd van \"<strong>:oud</strong>\" naar \"<strong>:nieuw</strong>\"',
+      'wiki' => '<strong>Wiki</strong>is gewijzigd van \"<strong>:oud</strong>\" naar \"<strong>:nieuw</strong>\"',
+    ],
+  ],
+];

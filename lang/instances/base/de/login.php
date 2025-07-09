@@ -1,18 +1,20 @@
 <?php
 
 return [
-  'whatis' => 'German Welcome to the Restarters community',
-  'whatis_content' => '<p>This is a place to grow the community electronics repair movement. The world needs more fixing and more fixing skills to be shared.</p><p>Join in if you would like to:</p><ul>
-                                <li>Learn electronics repair with others</li>
-                                <li>Share your repair skills with others</li>
-                                <li>Organise electronics repair events</li>
-                                <li>View and share the impact of repair events</li>
-                                <li>Document and bring down the barriers to repair</li>
-                            </ul>',
-  'more' => 'Find out more',
-  'stat_1' => 'Devices fixed',
-  'stat_2' => 'CO<sub>2</sub> emissions prevented',
-  'stat_3' => 'Waste prevented',
-  'stat_4' => 'Events held',
-  'login_title' => 'Sign in',
+  'whatis_content' => '<p>Dies ist ein Ort, an dem die gemeinschaftliche Elektronikreparaturbewegung wächst. Die Welt braucht mehr Reparaturen und mehr Reparaturfähigkeiten, die geteilt werden können.</p><p>Machen Sie mit, wenn Sie möchten:</p><ul>
+                               <li>Elektronikreparaturen mit anderen lernen</li>
+                                <li>Geben Sie Ihre Reparaturkenntnisse an andere weiter</li>
+                                <li>Organisieren Sie Veranstaltungen zur Elektronikreparatur</li>
+                                <li>Betrachten und teilen Sie die Auswirkungen von Reparaturveranstaltungen</li>
+                                <li>Dokumentieren und die Barrieren für die Reparatur abbauen</li>
+                           </ul>',
+  'whatis' => 'Willkommen in der Restarters-Gemeinschaft',
+  'more' => 'Weitere Informationen',
+  'stat_1' => 'Festgelegte Geräte',
+  'stat_2' => 'CO<sub>2</sub>Emissionen verhindert',
+  'stat_3' => 'Abfallvermeidung',
+  'stat_4' => 'Ausgetragene Veranstaltungen',
+  'login_title' => 'Eintragen',
+  'join_title' => 'Restarters beitreten',
+  'join_title_short' => 'Beitreten',
 ];

@@ -1,0 +1,46 @@
+<?php
+
+return [
+  'unavailable_audits' => 'No se han realizado cambios en este dispositivo',
+  'created' => [
+    'metadata' => 'En :audit_created_at, :user_name creó el registro<strong>:audit_url</strong>',
+    'modified' => [
+      'event' => '<strong>Evento</strong>establecido como \"<strong>:nuevo</strong>\"',
+      'category' => '<strong>Categoría</strong>establecida como \"<strong>:nuevo</strong>\"',
+      'category_creation' => '<strong>Creación de categoría</strong>establecida como \"<strong>:nuevo</strong>\"',
+      'estimate' => '<strong>Estimate</strong>set as \"<strong>:new</strong>\"',
+      'repair_status' => '<strong>Estado de reparación</strong>establecido como \"<strong>:nuevo</strong>\"',
+      'spare_parts' => '<strong>Piezas de recambio</strong>establecidas como \"<strong>:nuevo</strong>\"',
+      'brand' => '<strong>Marca</strong>establecida como \"<strong>:nuevo</strong>\"',
+      'model' => '<strong>Modelo</strong>establecido como \"<strong>:nuevo</strong>\"',
+      'age' => '<strong>Edad</strong>establecido como \"<strong>:nuevo</strong>\"',
+      'problem' => '<strong>Problema</strong>establecido como \"<strong>:nuevo</strong>\"',
+      'repaired_by' => '<strong>Reparado por</strong>establecido como \"<strong>:nuevo</strong>\"',
+      'do_it_yourself' => '<strong>Hágalo usted mismo</strong>establecer como \"<strong>:nuevo</strong>\"',
+      'professional_help' => '<strong>Ayuda Profesional</strong>set as \"<strong>:new</strong>\"',
+      'more_time_needed' => '<strong>Se necesita más tiempo</strong>establecido como \"<strong>:nuevo</strong>\"',
+      'wiki' => '<strong>Wiki</strong>establecido como \"<strong>:nuevo</strong>\"',
+      'iddevices' => '<strong>ID de dispositivo</strong>establecido como \"<strong>:nuevo</strong>\"',
+    ],
+  ],
+  'updated' => [
+    'metadata' => 'En :audit_created_at, :user_name actualizó el registro<strong>:audit_url</strong>',
+    'modified' => [
+      'event' => '<strong>Evento</strong>fue modificado de \"<strong>:old</strong>\" a \"<strong>:new</strong>\"',
+      'category' => '<strong>La categoría</strong>fue modificada de \"<strong>:antiguo</strong>\" a \"<strong>:nuevo</strong>\"',
+      'category_creation' => '<strong>Creación de categoría</strong>se modificó de \"<strong>:antiguo</strong>\" a \"<strong>:nuevo</strong>\"',
+      'estimate' => '<strong>Estimación</strong>fue modificado de \"<strong>:old</strong>\" a \"<strong>:new</strong>\"',
+      'repair_status' => '<strong>Estado de reparación</strong>fue modificado de \"<strong>:antiguo</strong>\" a \"<strong>:nuevo</strong>\"',
+      'spare_parts' => '<strong>Repuestos</strong>se modificó de \"<strong>:viejo</strong>\" a \"<strong>:nuevo</strong>\"',
+      'brand' => '<strong>La marca</strong>fue modificada de \"<strong>:antiguo</strong>\" a \"<strong>:nuevo</strong>\"',
+      'model' => '<strong>El modelo</strong>fue modificado de \"<strong>:antiguo</strong>\" a \"<strong>:nuevo</strong>\"',
+      'age' => '<strong>Edad</strong>se modificó de \"<strong>:antiguo</strong>\" a \"<strong>:nuevo</strong>\"',
+      'problem' => '<strong>Problema</strong>fue modificado de \"<strong>:antiguo</strong>\" a \"<strong>:nuevo</strong>\"',
+      'repaired_by' => '<strong>Reparado por</strong>fue modificado de \"<strong>:antiguo</strong>\" a \"<strong>:nuevo</strong>\"',
+      'do_it_yourself' => '<strong>Do it yourself</strong>fue modificado de \"<strong>:antiguo</strong>\" a \"<strong>:nuevo</strong>\"',
+      'professional_help' => '<strong>Ayuda profesional</strong>se modificó de \"<strong>:antiguo</strong>\" a \"<strong>:nuevo</strong>\"',
+      'more_time_needed' => '<strong>Se necesita más tiempo</strong>fue modificado de \"<strong>:old</strong>\" a \"<strong>:new</strong>\"',
+      'wiki' => '<strong>Wiki</strong>fue modificado de \"<strong>:old</strong>\" a \"<strong>:new</strong>\"',
+    ],
+  ],
+];
