@@ -18,6 +18,17 @@ class GroupsController extends Controller
             $query = Group::with(['networks', 'group_tags'])
                 ->withCount(['allConfirmedHosts', 'allConfirmedRestarters']);
 
+            // Apply search filter
+            if ($request->filled('search')) {
+                $search = $request->input('search');
+                $query->where(function($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                      ->orWhere('location', 'like', "%{$search}%")
+                      ->orWhere('postcode', 'like', "%{$search}%")
+                      ->orWhere('area', 'like', "%{$search}%");
+                });
+            }
+
             // Handle sorting
             $sortBy = $request->input('sort_by', 'name');
             $sortDirection = $request->input('sort_direction', 'asc');

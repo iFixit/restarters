@@ -11,6 +11,24 @@
       </div>
     </div>
 
+    <!-- Search Bar -->
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <div class="input-group">
+          <input id="search" class="form-control" placeholder="Search groups by name, location, postcode, or area..."
+            v-model="searchQuery" @input="handleSearchInput" />
+          <div class="input-group-append" v-if="searchQuery">
+            <button class="btn btn-outline-secondary" type="button" @click="clearSearch" title="Clear search">
+              &times;
+            </button>
+          </div>
+        </div>
+        <small class="form-text text-muted" v-if="searchQuery">
+          {{ searchResultsText }}
+        </small>
+      </div>
+    </div>
+
     <div v-if="alert.message" :class="`alert alert-${alert.type}`" class="alert-dismissible fade show">
       {{ alert.message }}
       <button type="button" class="close" @click="clearAlert">
@@ -92,6 +110,9 @@ export default {
       sortField: "name",
       sortDirection: "asc",
 
+      searchQuery: "",
+      searchTimeout: null,
+
       uploadProgress: 0,
       uploading: false,
 
@@ -111,8 +132,24 @@ export default {
     window.addEventListener('scroll', this.handleScroll);
   },
 
+  computed: {
+    searchResultsText() {
+      if (!this.searchQuery) return '';
+
+      if (this.loading) {
+        return 'Searching...';
+      }
+
+      return `Found ${this.totalCount} result${this.totalCount !== 1 ? 's' : ''} for "${this.searchQuery}"`;
+    }
+  },
+
   beforeDestroy() {
     window.removeEventListener('scroll', this.handleScroll);
+    // Clear search timeout to prevent memory leaks
+    if (this.searchTimeout) {
+      clearTimeout(this.searchTimeout);
+    }
   },
 
   methods: {
@@ -125,6 +162,11 @@ export default {
           sort_by: this.sortField,
           sort_direction: this.sortDirection,
         };
+
+        // Add search parameter if search query exists
+        if (this.searchQuery.trim()) {
+          params.search = this.searchQuery.trim();
+        }
 
         const response = await groupsApi.fetchGroups(params);
         this.groups = response.data;
@@ -177,6 +219,25 @@ export default {
     handleSortChange(field, direction) {
       this.sortField = field;
       this.sortDirection = direction;
+      this.loadGroups();
+    },
+
+    handleSearchInput() {
+      // Clear existing timeout
+      if (this.searchTimeout) {
+        clearTimeout(this.searchTimeout);
+      }
+
+      // Debounce search to avoid too many API calls
+      this.searchTimeout = setTimeout(() => {
+        this.pagination.currentPage = 1; // Reset to first page when searching
+        this.loadGroups();
+      }, 500); // 500ms delay
+    },
+
+    clearSearch() {
+      this.searchQuery = '';
+      this.pagination.currentPage = 1;
       this.loadGroups();
     },
 
@@ -431,5 +492,17 @@ export default {
   font-size: 16px;
   font-weight: bold;
   line-height: 1;
+}
+
+.form-control:focus {
+  border-color: #80bdff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.input-group-append {
+  background-color: #f8f9fa;
+  border-color: #ced4da;
+  color: #6c757d;
+  height: 40px;
 }
 </style>
