@@ -200,6 +200,24 @@ secrets:
       dbUsername: "your-db-username-here"
       dbPassword: "your-db-password-here"
 
+  # AWS S3 credentials for file uploads
+  # IMPORTANT: For production deployments, create the secret externally and set createSecret: false
+  # Only required when storage.filesystemDisk is set to 's3'
+  awsS3Credentials:
+    enabled: false
+    createSecret: false
+    secretName: "restarters-aws-s3-credentials"
+    keys:
+      awsAccessKeyId: "AWS_ACCESS_KEY_ID"
+      awsSecretAccessKey: "AWS_SECRET_ACCESS_KEY"
+      awsDefaultRegion: "AWS_DEFAULT_REGION"
+      awsBucket: "AWS_BUCKET"
+    data:
+      awsAccessKeyId: "your-aws-access-key-id-here"
+      awsSecretAccessKey: "your-aws-secret-access-key-here"
+      awsDefaultRegion: "your-aws-region-here"
+      awsBucket: "your-s3-bucket-name-here"
+
 # Environment variable groups - organized by functionality
 envGroups:
   # Application core settings
@@ -225,6 +243,20 @@ envGroups:
   # Logging configuration
   logging:
     LOG_CHANNEL: "stack"
+
+  # File storage configuration
+  storage:
+    # Set to 's3' for S3/CloudFront uploads, 'public_uploads' for local storage
+    FILESYSTEM_DISK: "public_uploads"
+    # AWS S3 configuration (only required when FILESYSTEM_DISK=s3)
+    # These values will be overridden by secrets.awsCredentials if enabled
+    AWS_ACCESS_KEY_ID: ""
+    AWS_SECRET_ACCESS_KEY: ""
+    AWS_DEFAULT_REGION: "us-east-1"
+    AWS_BUCKET: ""
+    # Set to your CloudFront distribution URL for faster delivery
+    # e.g., "https://d1234567890.cloudfront.net" or leave empty for direct S3 URLs
+    AWS_URL: ""
 
   # Database configuration
   database:

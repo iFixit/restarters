@@ -15,6 +15,15 @@ data:
         # Logging Configuration
         {{- include "restarters.envGroup" (dict "groupName" "logging" "context" .) | nindent 8 }}
 
+        # File Storage Configuration
+        {{- if not .Values.secrets.awsCredentials.enabled }}
+        {{- include "restarters.envGroup" (dict "groupName" "storage" "context" .) | nindent 8 }}
+        {{- else}}
+        # AWS credentials managed by secrets, only including non-sensitive storage config
+        FILESYSTEM_DISK={{ .Values.envGroups.storage.FILESYSTEM_DISK | quote }}
+        AWS_URL={{ .Values.envGroups.storage.AWS_URL | quote }}
+        {{- end }}
+
         # Database Configuration
         {{- include "restarters.envGroup" (dict "groupName" "database" "context" .) | nindent 8 }}
 
