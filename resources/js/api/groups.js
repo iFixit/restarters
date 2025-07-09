@@ -34,4 +34,11 @@ export default {
 		});
 		return response.data;
 	},
+
+	async exportGroups() {
+		const response = await axios.get(`${API_BASE}/export`, {
+			responseType: "blob",
+		});
+		return response;
+	},
 };

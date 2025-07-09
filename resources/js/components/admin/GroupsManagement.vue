@@ -5,7 +5,10 @@
         <h2>Groups Management</h2>
         <span class="text-muted"> {{ totalCount }} groups</span>
       </div>
-      <button class="btn btn-primary" @click="showCsvUploadModal = true">Import Groups</button>
+      <div class="button-group">
+        <button class="btn btn-primary mr-2" @click="handleExport" :disabled="exporting">Export Groups</button>
+        <button class="btn btn-primary" @click="showCsvUploadModal = true">Import Groups</button>
+      </div>
     </div>
 
     <div v-if="alert.message" :class="`alert alert-${alert.type}`" class="alert-dismissible fade show">
@@ -66,6 +69,7 @@ export default {
       selectedGroups: [],
       totalCount: 0,
       showCsvUploadModal: false,
+      exporting: false,
       confirmationModal: {
         show: false,
         action: null,
@@ -221,6 +225,45 @@ export default {
       this.confirmationModal.show = false;
       this.confirmationModal.action = null;
       this.confirmationModal.groups = [];
+    },
+
+    async handleExport() {
+      this.exporting = true;
+
+      try {
+        const response = await groupsApi.exportGroups();
+
+        // Extract filename from response headers if available
+        const contentDisposition = response.headers["content-disposition"];
+        let filename = `groups_export_${new Date().toISOString().split("T")[0]}.csv`;
+
+        if (contentDisposition) {
+          const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+          if (filenameMatch) {
+            filename = filenameMatch[1];
+          }
+        }
+
+        // Create download URL from blob response
+        const url = window.URL.createObjectURL(response.data);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+
+        this.showAlert("Groups exported successfully!", "success");
+      } catch (error) {
+        console.error("Export error:", error);
+        this.showAlert(
+          `Error exporting groups: ${error.response?.data?.message || error.message}`,
+          "danger",
+        );
+      } finally {
+        this.exporting = false;
+      }
     },
 
     async handleUpload(file) {

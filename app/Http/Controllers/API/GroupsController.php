@@ -262,6 +262,140 @@ class GroupsController extends Controller
         }
     }
 
+    public static function exportGroups(Request $request)
+    {
+        try {
+            // Build query with same logic as index method
+            $query = Group::with(['networks', 'group_tags']);
+
+            // Apply search filter
+            if ($request->filled('search')) {
+                $search = $request->input('search');
+                $query->where(function($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                      ->orWhere('location', 'like', "%{$search}%")
+                      ->orWhere('postcode', 'like', "%{$search}%")
+                      ->orWhere('area', 'like', "%{$search}%");
+                });
+            }
+
+            // Apply status filter
+            if ($request->filled('status')) {
+                $status = $request->input('status');
+                if ($status === 'approved') {
+                    $query->where('approved', true);
+                } elseif ($status === 'pending') {
+                    $query->where('approved', false);
+                }
+            }
+
+            // Apply archived filter
+            if ($request->filled('archived')) {
+                $archived = $request->input('archived');
+                if ($archived === 'yes') {
+                    $query->whereNotNull('archived_at');
+                } elseif ($archived === 'no') {
+                    $query->whereNull('archived_at');
+                }
+            }
+
+            // Apply network filter
+            if ($request->filled('network')) {
+                $networkId = $request->input('network');
+                $query->whereHas('networks', function($q) use ($networkId) {
+                    $q->where('networks.id', $networkId);
+                });
+            }
+
+            // Apply country filter
+            if ($request->filled('country')) {
+                $countryCode = $request->input('country');
+                $query->where('country_code', $countryCode);
+            }
+
+            $groups = $query->orderBy('name', 'asc')->get();
+
+            // Create CSV content
+            $filename = 'groups_export_' . date('Y-m-d_H-i-s') . '.csv';
+            $csvContent = self::generateCsvContent($groups);
+
+            // Return CSV as download
+            return response($csvContent)
+                ->header('Content-Type', 'text/csv')
+                ->header('Content-Disposition', 'attachment; filename="' . $filename . '"')
+                ->header('Cache-Control', 'no-cache, no-store, must-revalidate')
+                ->header('Pragma', 'no-cache')
+                ->header('Expires', '0');
+
+        } catch (\Exception $e) {
+            Log::error('Error exporting groups CSV: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to export groups'
+            ], 500);
+        }
+    }
+
+
+    private static function generateCsvContent($groups)
+    {
+        $csvData = [];
+        
+        // Add headers
+        $csvData[] = [
+            'ID', 'Name', 'Location', 'Postcode', 'Area', 'Country Code',
+            'Latitude', 'Longitude', 'Website', 'Phone', 'Email',
+            'Approved', 'Archived', 'Networks', 'Tags', 'Description',
+            'Hosts Count', 'Restarters Count', 'Created At'
+        ];
+
+        // Add data rows
+        foreach ($groups as $group) {
+            // Get country name from country code
+            $countryDisplay = null;
+            if ($group->country_code) {
+                $countryDisplay = \App\Helpers\Fixometer::getCountryFromCountryCode($group->country_code);
+            }
+
+            // Manually calculate counts
+            $confirmedHostsCount = $group->allConfirmedHosts()->count();
+            $confirmedRestartersCount = $group->allConfirmedRestarters()->count();
+
+            $csvData[] = [
+                $group->idgroups,
+                $group->name,
+                $group->location,
+                $group->postcode,
+                $group->area,
+                $group->country_code,
+                $group->latitude,
+                $group->longitude,
+                $group->website,
+                $group->phone,
+                $group->email,
+                $group->approved ? 'Yes' : 'No',
+                $group->archived_at ? 'Yes' : 'No',
+                $group->networks->pluck('name')->join(', '),
+                $group->group_tags->pluck('tag_name')->join(', '),
+                $group->free_text,
+                $confirmedHostsCount,
+                $confirmedRestartersCount,
+                $group->created_at ? $group->created_at->format('Y-m-d H:i:s') : ''
+            ];
+        }
+
+        // Convert to CSV string
+        $output = fopen('php://temp', 'r+');
+        foreach ($csvData as $row) {
+            fputcsv($output, $row);
+        }
+        rewind($output);
+        $csvContent = stream_get_contents($output);
+        fclose($output);
+
+        return $csvContent;
+    }
+
     /**
      * Transform group data for frontend
      */
