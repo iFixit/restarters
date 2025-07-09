@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
 use App\Helpers\FixometerFile;
+use App\Services\S3Service;
 
 class TestS3Upload extends Command
 {
@@ -20,7 +21,15 @@ class TestS3Upload extends Command
      *
      * @var string
      */
-    protected $description = 'Detailed S3 upload test to debug LocalStack issues';
+    protected $description = 'Detailed S3 upload test to debug upload issues';
+
+    protected $s3Service;
+
+    public function __construct(S3Service $s3Service)
+    {
+        parent::__construct();
+        $this->s3Service = $s3Service;
+    }
 
     /**
      * Execute the console command.
@@ -33,9 +42,9 @@ class TestS3Upload extends Command
         // Test 1: Direct Storage upload
         $this->info('1️⃣ Testing direct Storage upload...');
         try {
-            $disk = Storage::disk('s3_uploads');
+            $disk = Storage::disk(); // Use default disk
             $testContent = 'Direct upload test at ' . now();
-            $testFile = 'direct-test-' . time() . '.txt';
+            $testFile = 'uploads/direct-test-' . time() . '.txt';
             
             $this->info("   Uploading: {$testFile}");
             $result = $disk->put($testFile, $testContent);
@@ -50,11 +59,12 @@ class TestS3Upload extends Command
                     $content = $disk->get($testFile);
                     $this->info("   Retrieved content: " . substr($content, 0, 50) . '...');
                     
-                    // Get URL
-                    $url = $disk->url($testFile);
+                    // Get URL using S3Service
+                    $filename = basename($testFile);
+                    $url = $this->s3Service->getFileUrl($filename);
                     $this->info("   Generated URL: {$url}");
                     
-                    // Test actual HTTP request to LocalStack
+                    // Test actual HTTP request
                     $this->info("   Testing HTTP GET to URL...");
                     try {
                         $response = \Http::timeout(10)->get($url);
@@ -65,6 +75,9 @@ class TestS3Upload extends Command
                     } catch (\Exception $e) {
                         $this->error("   HTTP request failed: " . $e->getMessage());
                     }
+                    
+                    // Clean up
+                    $disk->delete($testFile);
                 }
             }
         } catch (\Exception $e) {
@@ -73,14 +86,22 @@ class TestS3Upload extends Command
 
         $this->newLine();
 
-        // Test 2: Check what's in bucket via AWS CLI
-        $this->info('2️⃣ Checking bucket contents via AWS CLI...');
+        // Test 2: Check what's in bucket via storage
+        $this->info('2️⃣ Checking storage contents...');
         try {
-            $output = shell_exec('aws --endpoint-url=https://localhost.localstack.cloud:4566 s3 ls s3://restarters/test/ --recursive 2>&1');
-            $this->info("   Bucket contents:");
-            $this->info($output ?: '   (empty)');
+            $disk = Storage::disk(); // Use default disk
+            $files = $disk->files('uploads');
+            $this->info("   Found " . count($files) . " files in uploads directory");
+            
+            if (count($files) > 0) {
+                $this->info("   Recent files:");
+                $recentFiles = array_slice($files, -5); // Show last 5 files
+                foreach ($recentFiles as $file) {
+                    $this->info("     - " . $file);
+                }
+            }
         } catch (\Exception $e) {
-            $this->error("   AWS CLI check failed: " . $e->getMessage());
+            $this->error("   Storage listing failed: " . $e->getMessage());
         }
 
         $this->newLine();
@@ -114,14 +135,18 @@ class TestS3Upload extends Command
             $this->info("   Upload returned filename: " . ($filename ?: 'NULL'));
             
             if ($filename) {
-                // Check if file exists in S3
-                $disk = Storage::disk('s3_uploads');
-                $exists = $disk->exists($filename);
-                $this->info("   File exists in S3: " . ($exists ? 'YES' : 'NO'));
+                // Check if file exists in storage
+                $disk = Storage::disk(); // Use default disk
+                $exists = $disk->exists('uploads/' . $filename);
+                $this->info("   File exists in storage: " . ($exists ? 'YES' : 'NO'));
                 
                 if ($exists) {
                     $url = FixometerFile::getUploadFileUrl($filename);
                     $this->info("   Generated URL via helper: {$url}");
+                    
+                    // Clean up test file
+                    $disk->delete('uploads/' . $filename);
+                    $this->info("   Test file cleaned up");
                 }
             }
             
@@ -139,23 +164,35 @@ class TestS3Upload extends Command
 
         $this->newLine();
 
-        // Test 4: Check LocalStack logs
-        $this->info('4️⃣ LocalStack configuration check...');
-        $this->info("   Current S3 disk config:");
-        $s3Config = config('filesystems.disks.s3_uploads');
-        foreach ($s3Config as $key => $value) {
-            if (in_array($key, ['key', 'secret']) && $value) {
-                $value = '***HIDDEN***';
+        // Test 4: Check configuration
+        $this->info('4️⃣ Configuration check...');
+        $this->info("   Default filesystem disk: " . config('filesystems.default'));
+        $this->info("   Using S3: " . ($this->s3Service->isUsingS3() ? 'YES' : 'NO'));
+        
+        if ($this->s3Service->isUsingS3()) {
+            $this->info("   Current S3 disk config:");
+            $s3Config = config('filesystems.disks.s3');
+            foreach ($s3Config as $key => $value) {
+                if (in_array($key, ['key', 'secret']) && $value) {
+                    $value = '***' . substr($value, -4);
+                }
+                $this->info("   {$key}: " . ($value ?? 'NULL'));
             }
-            $this->info("   {$key}: " . ($value ?? 'NULL'));
+        } else {
+            $this->info("   Using local storage");
         }
 
         $this->newLine();
         $this->info('💡 Troubleshooting tips:');
-        $this->info('   1. Check LocalStack logs: docker logs <localstack-container>');
-        $this->info('   2. Verify bucket policy allows uploads');
-        $this->info('   3. Check if LocalStack S3 service is properly configured');
-        $this->info('   4. Try recreating the bucket with proper permissions');
+        if ($this->s3Service->isUsingS3()) {
+            $this->info('   1. Ensure AWS credentials are correct');
+            $this->info('   2. Verify bucket exists and is accessible');
+            $this->info('   3. Check IAM permissions for S3 operations');
+        } else {
+            $this->info('   1. Check if uploads directory exists and is writable');
+            $this->info('   2. Verify file permissions');
+            $this->info('   3. To use S3: set FILESYSTEM_DISK=s3 in your .env');
+        }
 
         return 0;
     }

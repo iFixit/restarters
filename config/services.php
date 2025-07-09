@@ -27,51 +27,52 @@ return [
         // User specific items
         // NOTE: The 'email' & 'external_id' are the only 2 required fields
         'user' => [
-            // Check to see if the user has forum access & should be logged in via SSO
-            'access' => null,
-
-            // Groups to make sure that the user is part of in a comma-separated string
-            // NOTE: Groups cannot have spaces in their names & must already exist in Discourse
-            'add_groups' => null,
-
-            // Boolean for user a Discourse admin, leave null to ignore
-            'admin' => null,
-
-            // Full path to user's avatar image
-            'avatar_url' => null,
-
-            // The avatar is cached, so this triggers an update
-            'avatar_force_update' => false,
-
-            // Content of the user's bio
-            'bio' => 'biography',
-
-            // Verified email address (see "require_activation" if not verified)
+            'access' => 'email,external_id,name,username,avatar_url',
             'email' => 'email',
-
-            // Unique string to the user that will never change
-            'external_id' => 'id',
-
-            // Boolean for user a Discourse admin, leave null to ignore
-            'moderator' => null,
-
-            // Full name on Discourse if the user is new or
-            // if SiteSetting.sso_overrides_name is set
+            'external_id' => 'external_id',
             'name' => 'name',
-
-            // Groups to make sure that the user is *NOT* part of in a comma-separated string
-            // NOTE: Groups cannot have spaces in their names & must already exist in Discourse
-            // There is not a way to specify the exact list of groups that a user is in, so
-            // you may want to send the inverse of the 'add_groups'
-            'remove_groups' => null,
-
-            // If the email has not been verified, set this to true
-            'require_activation' => false,
-
-            // username on Discourse if the user is new or
-            // if SiteSetting.sso_overrides_username is set
-            'username' => 'name',
+            'username' => 'username',
+            'avatar_url' => 'avatar_url',
         ],
+    ],
+
+    'matomo' => [
+        'enabled' => env('MATOMO_ENABLED', false),
+        'url' => env('MATOMO_URL'),
+        'site_id' => env('MATOMO_SITE_ID'),
+    ],
+
+    'sentry' => [
+        'user_context' => env('SENTRY_USER_CONTEXT', false),
+        'breadcrumb_level' => env('SENTRY_BREADCRUMB_LEVEL', 'error'),
+        'breadcrumb_sql' => env('SENTRY_BREADCRUMB_SQL', false),
+        'breadcrumb_sql_origin' => env('SENTRY_BREADCRUMB_SQL_ORIGIN', false),
+        'breadcrumb_sql_bindings' => env('SENTRY_BREADCRUMB_SQL_BINDINGS', false),
+    ],
+
+    'wp' => [
+        'url' => env('WP_URL'),
+        'username' => env('WP_USERNAME'),
+        'password' => env('WP_PASSWORD'),
+    ],
+
+    'geocoder' => [
+        'cache' => env('GEOCODER_CACHE', false),
+        'providers' => [
+            'mapbox' => [
+                'key' => env('MAPBOX_ACCESS_TOKEN'),
+            ],
+        ],
+    ],
+
+    'postmark' => [
+        'token' => env('POSTMARK_TOKEN'),
+    ],
+
+    'ses' => [
+        'key' => env('AWS_ACCESS_KEY_ID'),
+        'secret' => env('AWS_SECRET_ACCESS_KEY'),
+        'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
 ];

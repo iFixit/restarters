@@ -2,7 +2,7 @@
 
 return [
 
-    'default' => env('FILESYSTEM_DISK', 'local'),
+    'default' => env('FILESYSTEM_DISK', 'public_uploads'),
 
     'disks' => [
         'local' => [
@@ -13,12 +13,23 @@ return [
             'report' => false,
         ],
 
-        'public_uploads' => [
+        'public' => [
             'driver' => 'local',
-            'root'   => public_path() . '/uploads',
+            'root' => storage_path('app/public'),
+            'url' => env('APP_URL').'/storage',
+            'visibility' => 'public',
+            'throw' => false,
         ],
 
-        's3_uploads' => [
+        'public_uploads' => [
+            'driver' => 'local',
+            'root' => public_path('uploads'),
+            'url' => env('APP_URL').'/uploads',
+            'visibility' => 'public',
+            'throw' => false,
+        ],
+
+        's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),
             'secret' => env('AWS_SECRET_ACCESS_KEY'),
@@ -28,22 +39,13 @@ return [
             'endpoint' => env('AWS_ENDPOINT'),
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
             'throw' => false,
-            'root' => env('AWS_UPLOADS_ROOT', 'uploads'),
-            'cloudfront_url' => env('AWS_CLOUDFRONT_URL'),
+            'root' => env('AWS_UPLOADS_ROOT', ''),
+            'visibility' => 'private',
         ],
+    ],
 
-        'uploads' => [
-            'driver' => env('UPLOADS_DISK', 'local'),
-            'root' => env('UPLOADS_DISK') === 's3' ? env('AWS_UPLOADS_ROOT', 'uploads') : public_path() . '/uploads',
-            'key' => env('AWS_ACCESS_KEY_ID'),
-            'secret' => env('AWS_SECRET_ACCESS_KEY'),
-            'region' => env('AWS_DEFAULT_REGION'),
-            'bucket' => env('AWS_BUCKET'),
-            'url' => env('AWS_URL'),
-            'endpoint' => env('AWS_ENDPOINT'),
-            'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
-            'throw' => false,
-        ],
+    'links' => [
+        public_path('storage') => storage_path('app/public'),
     ],
 
 ];

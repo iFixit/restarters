@@ -56,15 +56,15 @@
                         <h5>Configuration Status</h5>
                         <div class="row">
                             <div class="col-md-6">
-                                <p><strong>Current Upload Disk:</strong> 
-                                    <span class="badge badge-{{ config('filesystems.disks.uploads.driver') === 's3' ? 'success' : 'secondary' }}">
-                                        {{ config('filesystems.disks.uploads.driver', 'local') }}
+                                <p><strong>Default Filesystem Disk:</strong> 
+                                    <span class="badge badge-{{ config('filesystems.default') === 's3' ? 'success' : 'secondary' }}">
+                                        {{ config('filesystems.default', 'local') }}
                                     </span>
                                 </p>
                             </div>
                             <div class="col-md-6">
                                 <p><strong>S3 Bucket:</strong> 
-                                    <code>{{ config('filesystems.disks.s3_uploads.bucket', 'Not configured') }}</code>
+                                    <code>{{ config('filesystems.disks.s3.bucket', 'Not configured') }}</code>
                                 </p>
                             </div>
                         </div>
@@ -104,7 +104,7 @@
                             <h6>Environment Variables</h6>
                             <p>Make sure these are set in your .env:</p>
                             <ul class="small">
-                                <li>UPLOADS_DISK=s3</li>
+                                <li>FILESYSTEM_DISK=s3</li>
                                 <li>AWS_ACCESS_KEY_ID</li>
                                 <li>AWS_SECRET_ACCESS_KEY</li>
                                 <li>AWS_DEFAULT_REGION</li>

@@ -48,17 +48,17 @@ class AppServiceProvider extends ServiceProvider
 
         \Illuminate\Pagination\Paginator::useBootstrapThree();
 
-        // Register Blade directive for upload URLs
+        // Custom Blade directives for upload URLs
         \Blade::directive('uploadUrl', function ($expression) {
-            return "<?php echo \App\Helpers\FixometerFile::getUploadFileUrl($expression); ?>";
+            return "<?php echo \\App\\Helpers\\FixometerFile::getUploadFileUrl($expression, 'original'); ?>";
         });
 
         \Blade::directive('uploadThumbnailUrl', function ($expression) {
-            return "<?php echo \App\Helpers\FixometerFile::getUploadFileUrl($expression, 'thumbnail'); ?>";
+            return "<?php echo \\App\\Helpers\\FixometerFile::getUploadFileUrl($expression, 'thumbnail'); ?>";
         });
 
         \Blade::directive('uploadMidUrl', function ($expression) {
-            return "<?php echo \App\Helpers\FixometerFile::getUploadFileUrl($expression, 'mid'); ?>";
+            return "<?php echo \\App\\Helpers\\FixometerFile::getUploadFileUrl($expression, 'mid'); ?>";
         });
 
         

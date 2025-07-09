@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
 use App\Helpers\FixometerFile;
+use App\Services\S3Service;
 
 class TestS3Connection extends Command
 {
@@ -22,6 +23,14 @@ class TestS3Connection extends Command
      */
     protected $description = 'Test S3 connection and upload functionality';
 
+    protected $s3Service;
+
+    public function __construct(S3Service $s3Service)
+    {
+        parent::__construct();
+        $this->s3Service = $s3Service;
+    }
+
     /**
      * Execute the console command.
      */
@@ -31,12 +40,13 @@ class TestS3Connection extends Command
         $this->newLine();
 
         // Check current configuration
-        $uploadsDisk = config('filesystems.disks.uploads.driver', 'local');
-        $this->info("Current uploads disk driver: {$uploadsDisk}");
+        $defaultDisk = config('filesystems.default');
+        $this->info("Default filesystem disk: {$defaultDisk}");
+        $this->info("Using S3: " . ($this->s3Service->isUsingS3() ? 'Yes' : 'No'));
 
-        if ($uploadsDisk !== 's3') {
-            $this->warn('⚠️  UPLOADS_DISK is not set to "s3". Current setting: ' . $uploadsDisk);
-            $this->info('To test S3, make sure your .env file has: UPLOADS_DISK=s3');
+        if (!$this->s3Service->isUsingS3()) {
+            $this->warn('⚠️  FILESYSTEM_DISK is not set to "s3". Current setting: ' . $defaultDisk);
+            $this->info('To test S3, make sure your .env file has: FILESYSTEM_DISK=s3');
             $this->newLine();
         }
 
@@ -47,48 +57,67 @@ class TestS3Connection extends Command
         // Test 1: Basic S3 connection
         $this->info('🔍 Test 1: Basic S3 connection...');
         try {
-            $disk = Storage::disk('s3_uploads');
+            // Use default disk which should be 's3' if configured
+            $disk = Storage::disk();
             
             // Try to list bucket contents (this tests basic connectivity)
-            $this->info('   Attempting to connect to S3...');
-            $files = $disk->files('', false); // Non-recursive first
-            $this->info('✅ Successfully connected to S3 bucket');
-            $this->info("   Found " . count($files) . " files in bucket root");
+            $this->info('   Attempting to connect to default disk...');
+            
+            if ($this->s3Service->isUsingS3()) {
+                $files = $disk->files('uploads', false); // Check uploads directory
+                $this->info('✅ Successfully connected to S3 bucket');
+                $this->info("   Found " . count($files) . " files in uploads directory");
+            } else {
+                $files = $disk->files('uploads', false);
+                $this->info('✅ Successfully connected to local storage');
+                $this->info("   Found " . count($files) . " files in uploads directory");
+            }
             
         } catch (\Exception $e) {
-            $this->error('❌ Failed to connect to S3: ' . $e->getMessage());
+            $this->error('❌ Failed to connect to storage: ' . $e->getMessage());
             $this->newLine();
             $this->info('💡 Debugging tips:');
-            $this->info('   1. Check if your AWS credentials are correct');
-            $this->info('   2. Verify your bucket name and region');
-            $this->info('   3. Ensure your AWS user has ListBucket permission');
-            $this->info('   4. Check if you\'re using LocalStack or real AWS');
+            if ($this->s3Service->isUsingS3()) {
+                $this->info('   1. Check if your AWS credentials are correct');
+                $this->info('   2. Verify your bucket name and region');
+                $this->info('   3. Ensure your AWS user has ListBucket permission');
+            } else {
+                $this->info('   1. Check if uploads directory exists and is writable');
+                $this->info('   2. Verify file permissions');
+            }
             return 1;
         }
 
-        // Test 2: Test file upload
+        // Test 2: Test file upload using S3Service
         $this->info('🔍 Test 2: Testing file upload...');
         try {
             $testContent = 'This is a test file created at ' . now()->toDateTimeString();
             $testFileName = 'test-connection-' . time() . '.txt';
             
-            $disk = Storage::disk('s3_uploads');
-            $this->info("   Uploading test file: {$testFileName}");
-            $success = $disk->put($testFileName, $testContent);
+            $disk = Storage::disk(); // Use default disk
+            
+            if ($this->s3Service->isUsingS3()) {
+                $this->info("   Uploading test file to uploads/{$testFileName}");
+                $success = $disk->put('uploads/' . $testFileName, $testContent);
+            } else {
+                $this->info("   Uploading test file to uploads/{$testFileName}");
+                $success = $disk->put('uploads/' . $testFileName, $testContent);
+            }
             
             if ($success) {
                 $this->info('✅ Successfully uploaded test file');
                 
                 // Test file reading
-                $retrievedContent = $disk->get($testFileName);
+                $filePath = 'uploads/' . $testFileName;
+                $retrievedContent = $disk->get($filePath);
                 if ($retrievedContent === $testContent) {
                     $this->info('✅ Successfully read back test file content');
                 } else {
                     $this->error('❌ File content mismatch after upload');
                 }
                 
-                // Get URL and test it
-                $url = $disk->url($testFileName);
+                // Get URL using the S3Service
+                $url = $this->s3Service->getFileUrl($testFileName);
                 $this->info('✅ Generated URL: ' . $url);
                 
                 // Test URL accessibility
@@ -105,7 +134,7 @@ class TestS3Connection extends Command
                 }
                 
                 // Clean up test file
-                $disk->delete($testFileName);
+                $disk->delete($filePath);
                 $this->info('✅ Test file cleaned up');
                 
             } else {
@@ -124,18 +153,18 @@ class TestS3Connection extends Command
             $imageContent = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==');
             $testImageName = 'test-image-' . time() . '.png';
             
-            $disk = Storage::disk('s3_uploads');
+            $disk = Storage::disk(); // Use default disk
             
             // Test original image
-            $disk->put($testImageName, $imageContent);
+            $disk->put('uploads/' . $testImageName, $imageContent);
             $this->info('✅ Uploaded test image: ' . $testImageName);
             
             // Test thumbnail
-            $disk->put('thumbnail_' . $testImageName, $imageContent);
+            $disk->put('uploads/thumbnail_' . $testImageName, $imageContent);
             $this->info('✅ Uploaded test thumbnail: thumbnail_' . $testImageName);
             
             // Test mid-size
-            $disk->put('mid_' . $testImageName, $imageContent);
+            $disk->put('uploads/mid_' . $testImageName, $imageContent);
             $this->info('✅ Uploaded test mid-size image: mid_' . $testImageName);
             
             // Test URL generation using helper
@@ -164,7 +193,11 @@ class TestS3Connection extends Command
             }
             
             // Clean up test images
-            $disk->delete([$testImageName, 'thumbnail_' . $testImageName, 'mid_' . $testImageName]);
+            $disk->delete([
+                'uploads/' . $testImageName, 
+                'uploads/thumbnail_' . $testImageName, 
+                'uploads/mid_' . $testImageName
+            ]);
             $this->info('✅ Test images cleaned up');
             
         } catch (\Exception $e) {
@@ -173,16 +206,16 @@ class TestS3Connection extends Command
         }
 
         // Test 4: Test permissions
-        $this->info('🔍 Test 4: Testing bucket permissions...');
+        $this->info('🔍 Test 4: Testing storage permissions...');
         try {
-            $disk = Storage::disk('s3_uploads');
+            $disk = Storage::disk(); // Use default disk
             
             // Test listing
-            $files = $disk->files();
-            $this->info('✅ Can list bucket contents (' . count($files) . ' files)');
+            $files = $disk->files('uploads');
+            $this->info('✅ Can list storage contents (' . count($files) . ' files)');
             
             // Test if we can check file existence
-            $testFileName = 'permission-test-' . time() . '.txt';
+            $testFileName = 'uploads/permission-test-' . time() . '.txt';
             $disk->put($testFileName, 'test');
             
             if ($disk->exists($testFileName)) {
@@ -195,35 +228,39 @@ class TestS3Connection extends Command
             
         } catch (\Exception $e) {
             $this->error('❌ Permission test failed: ' . $e->getMessage());
-            $this->warn('💡 Check your IAM permissions for the AWS user');
+            if ($this->s3Service->isUsingS3()) {
+                $this->warn('💡 Check your IAM permissions for the AWS user');
+            } else {
+                $this->warn('💡 Check your local file permissions');
+            }
         }
 
         $this->newLine();
-        $this->info('🎉 All S3 tests completed successfully!');
-        $this->info('Your S3 configuration is working properly.');
-        
-        $this->newLine();
-        $this->info('💡 Next steps:');
-        $this->info('   1. Test the web interface at: /test-s3-upload');
-        $this->info('   2. Try uploading images through the actual application');
-        $this->info('   3. Check that existing local images still work if you have any');
+        $this->info('🎉 Storage testing completed!');
         
         return 0;
     }
 
     private function printS3Configuration()
     {
-        $this->info('Current S3 Configuration:');
-        $this->table(
-            ['Setting', 'Value'],
-            [
-                ['AWS_ACCESS_KEY_ID', config('filesystems.disks.s3_uploads.key') ? '***SET***' : 'NOT SET'],
-                ['AWS_SECRET_ACCESS_KEY', config('filesystems.disks.s3_uploads.secret') ? '***SET***' : 'NOT SET'],
-                ['AWS_DEFAULT_REGION', config('filesystems.disks.s3_uploads.region') ?: 'NOT SET'],
-                ['AWS_BUCKET', config('filesystems.disks.s3_uploads.bucket') ?: 'NOT SET'],
-                ['AWS_URL', config('filesystems.disks.s3_uploads.url') ?: 'NOT SET'],
-                ['AWS_UPLOADS_ROOT', config('filesystems.disks.s3_uploads.root') ?: 'uploads'],
-            ]
-        );
+        $this->info('📋 Current Storage Configuration:');
+        $configData = [
+            ['FILESYSTEM_DISK', config('filesystems.default', 'Not set')],
+        ];
+
+        if ($this->s3Service->isUsingS3()) {
+            $configData = array_merge($configData, [
+                ['AWS_ACCESS_KEY_ID', config('filesystems.disks.s3.key') ? '***' . substr(config('filesystems.disks.s3.key'), -4) : 'Not set'],
+                ['AWS_SECRET_ACCESS_KEY', config('filesystems.disks.s3.secret') ? 'Set (***' . substr(config('filesystems.disks.s3.secret'), -4) . ')' : 'Not set'],
+                ['AWS_DEFAULT_REGION', config('filesystems.disks.s3.region', 'Not set')],
+                ['AWS_BUCKET', config('filesystems.disks.s3.bucket', 'Not set')],
+                ['AWS_URL', config('filesystems.disks.s3.url', 'Not set')],
+                ['AWS_ENDPOINT', config('filesystems.disks.s3.endpoint', 'Not set')],
+            ]);
+        } else {
+            $configData[] = ['Storage Type', 'Local filesystem'];
+        }
+
+        $this->table(['Setting', 'Value'], $configData);
     }
 } 

@@ -4,6 +4,7 @@ namespace App\Helpers;
 
 use App\Models\Images;
 use App\Models\Xref;
+use App\Services\S3Service;
 use Illuminate\Database\Eloquent\Model;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
@@ -21,42 +22,22 @@ class FixometerFile extends Model
     protected $dates = true;
     public static $uploadTesting = false;
 
-    /**
-     * Get the uploads disk configuration
-     */
-    private function getUploadsDisk()
+    protected $s3Service;
+
+    public function __construct(array $attributes = [])
     {
-        return config('filesystems.disks.uploads.driver', 'local') === 's3' ? 's3_uploads' : 'public_uploads';
+        parent::__construct($attributes);
     }
 
     /**
-     * Check if we're using S3 for uploads
+     * Get S3 Service instance
      */
-    private function isUsingS3()
+    protected function getS3Service()
     {
-        return config('filesystems.disks.uploads.driver', 'local') === 's3';
-    }
-
-    /**
-     * Get the upload path based on storage type
-     */
-    private function getUploadPath($filename = '')
-    {
-        if ($this->isUsingS3()) {
-            return $filename;
+        if (!$this->s3Service) {
+            $this->s3Service = app(S3Service::class);
         }
-        return public_path('uploads') . ($filename ? '/' . $filename : '');
-    }
-
-    /**
-     * Get the URL for uploaded files
-     */
-    private function getUploadUrl($filename)
-    {
-        if ($this->isUsingS3()) {
-            return Storage::disk('s3_uploads')->url($filename);
-        }
-        return '/uploads/' . $filename;
+        return $this->s3Service;
     }
 
     /**
@@ -69,47 +50,13 @@ class FixometerFile extends Model
             return null;
         }
 
-        $isUsingS3 = config('filesystems.disks.uploads.driver', 'local') === 's3';
-        
-        if ($isUsingS3) {
-            $prefix = '';
-            if ($type === 'thumbnail') {
-                $prefix = 'thumbnail_';
-            } elseif ($type === 'mid') {
-                $prefix = 'mid_';
-            }
-            
-            // Check if CloudFront URL is configured
-            $cloudfrontUrl = config('filesystems.disks.s3_uploads.cloudfront_url');
-            if ($cloudfrontUrl) {
-                // Use CloudFront for serving images
-                $root = config('filesystems.disks.s3_uploads.root');
-                $url = rtrim($cloudfrontUrl, '/') . '/' . ltrim($root, '/') . '/' . $prefix . $filename;
-                return $url;
-            }
-            
-            // Fallback to direct S3 URLs
-            $url = Storage::disk('s3_uploads')->url($prefix . $filename);
-            
-            // Fix for path-style endpoints (LocalStack) - construct proper URL with bucket name
-            if (config('filesystems.disks.s3_uploads.use_path_style_endpoint')) {
-                $bucket = config('filesystems.disks.s3_uploads.bucket');
-                $endpoint = config('filesystems.disks.s3_uploads.endpoint');
-                $root = config('filesystems.disks.s3_uploads.root');
-                
-                // Build correct path-style URL: endpoint/bucket/root/file
-                $url = rtrim($endpoint, '/') . '/' . $bucket . '/' . ltrim($root, '/') . '/' . $prefix . $filename;
-            }
-            
-            return $url;
-        } else {
-            if ($type === 'thumbnail') {
-                return asset('/uploads/thumbnail_' . $filename);
-            } elseif ($type === 'mid') {
-                return asset('/uploads/mid_' . $filename);
-            }
-            return asset('/uploads/' . $filename);
+        // If it's already a full URL, return as is
+        if (filter_var($filename, FILTER_VALIDATE_URL)) {
+            return $filename;
         }
+
+        $s3Service = app(S3Service::class);
+        return $s3Service->getFileUrl($filename, $type);
     }
 
     public function move($from, $to) {
@@ -169,15 +116,15 @@ class FixometerFile extends Model
             \Log::info('FixometerFile upload attempt', [
                 'filename' => $filename,
                 'type' => $type,
-                'storage_type' => $this->isUsingS3() ? 's3' : 'local',
+                'storage_type' => $this->getS3Service()->isUsingS3() ? 's3' : 'local',
                 'reference' => $reference,
                 'reference_type' => $referenceType
             ]);
             
-            if ($this->isUsingS3()) {
+            if ($this->getS3Service()->isUsingS3()) {
                 // Upload to S3
                 $fileContents = file_get_contents($tmp_name);
-                Storage::disk('s3_uploads')->put($filename, $fileContents);
+                Storage::disk('s3')->put('uploads/' . $filename, $fileContents);
                 $this->path = $filename;
             } else {
                 // Upload to local storage
@@ -196,172 +143,166 @@ class FixometerFile extends Model
 
             // In test mode, we skip image manipulations to avoid dependency issues
             if (!FixometerFile::$uploadTesting) {
-                if (!$this->isUsingS3()) {
+                if (!$this->getS3Service()->isUsingS3()) {
                     // Fix orientation for local files
                     $imageManager->read($this->path)->save($this->path);
                 }
+                
+                // Create thumbnails
+                $this->createThumbnails($imageManager, $filename);
             }
 
-            if ($type === 'image') {
-                // Get image dimensions
-                if ($this->isUsingS3()) {
-                    // For S3, we need to get dimensions from the temporary file
-                    $size = getimagesize($tmp_name);
-                } else {
-                    $size = getimagesize($this->path);
-                }
-                $data['width'] = $size[0];
-                $data['height'] = $size[1];
-
-                if ($profile) {
-                    $data['alt_text'] = 'Profile Picture';
-                }
-
-                if ($data['width'] > $data['height']) {
-                    $biggestSide = $data['width'];
-                    $resize_height = true;
-                } else {
-                    $biggestSide = $data['height'];
-                    $resize_height = false;
-                }
-
-                $thumbSize = 80;
-                $midSize = 260;
-
-                // In test mode, we create empty thumbnails to satisfy the code without Intervention
-                if (FixometerFile::$uploadTesting) {
-                    if ($this->isUsingS3()) {
-                        // For S3 testing, just store the same file as thumbnails
-                        Storage::disk('s3_uploads')->put('thumbnail_' . $filename, $fileContents);
-                        Storage::disk('s3_uploads')->put('mid_' . $filename, $fileContents);
-                    } else {
-                        // Just copy the original file as thumbnails for testing
-                        copy($this->path, $this->getUploadPath('thumbnail_' . $filename));
-                        copy($this->path, $this->getUploadPath('mid_' . $filename));
-                    }
-                } else {
-                    // Normal processing with Intervention Image
-                    if ($this->isUsingS3()) {
-                        // For S3, process from temporary file and upload results
-                        $thumb = $imageManager->read($tmp_name);
-                        $mid = $imageManager->read($tmp_name);
-
-                        if ($resize_height) { // Resize before crop
-                            $thumb->scale(null, $thumbSize);
-                            $mid->scale(null, $midSize);
-                        } else {
-                            $thumb->scale($thumbSize, null);
-                            $mid->scale($midSize, null);
-                        }
-
-                        if ($crop) {
-                            $thumb->crop($thumbSize, $thumbSize);
-                            $mid->crop($midSize, $midSize);
-                        }
-
-                        // Save to temporary files and upload to S3
-                        $thumbTemp = tempnam(sys_get_temp_dir(), 'thumb_');
-                        $midTemp = tempnam(sys_get_temp_dir(), 'mid_');
-                        
-                        $thumb->save($thumbTemp, 85);
-                        $mid->save($midTemp, 85);
-                        
-                        Storage::disk('s3_uploads')->put('thumbnail_' . $filename, file_get_contents($thumbTemp));
-                        Storage::disk('s3_uploads')->put('mid_' . $filename, file_get_contents($midTemp));
-                        
-                        // Clean up temporary files
-                        unlink($thumbTemp);
-                        unlink($midTemp);
-                    } else {
-                        // Local processing as before
-                        $thumb = $imageManager->read($this->path);
-                        $mid = $imageManager->read($this->path);
-
-                        if ($resize_height) { // Resize before crop
-                            $thumb->scale(null, $thumbSize);
-                            $mid->scale(null, $midSize);
-                        } else {
-                            $thumb->scale($thumbSize, null);
-                            $mid->scale($midSize, null);
-                        }
-
-                        if ($crop) {
-                            $thumb->crop($thumbSize, $thumbSize);
-                            $mid->crop($midSize, $midSize);
-                        }
-
-                        $thumb->save($this->getUploadPath('thumbnail_' . $filename), 85);
-                        $mid->save($this->getUploadPath('mid_' . $filename), 85);
-                    }
-                }
-
-                $this->table = 'images';
-                $Images = new Images;
-
-                $image = $Images->create($data)->id;
-
-                if (is_numeric($image) && ! is_null($reference) && ! is_null($referenceType)) {
-                    Xref::create([
-                        'object' => $image,
-                        'object_type' => env('TBL_IMAGES'),
-                        'reference' => $reference,
-                        'reference_type' => $referenceType,
-                    ]);
-                }
+            if ($type == 'image') {
+                // Save to database
+                $data['object_type'] = 2;
+                $idxref = $this->saveToDatabase($data, $reference, $referenceType);
+                
+                return $idxref;
+            } else {
+                return $this->file;
             }
-
-            return $filename;
         }
 
-        return null;
+        return false;
     }
 
     /**
-     * generates filename and maintains
-     * correct file extension
-     * (MIME check with Finfo!)
-     * */
+     * Create thumbnail images
+     */
+    protected function createThumbnails($imageManager, $filename)
+    {
+        if ($this->getS3Service()->isUsingS3()) {
+            // For S3, create thumbnails and upload them
+            $this->createS3Thumbnail($imageManager, $filename, 'thumbnail_', 150, 150);
+            $this->createS3Thumbnail($imageManager, $filename, 'mid_', 300, 300);
+        } else {
+            // For local storage, create thumbnails
+            $this->createLocalThumbnail($imageManager, $filename, 'thumbnail_', 150, 150);
+            $this->createLocalThumbnail($imageManager, $filename, 'mid_', 300, 300);
+        }
+    }
+
+    /**
+     * Create S3 thumbnail
+     */
+    protected function createS3Thumbnail($imageManager, $filename, $prefix, $width, $height)
+    {
+        try {
+            $originalPath = 'uploads/' . $filename;
+            $thumbnailPath = 'uploads/' . $prefix . $filename;
+            
+            // Get original image from S3
+            $imageContent = Storage::disk('s3')->get($originalPath);
+            
+            // Create thumbnail
+            $image = $imageManager->read($imageContent);
+            $image->resize($width, $height, function ($constraint) {
+                $constraint->aspectRatio();
+                $constraint->upsize();
+            });
+            
+            // Upload thumbnail to S3
+            Storage::disk('s3')->put($thumbnailPath, $image->toJpeg(90));
+        } catch (\Exception $e) {
+            \Log::error('Failed to create S3 thumbnail: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Create local thumbnail
+     */
+    protected function createLocalThumbnail($imageManager, $filename, $prefix, $width, $height)
+    {
+        try {
+            $uploadsPath = public_path('uploads');
+            $originalPath = $uploadsPath . '/' . $filename;
+            $thumbnailPath = $uploadsPath . '/' . $prefix . $filename;
+            
+            // Create thumbnail
+            $image = $imageManager->read($originalPath);
+            $image->resize($width, $height, function ($constraint) {
+                $constraint->aspectRatio();
+                $constraint->upsize();
+            });
+            
+            $image->save($thumbnailPath);
+        } catch (\Exception $e) {
+            \Log::error('Failed to create local thumbnail: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Save to database
+     */
+    protected function saveToDatabase($data, $reference, $referenceType)
+    {
+        // Save to xref table
+        $idxref = Xref::create([
+            'object_type' => $data['object_type'],
+            'object' => $data['path'],
+            'reference_type' => $referenceType,
+            'reference' => $reference
+        ]);
+
+        // Save to images table
+        Images::create([
+            'image' => $data['path'],
+            'id_reference' => $reference,
+            'reference_type' => $referenceType
+        ]);
+
+        return $idxref->idxref;
+    }
+
     public function filename($tmp_name)
     {
-        $finfo = new \finfo(FILEINFO_MIME_TYPE);
-        $lext = array_search(
-            $finfo->file($tmp_name),
-            [
-                'jpg' => 'image/jpeg',
-                'png' => 'image/png',
-                'gif' => 'image/gif',
-            ],
-            true
-        );
-
-        if (empty($lext) || ! $lext || is_null($lext)) {
-            return false;
+        // Generate unique filename
+        $finfo = new \finfo(FILEINFO_EXTENSION);
+        $ext = $finfo->file($tmp_name);
+        
+        if (empty($ext)) {
+            $ext = 'jpg'; // Default extension
         }
-        $this->ext = $lext;
-
-        return time().sha1_file($tmp_name).rand(1, 15000).'.'.$lext;
+        
+        return time() . '_' . mt_rand(100000, 999999) . '.' . $ext;
     }
 
     public function findImages($of_ref_type, $ref_id)
     {
-        $sql = 'SELECT * FROM `images` AS `i`
-                    INNER JOIN `xref` AS `x` ON `x`.`object` = `i`.`idimages`
-                    WHERE `x`.`object_type` = '.env('TBL_IMAGES').' AND
-                    `x`.`reference_type` = :refType AND
-                    `x`.`reference` = :refId';
-
-        try {
-            return DB::select($sql, ['refType' => $of_ref_type, 'refId' => $ref_id]);
-        } catch (\Illuminate\Database\QueryException $e) {
-            return DB::db($e);
-        }
+        $images = Images::where('id_reference', $ref_id)
+                       ->where('reference_type', $of_ref_type)
+                       ->get();
+        
+        return $images;
     }
 
     public function deleteImage($idxref)
     {
-        // Delete the xref.  This is sufficient to stop the image being attached to the device.  We leave the
-        // file in existence in case we want it later for debugging/mining.
-        $sql = 'DELETE FROM `xref` WHERE `idxref` = :id AND `object_type` = '.env('TBL_IMAGES');
-        DB::delete($sql, ['id' => $idxref]);
+        $xref = Xref::find($idxref);
+        
+        if ($xref) {
+            $filename = $xref->object;
+            
+            // Delete files from storage
+            if ($this->getS3Service()->isUsingS3()) {
+                Storage::disk('s3')->delete('uploads/' . $filename);
+                Storage::disk('s3')->delete('uploads/thumbnail_' . $filename);
+                Storage::disk('s3')->delete('uploads/mid_' . $filename);
+            } else {
+                $uploadsPath = public_path('uploads');
+                @unlink($uploadsPath . '/' . $filename);
+                @unlink($uploadsPath . '/thumbnail_' . $filename);
+                @unlink($uploadsPath . '/mid_' . $filename);
+            }
+            
+            // Delete from database
+            $xref->delete();
+            
+            Images::where('image', $filename)->delete();
+            
+            return true;
+        }
+        
+        return false;
     }
 }

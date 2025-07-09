@@ -8,4 +8,5 @@ return [
     App\Providers\DiscourseServiceProvider::class,
     App\Providers\ScheduleServiceProvider::class,
     App\Providers\OurSentryLogging::class,
+    App\Providers\S3ServiceProvider::class,
 ];
