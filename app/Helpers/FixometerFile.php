@@ -124,10 +124,55 @@ class FixometerFile extends Model
             if ($this->getS3Service()->isUsingS3()) {
                 // Upload to S3
                 $fileContents = file_get_contents($tmp_name);
-                $uploadResult = Storage::disk('s3')->put('uploads/' . $filename, $fileContents);
                 
-                if (!$uploadResult) {
-                    \Log::error('Failed to upload file to S3', ['filename' => $filename]);
+                if ($fileContents === false) {
+                    \Log::error('Failed to read file contents', [
+                        'tmp_name' => $tmp_name,
+                        'filename' => $filename,
+                        'file_exists' => file_exists($tmp_name),
+                        'file_size' => file_exists($tmp_name) ? filesize($tmp_name) : 'N/A'
+                    ]);
+                    return false;
+                }
+                
+                \Log::info('Attempting S3 upload', [
+                    'filename' => $filename,
+                    'file_size' => strlen($fileContents),
+                    'tmp_name' => $tmp_name,
+                    'target_path' => 'uploads/' . $filename
+                ]);
+                
+                try {
+                    $uploadResult = Storage::disk('s3')->put('uploads/' . $filename, $fileContents);
+                    
+                    if (!$uploadResult) {
+                        // Get more detailed error information
+                        $s3Config = config('filesystems.disks.s3');
+                        \Log::error('S3 upload failed', [
+                            'filename' => $filename,
+                            'file_size' => strlen($fileContents),
+                            'bucket' => $s3Config['bucket'] ?? 'not_set',
+                            'region' => $s3Config['region'] ?? 'not_set',
+                            'has_credentials' => !empty($s3Config['key']) && !empty($s3Config['secret']),
+                            'target_path' => 'uploads/' . $filename
+                        ]);
+                        return false;
+                    }
+                    
+                    \Log::info('S3 upload successful', [
+                        'filename' => $filename,
+                        'file_size' => strlen($fileContents),
+                        'upload_result' => $uploadResult
+                    ]);
+                    
+                } catch (\Exception $e) {
+                    \Log::error('S3 upload exception', [
+                        'filename' => $filename,
+                        'error' => $e->getMessage(),
+                        'error_code' => $e->getCode(),
+                        'exception_class' => get_class($e),
+                        'trace' => $e->getTraceAsString()
+                    ]);
                     return false;
                 }
                 
@@ -136,8 +181,20 @@ class FixometerFile extends Model
                 usleep(500000); // 0.5 second
                 
                 // Verify file exists before proceeding
-                if (!Storage::disk('s3')->exists('uploads/' . $filename)) {
-                    \Log::error('File not available in S3 after upload', ['filename' => $filename]);
+                try {
+                    if (!Storage::disk('s3')->exists('uploads/' . $filename)) {
+                        \Log::error('File not available in S3 after upload', [
+                            'filename' => $filename,
+                            'path' => 'uploads/' . $filename
+                        ]);
+                        return false;
+                    }
+                } catch (\Exception $e) {
+                    \Log::error('Failed to verify file existence in S3', [
+                        'filename' => $filename,
+                        'error' => $e->getMessage(),
+                        'path' => 'uploads/' . $filename
+                    ]);
                     return false;
                 }
                 
@@ -170,7 +227,7 @@ class FixometerFile extends Model
 
             if ($type == 'image') {
                 // Save to database
-                $data['object_type'] = 2;
+                $data['object_type'] = 5; // 5 = images for users/profiles
                 $idxref = $this->saveToDatabase($data, $reference, $referenceType);
                 
                 return $idxref;
@@ -354,19 +411,17 @@ class FixometerFile extends Model
      */
     protected function saveToDatabase($data, $reference, $referenceType)
     {
-        // Save to xref table
-        $idxref = Xref::create([
-            'object_type' => $data['object_type'],
-            'object' => $data['path'],
-            'reference_type' => $referenceType,
-            'reference' => $reference
+        // Create image record first
+        $image = Images::create([
+            'path' => $data['path'],
         ]);
 
-        // Save to images table
-        Images::create([
-            'image' => $data['path'],
-            'id_reference' => $reference,
-            'reference_type' => $referenceType
+        // Save to xref table with image ID
+        $idxref = Xref::create([
+            'object_type' => $data['object_type'],
+            'object' => $image->idimages,
+            'reference_type' => $referenceType,
+            'reference' => $reference
         ]);
 
         return $idxref->idxref;
@@ -399,24 +454,29 @@ class FixometerFile extends Model
         $xref = Xref::find($idxref);
         
         if ($xref) {
-            $filename = $xref->object;
+            $imageId = $xref->object;
+            $image = Images::find($imageId);
             
-            // Delete files from storage
-            if ($this->getS3Service()->isUsingS3()) {
-                Storage::disk('s3')->delete('uploads/' . $filename);
-                Storage::disk('s3')->delete('uploads/thumbnail_' . $filename);
-                Storage::disk('s3')->delete('uploads/mid_' . $filename);
-            } else {
-                $uploadsPath = public_path('uploads');
-                @unlink($uploadsPath . '/' . $filename);
-                @unlink($uploadsPath . '/thumbnail_' . $filename);
-                @unlink($uploadsPath . '/mid_' . $filename);
+            if ($image && $image->path) {
+                $filename = $image->path;
+                
+                // Delete files from storage
+                if ($this->getS3Service()->isUsingS3()) {
+                    Storage::disk('s3')->delete('uploads/' . $filename);
+                    Storage::disk('s3')->delete('uploads/thumbnail_' . $filename);
+                    Storage::disk('s3')->delete('uploads/mid_' . $filename);
+                } else {
+                    $uploadsPath = public_path('uploads');
+                    @unlink($uploadsPath . '/' . $filename);
+                    @unlink($uploadsPath . '/thumbnail_' . $filename);
+                    @unlink($uploadsPath . '/mid_' . $filename);
+                }
+                
+                // Delete from database
+                $image->delete();
             }
             
-            // Delete from database
             $xref->delete();
-            
-            Images::where('image', $filename)->delete();
             
             return true;
         }
