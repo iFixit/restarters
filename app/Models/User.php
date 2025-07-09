@@ -41,7 +41,7 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'role', 'recovery', 'recovery_expires', 'language', 'repair_network', 'location', 'age', 'gender', 'country_code', 'newsletter', 'invites', 'biography', 'consent_future_data', 'consent_past_data', 'consent_gdpr', 'number_of_logins', 'latitude', 'longitude', 'last_login_at', 'api_token', 'access_group_tag_id', 'calendar_hash', 'repairdir_role', 'mediawiki', 'username',
+        'name', 'email', 'password', 'role', 'recovery', 'recovery_expires', 'language', 'repair_network', 'location', 'age', 'gender', 'country_code', 'newsletter', 'invites', 'biography', 'consent_future_data', 'consent_past_data', 'consent_gdpr', 'number_of_logins', 'latitude', 'longitude', 'last_login_at', 'api_token', 'access_group_tag_id', 'calendar_hash', 'repairdir_role', 'mediawiki', 'username', 'external_user_id', 'external_username',
     ];
 
     /**
@@ -574,6 +574,26 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
         // working.  So at the moment we are passing a locale explicitly in the translations in the notifications
         // to users (not admins).
         return $this->language ?? config('app.locale', 'en');
+    }
+
+    /**
+     * Sync user from external service data
+     */
+    public static function syncFromExternal(array $externalUserData): User
+    {
+        return self::updateOrCreate(
+            ['external_user_id' => $externalUserData['userid']],
+            [
+                'name' => $externalUserData['username'],
+                'email' => $externalUserData['login'],
+                'external_user_id' => $externalUserData['userid'],
+                'external_username' => $externalUserData['unique_username'] ?? null,
+                'role' => 4, // Default role for external users
+                'username' => $externalUserData['unique_username'] ?? null,
+                'password' => null, // External users don't have local passwords
+                'repairdir_role' => Role::REPAIR_DIRECTORY_NONE,
+            ]
+        );
     }
 
     public static function userCanSeeEvent($user, $event) {

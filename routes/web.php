@@ -66,6 +66,29 @@ Route::middleware('ensureAPIToken')->group(function () {
 // We use the Laravel login route.
     Auth::routes();
 
+    // iFixit external authentication routes
+    Route::get('/auth/ifixit/login', function (App\Services\IFixitAuthService $iFixitAuthService) {
+        $callbackUrl = request()->get('redirect', '/');
+        $iFixitLoginUrl = $iFixitAuthService->getLoginUrl($callbackUrl);
+        return redirect($iFixitLoginUrl);
+    })->name('auth.ifixit.login');
+
+    Route::post('/auth/ifixit/logout', function (App\Services\IFixitAuthService $iFixitAuthService) {
+        \Log::info('Logging out from iFixit');
+        $callbackUrl = url('/auth/ifixit/logout-callback');
+        
+        return redirect($iFixitAuthService->getLogoutUrl($callbackUrl));
+    })->name('auth.ifixit.logout');
+
+    Route::get('/auth/ifixit/logout-callback', function () {
+        \Log::info('Logging out from iFixit callback');
+        // Clear any local session data
+        session()->flush();
+        
+        // Clear session cookie
+        return redirect('/login')->withCookie(cookie('session', null, -1, '/'));
+    })->name('auth.ifixit.logout-callback');
+
     Route::middleware('guest')->group(function ()
     {
         Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -377,6 +400,14 @@ Route::middleware('ensureAPIToken')->group(function () {
     });
 });
 
+Route::middleware('unifiedAuth')->group(function () {
+    //Dashboard Controller
+    Route::prefix('dashboard')->group(function () {
+        Route::get('/', [DashboardController::class, 'index'])->name('dashboard')->middleware('AcceptUserInvites');
+        Route::get('/host', [DashboardController::class, 'getHostDash']);
+    });
+});
+
 Route::middleware('auth', 'verifyUserConsent', 'ensureAPIToken')->group(function () {
     //User Controller
     Route::prefix('profile')->group(function () {
@@ -414,12 +445,6 @@ Route::middleware('auth', 'verifyUserConsent', 'ensureAPIToken')->group(function
         Route::get('/', [CategoryController::class, 'index'])->name('category');
         Route::get('/edit/{id}', [CategoryController::class, 'getEditCategory']);
         Route::post('/edit/{id}', [CategoryController::class, 'postEditCategory']);
-    });
-
-    //Dashboard Controller
-    Route::prefix('dashboard')->group(function () {
-        Route::get('/', [DashboardController::class, 'index'])->name('dashboard')->middleware('AcceptUserInvites');
-        Route::get('/host', [DashboardController::class, 'getHostDash']);
     });
 
     Route::prefix('fixometer')->group(function () {

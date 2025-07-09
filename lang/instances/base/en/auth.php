@@ -32,4 +32,6 @@ this is a permanent action.',
   'assigned_groups' => 'Assigned to groups',
   'save_user' => 'Save user',
   'login_before_using_shareable_link' => 'To complete your invitation please create an account below, or if you already have an account <a href=":login_url">login here</a>.',
+  'or_login_with' => 'Or login with',
+  'login_with_ifixit' => 'Login with iFixit',
 ];

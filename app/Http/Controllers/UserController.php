@@ -908,8 +908,20 @@ class UserController extends Controller
 
     public function logout(): RedirectResponse
     {
-        Auth::logout();
+        // If authenticated via iFixit external session
+        if (Auth::guard('external_session')->check()) {
+            $callbackUrl = url('/auth/ifixit/logout-callback');
+            return redirect(app(App\Services\IFixitAuthService::class)->getLogoutUrl($callbackUrl));
+        }
 
+        // If authenticated via regular Laravel session
+        if (Auth::check()) {
+            Auth::logout();
+
+            return redirect('/login');
+        }
+
+        // If not authenticated, just redirect to login
         return redirect('/login');
     }
 

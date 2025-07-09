@@ -12,5 +12,9 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        'external_session' => [
+            'driver' => 'external_session',
+            'provider' => 'users',
+        ],
     ],
 ];

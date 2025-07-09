@@ -35,12 +35,24 @@
                   <a class="entry-panel__link" href="/user/recover">{{ translatedForgotPassword }}</a>
                 </div>
                 <div class="col-12">
-                  <a class="entry-panel__link" href="/user/register">{{ translatedCreateAccount}}</a>
+                  <a class="entry-panel__link" href="/user/register">{{ translatedCreateAccount }}</a>
                 </div>
               </div>
             </div>
             <div class="col-6 col-md-4 align-content-center flex-column justify-content-end d-flex">
-              <b-button id="login-form-submit" type="submit" variant="primary" @click="login" :disabled="disabled">{{ translatedLogin }}</b-button>
+              <b-button id="login-form-submit" type="submit" variant="primary" @click="login" :disabled="disabled">{{
+                translatedLogin }}</b-button>
+            </div>
+          </div>
+
+          <!-- iFixit Login Option -->
+          <div class="row mt-3" v-if="iFixitEnabled">
+            <div class="col-12 text-center">
+              <hr class="my-3">
+              <p class="mb-2 text-muted">{{ translatedOrLoginWith }}</p>
+              <b-button variant="outline-primary" @click="loginWithIFixit" class="btn-block">
+                {{ translatedLoginWithIFixit }}
+              </b-button>
             </div>
           </div>
         </form>
@@ -61,7 +73,7 @@ import auth from '../mixins/auth'
 
 export default {
   components: {},
-  mixins: [ auth ],
+  mixins: [auth],
   props: {
     error: {
       type: Boolean,
@@ -74,9 +86,14 @@ export default {
     email: {
       type: String,
       required: true
+    },
+    iFixitEnabled: {
+      type: Boolean,
+      required: false,
+      default: true
     }
   },
-  data () {
+  data() {
     return {
       disabled: false,
     }
@@ -114,6 +131,12 @@ export default {
     },
     translatedAuthFailed() {
       return this.$lang.get('auth.failed')
+    },
+    translatedOrLoginWith() {
+      return this.$lang.get('auth.or_login_with')
+    },
+    translatedLoginWithIFixit() {
+      return this.$lang.get('auth.login_with_ifixit')
     }
   },
   methods: {
@@ -124,6 +147,16 @@ export default {
       // The default event handler will proceed to validate the form (because of the required attributes) and
       // submit or show a native error.
       this.submitDisabled = true
+    },
+    loginWithIFixit() {
+      // Get the current URL for redirect after login
+      const currentUrl = window.location.href
+
+      // Construct the iFixit login URL with redirect
+      const iFixitLoginUrl = `/auth/ifixit/login?redirect=${encodeURIComponent(currentUrl)}`
+
+      // Redirect to iFixit login
+      window.location.href = iFixitLoginUrl
     }
   }
 }

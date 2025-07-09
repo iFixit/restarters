@@ -18,6 +18,7 @@
                 :error="{{ count($errors->all()) ? 'true' : 'false' }}"
                 time="{{ Crypt::encrypt(time()) }}"
                 email="{{ old('email') }}"
+                :i-fixit-enabled="{{ config('external_auth.enabled', true) ? 'true' : 'false' }}"
             />
         </div>
 

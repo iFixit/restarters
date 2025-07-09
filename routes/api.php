@@ -4,6 +4,7 @@ use App\Http\Controllers\API;
 use App\Http\Controllers\ApiController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -127,3 +128,49 @@ Route::prefix('v2')->group(function() {
 });
 
 Route::get('/timezone', [API\TimeZoneController::class, 'lookup']);
+
+// Authentication check endpoint for iFixit external auth
+Route::get('/auth/check', function () {
+    // Check if external auth is enabled
+    if (!config('external_auth.enabled', true)) {
+        return response()->json([
+            'isAuthenticated' => false,
+            'message' => 'External authentication is disabled'
+        ], 503);
+    }
+    
+    // Check regular authentication first
+    if (Auth::check()) {
+        return response()->json([
+            'isAuthenticated' => true,
+            'user' => [
+                'id' => Auth::user()->id,
+                'email' => Auth::user()->email,
+                'name' => Auth::user()->name,
+                'username' => Auth::user()->username,
+                'external_username' => Auth::user()->external_username,
+                'external_user_id' => Auth::user()->external_user_id,
+            ]
+        ]);
+    }
+    
+    // Check external authentication
+    if (Auth::guard('external_session')->check()) {
+        $user = Auth::guard('external_session')->user();
+        return response()->json([
+            'isAuthenticated' => true,
+            'user' => [
+                'id' => $user->id,
+                'email' => $user->email,
+                'name' => $user->name,
+                'username' => $user->username,
+                'external_username' => $user->external_username,
+                'external_user_id' => $user->external_user_id,
+            ]
+        ]);
+    }
+    
+    return response()->json([
+        'isAuthenticated' => false,
+    ], 401);
+});
