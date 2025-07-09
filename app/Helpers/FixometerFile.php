@@ -124,7 +124,23 @@ class FixometerFile extends Model
             if ($this->getS3Service()->isUsingS3()) {
                 // Upload to S3
                 $fileContents = file_get_contents($tmp_name);
-                Storage::disk('s3')->put('uploads/' . $filename, $fileContents);
+                $uploadResult = Storage::disk('s3')->put('uploads/' . $filename, $fileContents);
+                
+                if (!$uploadResult) {
+                    \Log::error('Failed to upload file to S3', ['filename' => $filename]);
+                    return false;
+                }
+                
+                // Give S3 a moment to make the file available for reading
+                // This helps prevent timing issues with immediate thumbnail creation
+                usleep(500000); // 0.5 second
+                
+                // Verify file exists before proceeding
+                if (!Storage::disk('s3')->exists('uploads/' . $filename)) {
+                    \Log::error('File not available in S3 after upload', ['filename' => $filename]);
+                    return false;
+                }
+                
                 $this->path = $filename;
             } else {
                 // Upload to local storage
@@ -173,12 +189,24 @@ class FixometerFile extends Model
     {
         if ($this->getS3Service()->isUsingS3()) {
             // For S3, create thumbnails and upload them
-            $this->createS3Thumbnail($imageManager, $filename, 'thumbnail_', 150, 150);
-            $this->createS3Thumbnail($imageManager, $filename, 'mid_', 300, 300);
+            $thumbnailSuccess = $this->createS3Thumbnail($imageManager, $filename, 'thumbnail_', 150, 150);
+            $midSuccess = $this->createS3Thumbnail($imageManager, $filename, 'mid_', 300, 300);
+            
+            // Log overall thumbnail creation result
+            \Log::info('S3 thumbnail creation completed', [
+                'filename' => $filename,
+                'thumbnail_success' => $thumbnailSuccess,
+                'mid_success' => $midSuccess
+            ]);
+            
+            // Even if thumbnails fail, we don't want to fail the entire upload
+            // The original image was uploaded successfully
+            return true;
         } else {
             // For local storage, create thumbnails
             $this->createLocalThumbnail($imageManager, $filename, 'thumbnail_', 150, 150);
             $this->createLocalThumbnail($imageManager, $filename, 'mid_', 300, 300);
+            return true;
         }
     }
 
@@ -191,20 +219,110 @@ class FixometerFile extends Model
             $originalPath = 'uploads/' . $filename;
             $thumbnailPath = 'uploads/' . $prefix . $filename;
             
-            // Get original image from S3
-            $imageContent = Storage::disk('s3')->get($originalPath);
+            // Add detailed logging for debugging
+            \Log::info('Creating S3 thumbnail', [
+                'original_path' => $originalPath,
+                'thumbnail_path' => $thumbnailPath,
+                'dimensions' => "{$width}x{$height}"
+            ]);
             
-            // Create thumbnail
-            $image = $imageManager->read($imageContent);
-            $image->resize($width, $height, function ($constraint) {
-                $constraint->aspectRatio();
-                $constraint->upsize();
-            });
+            // Check if original file exists in S3
+            if (!Storage::disk('s3')->exists($originalPath)) {
+                \Log::error('Original file not found in S3', ['path' => $originalPath]);
+                return false;
+            }
             
-            // Upload thumbnail to S3
-            Storage::disk('s3')->put($thumbnailPath, $image->toJpeg(90));
+            // Get original image from S3 with retry mechanism
+            $maxRetries = 3;
+            $imageContent = null;
+            
+            for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
+                try {
+                    $imageContent = Storage::disk('s3')->get($originalPath);
+                    
+                    // Validate image content
+                    if (empty($imageContent)) {
+                        throw new \Exception('Empty image content retrieved from S3');
+                    }
+                    
+                    // Check if content starts with valid image headers
+                    $imageHeaders = ['PNG' => "\x89PNG", 'JPEG' => "\xFF\xD8\xFF", 'GIF' => 'GIF'];
+                    $isValidImage = false;
+                    
+                    foreach ($imageHeaders as $type => $header) {
+                        if (substr($imageContent, 0, strlen($header)) === $header) {
+                            $isValidImage = true;
+                            \Log::info('Valid image detected', ['type' => $type, 'size' => strlen($imageContent)]);
+                            break;
+                        }
+                    }
+                    
+                    if (!$isValidImage) {
+                        throw new \Exception('Invalid image format or corrupted content');
+                    }
+                    
+                    // If we reach here, content is valid
+                    break;
+                    
+                } catch (\Exception $e) {
+                    \Log::warning("Attempt {$attempt} failed to retrieve image from S3", [
+                        'error' => $e->getMessage(),
+                        'path' => $originalPath
+                    ]);
+                    
+                    if ($attempt === $maxRetries) {
+                        throw $e;
+                    }
+                    
+                    // Wait before retry
+                    usleep(500000); // 0.5 second
+                }
+            }
+            
+            // Create thumbnail with better error handling
+            try {
+                $image = $imageManager->read($imageContent);
+                
+                // Resize with proper constraints
+                $image->resize($width, $height, function ($constraint) {
+                    $constraint->aspectRatio();
+                    $constraint->upsize();
+                });
+                
+                // Convert to JPEG with quality control
+                $thumbnailContent = $image->toJpeg(90);
+                
+                // Upload thumbnail to S3
+                $uploadResult = Storage::disk('s3')->put($thumbnailPath, $thumbnailContent);
+                
+                if ($uploadResult) {
+                    \Log::info('S3 thumbnail created successfully', [
+                        'path' => $thumbnailPath,
+                        'size' => strlen($thumbnailContent)
+                    ]);
+                    return true;
+                } else {
+                    throw new \Exception('Failed to upload thumbnail to S3');
+                }
+                
+            } catch (\Exception $e) {
+                \Log::error('Failed to process image for thumbnail', [
+                    'error' => $e->getMessage(),
+                    'image_size' => strlen($imageContent),
+                    'original_path' => $originalPath
+                ]);
+                throw $e;
+            }
+            
         } catch (\Exception $e) {
-            \Log::error('Failed to create S3 thumbnail: ' . $e->getMessage());
+            \Log::error('Failed to create S3 thumbnail', [
+                'error' => $e->getMessage(),
+                'filename' => $filename,
+                'prefix' => $prefix,
+                'dimensions' => "{$width}x{$height}",
+                'trace' => $e->getTraceAsString()
+            ]);
+            return false;
         }
     }
 
