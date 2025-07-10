@@ -59,9 +59,19 @@ export default {
   },
   computed: {
     groupImage() {
-      console.log("groupImage", this.group?.group_image?.image);
-
-      return this.group && this.group.group_image && this.group.group_image.image ? ('/uploads/mid_' + this.group.group_image.image.path) : DEFAULT_PROFILE
+      if (this.group && this.group.group_image && this.group.group_image.image) {
+        const imagePath = this.group.group_image.image.path;
+        
+        // Use the global helper function to get the correct URL
+        if (window.getUploadUrl) {
+          return window.getUploadUrl(imagePath, 'mid');
+        }
+        
+        // Fallback for older code - should not be needed
+        return `/uploads/mid_${imagePath}`;
+      }
+      
+      return DEFAULT_PROFILE;
     },
     location() {
       // This is a bit of finagling to deal with us not yet having full use of APIs in the client.

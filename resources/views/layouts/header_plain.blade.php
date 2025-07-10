@@ -49,6 +49,34 @@
             window.appDebug = "{{ env('APP_DEBUG', '0') }}";
             window.Laravel = {
                 imageUploadEnabled: @json(config('restarters.features.image_upload_enabled', false)),
+                uploadsUsingS3: @json(config('filesystems.disks.uploads.driver', 'local') === 's3'),
+                aws_url: @json(env('AWS_URL', '')),
+            };
+            
+            // Global helper for upload URLs
+            window.getUploadUrl = function(filename, type = 'original') {
+                if (!filename) return null;
+                
+                // Check if it's already a full URL (S3)
+                if (filename.startsWith('http')) {
+                    return filename;
+                }
+                
+                // Determine the prefix based on type
+                let prefix = '';
+                if (type === 'thumbnail') {
+                    prefix = 'thumbnail_';
+                } else if (type === 'mid') {
+                    prefix = 'mid_';
+                }
+                
+                // Use CloudFront URL if available and using S3
+                if (window.Laravel.uploadsUsingS3 && window.Laravel.aws_url) {
+                    return `${window.Laravel.aws_url}uploads/${prefix}${filename}`;
+                }
+                
+                // Fallback to local storage URL
+                return `/uploads/${prefix}${filename}`;
             };
         </script>
 

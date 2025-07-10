@@ -80,18 +80,6 @@ class FixometerFile extends Model
      * */
     public function upload($file, $type, $reference = null, $referenceType = null, $multiple = false, $profile = false, $ajax = false, $crop = true)
     {
-        // Debug logging to track parameters through the upload process
-        \Log::info('FixometerFile upload started', [
-            'file' => $file,
-            'type' => $type,
-            'reference' => $reference,
-            'referenceType' => $referenceType,
-            'multiple' => $multiple,
-            'profile' => $profile,
-            'ajax' => $ajax,
-            'crop' => $crop
-        ]);
-        
         $clear = true; // purge pre-existing images from db - this is the default behaviour
 
         if (is_string($file) && isset($_FILES[$file])) {
@@ -240,16 +228,6 @@ class FixometerFile extends Model
             if ($type == 'image') {
                 // Save to database
                 $data['object_type'] = 5; // 5 = images for users/profiles
-                
-                // Debug logging before saveToDatabase call
-                \Log::info('About to call saveToDatabase', [
-                    'data' => $data,
-                    'reference' => $reference,
-                    'referenceType' => $referenceType,
-                    'reference_is_null' => is_null($reference),
-                    'referenceType_is_null' => is_null($referenceType)
-                ]);
-                
                 $idxref = $this->saveToDatabase($data, $reference, $referenceType);
                 
                 return $idxref;
@@ -433,17 +411,6 @@ class FixometerFile extends Model
      */
     protected function saveToDatabase($data, $reference, $referenceType)
     {
-        // Debug logging at the start of saveToDatabase
-        \Log::info('saveToDatabase called with parameters', [
-            'data' => $data,
-            'reference' => $reference,
-            'referenceType' => $referenceType,
-            'reference_type' => gettype($reference),
-            'referenceType_type' => gettype($referenceType),
-            'reference_is_null' => is_null($reference),
-            'referenceType_is_null' => is_null($referenceType)
-        ]);
-        
         try {
             // Create image record first
             $image = Images::create([
@@ -453,14 +420,6 @@ class FixometerFile extends Model
             \Log::info('Image record created', [
                 'image_id' => $image->idimages,
                 'path' => $data['path']
-            ]);
-
-            // Debug logging before xref creation
-            \Log::info('About to create xref record', [
-                'object_type' => $data['object_type'],
-                'object' => $image->idimages,
-                'reference_type' => $referenceType,
-                'reference' => $reference
             ]);
 
             // Save to xref table with image ID
@@ -483,13 +442,9 @@ class FixometerFile extends Model
         } catch (\Exception $e) {
             \Log::error('Failed to save image to database', [
                 'error' => $e->getMessage(),
-                'error_code' => $e->getCode(),
-                'path' => $data['path'] ?? 'not_set',
+                'path' => $data['path'],
                 'reference' => $reference,
                 'reference_type' => $referenceType,
-                'reference_is_null' => is_null($reference),
-                'referenceType_is_null' => is_null($referenceType),
-                'data_object_type' => $data['object_type'] ?? 'not_set',
                 'trace' => $e->getTraceAsString()
             ]);
             throw $e;
