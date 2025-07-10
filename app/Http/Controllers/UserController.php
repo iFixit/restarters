@@ -352,8 +352,28 @@ class UserController extends Controller
             $id = Auth::id();
         }
 
+        // Debug logging to track what parameters are being passed
+        \Log::info('postProfilePictureEdit called', [
+            'user_id' => $id,
+            'tbl_users_env' => env('TBL_USERS'),
+            'files_present' => isset($_FILES) && !empty($_FILES),
+            'files_count' => isset($_FILES) ? count($_FILES) : 0,
+            'files_keys' => isset($_FILES) ? array_keys($_FILES) : []
+        ]);
+
         if (isset($_FILES) && ! empty($_FILES)) {
             $file = new FixometerFile;
+            
+            // Debug logging before upload call
+            \Log::info('About to call upload from UserController', [
+                'file_param' => 'profilePhoto',
+                'type' => 'image',
+                'reference' => $id,
+                'referenceType' => env('TBL_USERS'),
+                'reference_type' => gettype($id),
+                'referenceType_type' => gettype(env('TBL_USERS'))
+            ]);
+            
             $file->upload('profilePhoto', 'image', $id, env('TBL_USERS'), false, true);
 
             return redirect()->back()->with('message', __('profile.picture_success'));
