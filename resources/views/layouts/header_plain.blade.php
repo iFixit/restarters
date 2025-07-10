@@ -75,7 +75,7 @@
                 
                 // Use CloudFront URL if available and using S3
                 if (window.Laravel.uploadsUsingS3 && window.Laravel.aws_url) {
-                    return `${window.Laravel.aws_url}uploads/${prefix}${filename}`;
+                    return `${window.Laravel.aws_url}/uploads/${prefix}${filename}`;
                 }
                 
                 // Fallback to local storage URL
