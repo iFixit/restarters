@@ -28,6 +28,7 @@
 <script>
 import FileUploader from './FileUploader'
 import DeviceImage from './DeviceImage'
+import axios from 'axios';
 
 export default {
   components: { DeviceImage, FileUploader },
@@ -124,19 +125,31 @@ export default {
         return { success: true, images: [] };
       }
 
-      console.log('Uploading pending files:', this.pendingFiles);
-
-      const uploadPromises = this.pendingFiles.map(file => this.uploadSingleFile(file));
+      console.log('Uploading pending files sequentially:', this.pendingFiles);
 
       try {
-        const results = await Promise.all(uploadPromises);
+        const allUploadedImages = [];
 
-        // Clear pending files after successful upload
+        // Create a copy of pending files to avoid modifying array while iterating
+        const filesToUpload = [...this.pendingFiles];
+
+        // Upload files one by one sequentially to avoid server conflicts
+        for (const file of filesToUpload) {
+          console.log('Uploading file:', file.name);
+
+          const result = await this.uploadSingleFile(file);
+
+          if (result.success && result.images) {
+            // Collect all uploaded images
+            allUploadedImages.push(...result.images);
+            console.log('Successfully uploaded:', file.name, result.images);
+          }
+        }
+
+        // Clear all pending files after successful upload
         this.clearPendingFiles();
 
-        // Return combined results
-        const allImages = results.flatMap(result => result.images || []);
-        return { success: true, images: allImages };
+        return { success: true, images: allUploadedImages };
 
       } catch (error) {
         console.error('Error uploading files:', error);
@@ -145,26 +158,30 @@ export default {
     },
 
     async uploadSingleFile(file) {
+      console.log('Starting upload for file:', file.name, 'to device:', this.id);
+
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('_token', this.$store.getters['auth/CSRF']);
 
       try {
-        const response = await fetch(this.uploadURL, {
-          method: 'POST',
-          body: formData
+        const response = await axios.post(`/party/device/${this.id}/image-upload`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
         });
 
-        const result = await response.json();
+        console.log('Upload response for', file.name, ':', response.data);
 
-        if (!response.ok) {
-          throw new Error(result.error || 'Upload failed');
+        if (response.data.success) {
+          return {
+            success: true,
+            images: response.data.images || []
+          };
+        } else {
+          throw new Error(response.data.error || 'Upload failed');
         }
-
-        return result;
-
       } catch (error) {
-        console.error('Single file upload error:', error);
+        console.error('Upload error for', file.name, ':', error);
         throw error;
       }
     },

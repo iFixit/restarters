@@ -360,9 +360,10 @@ export default {
         const result = await this.$refs.deviceImages.uploadPendingFiles();
 
         if (result.success) {
-          console.log('Images uploaded successfully:', result.images);
+          console.log('All images uploaded successfully:', result.images);
 
-          // Refresh device data from server to get the updated images with proper URLs
+          // Only refresh device data from server after ALL uploads are complete
+          // This prevents interference with ongoing uploads
           if (this.id && this.id > 0) {
             await this.$store.dispatch('devices/fetch', this.id);
           }
