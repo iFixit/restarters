@@ -2,7 +2,8 @@
   <div>
     <div class="d-flex justify-content-between mb-3">
       <h1 class="d-block d-md-none">{{ __('events.events') }}</h1>
-      <EventActions :idevents="idevents" :canedit="canedit" :candelete="candelete" :is-admin="isAdmin" :in-group="inGroup" :is-attending="isAttending" class="d-block d-md-none" />
+      <EventActions :idevents="idevents" :canedit="canedit" :candelete="candelete" :is-admin="isAdmin"
+        :in-group="inGroup" :is-attending="isAttending" class="d-block d-md-none" />
     </div>
     <div class="border-top-very-thick border-bottom-thin mb-3">
       <div class="eh-layout mt-4 mb-3 mb-md-3">
@@ -24,7 +25,7 @@
               <b-img @error="brokenGroupImage" :src="groupImage" class="groupImage d-none d-md-block" />
               <div class="d-flex flex-wrap ml-md-2">
                 {{ translatedOrganised }}&nbsp;
-                <br class="d-none d-md-block"/>
+                <br class="d-none d-md-block" />
                 <b>
                   <a :href="'/group/view/' + event.group.idgroups">
                     {{ event.group.name.trim() }}
@@ -32,7 +33,8 @@
                 </b>
               </div>
             </div>
-            <EventActions :idevents="idevents" :canedit="canedit" :candelete="candelete" :is-admin="isAdmin" :in-group="inGroup" :is-attending="isAttending" class="d-none d-md-block" />
+            <EventActions :idevents="idevents" :canedit="canedit" :candelete="candelete" :is-admin="isAdmin"
+              :in-group="inGroup" :is-attending="isAttending" class="d-none d-md-block" />
           </div>
         </div>
       </div>
@@ -47,7 +49,7 @@ import EventActions from './EventActions'
 import EventTitle from './EventTitle'
 
 export default {
-  components: {EventTitle, EventActions},
+  components: { EventTitle, EventActions },
   mixins: [event],
   props: {
     idevents: {

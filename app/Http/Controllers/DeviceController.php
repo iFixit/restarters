@@ -78,8 +78,16 @@ class DeviceController extends Controller
                 if ($id > 0) {
                     // We are adding a photo to an existing device.
                     $fn = $file->upload('file', 'image', $id, env('TBL_DEVICES'), true, false, true);
-                    $device = Device::findOrFail($id);
-                    $images = $device->getImages();
+                    if ($fn) {
+                        $device = Device::findOrFail($id);
+                        $images = $device->getImages();
+                    } else {
+                        return response()->json([
+                            'success' => false,
+                            'error' => __('devices.image_upload_error'),
+                            'images' => []
+                        ], 400);
+                    }
                 } else {
                     // We are adding a photo for a device that hasn't yet been added.  Upload the file. We will add
                     // them to the device once the device is created.
@@ -89,20 +97,52 @@ class DeviceController extends Controller
                         $File = new FixometerFile;
                         $images = $File->findImages(env('TBL_DEVICES'), $id);
                     } else {
-                        return __('devices.image_upload_error');
+                        return response()->json([
+                            'success' => false,
+                            'error' => __('devices.image_upload_error'),
+                            'images' => []
+                        ], 400);
                     }
                 }
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'No files uploaded',
+                    'images' => []
+                ], 400);
+            }
+
+            // Convert images to array format expected by frontend
+            $imageArray = [];
+            foreach ($images as $image) {
+                $imageArray[] = [
+                    'id' => $image->idimages,
+                    'idxref' => $image->idxref ?? null,
+                    'path' => $image->path,
+                    'url' => \App\Helpers\FixometerFile::getUploadFileUrl($image->path),
+                    'thumbnail_url' => \App\Helpers\FixometerFile::getUploadFileUrl($image->path, 'thumbnail'),
+                    'mid_url' => \App\Helpers\FixometerFile::getUploadFileUrl($image->path, 'mid'),
+                ];
             }
 
             // Return the current set of images for this device so that the client doesn't need to merge.
             return response()->json([
                 'success' => true,
                 'iddevices' => $id,
-                'images' => $images,
+                'images' => $imageArray,
             ]);
         } catch (\Exception $e) {
             \Sentry\CaptureMessage("Image upload exception  " . $e->getMessage());
-            return __('devices.image_upload_error');
+            \Log::error('Image upload error: ' . $e->getMessage(), [
+                'device_id' => $id,
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'error' => __('devices.image_upload_error'),
+                'images' => []
+            ], 500);
         }
     }
 

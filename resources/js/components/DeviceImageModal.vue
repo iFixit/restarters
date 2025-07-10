@@ -1,9 +1,9 @@
 <template>
-  <b-modal ref="modal" :title="__('devices.image_photo')" size="lg" hide-footer>
-    <div class="d-flex justify-content-center">
-      <b-img-lazy class="w-100" :src="imageUrl" @error.native="brokenImage" />
-    </div>
-  </b-modal>
+	<b-modal ref="modal" :title="__('devices.image_photo')" size="lg" hide-footer>
+		<div class="d-flex justify-content-center">
+			<b-img-lazy class="w-100" :src="imageUrl" @error.native="brokenImage" />
+		</div>
+	</b-modal>
 </template>
 <script>
 export default {
