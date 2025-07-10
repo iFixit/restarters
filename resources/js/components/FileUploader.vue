@@ -1,8 +1,7 @@
 <template>
   <div>
-    <vue-dropzone ref="dropzone" id="dropzone" :options="dropzoneOptions" @vdropzone-sending="sendingEvent"
-      @vdropzone-success-multiple="successMultiple" @vdropzone-success="successSingle" @vdropzone-error="errorEvent"
-      class="ourdropzone" useCustomSlot>
+    <vue-dropzone ref="dropzone" id="dropzone" :options="dropzoneOptions" @vdropzone-file-added="fileAdded"
+      @vdropzone-error="errorEvent" class="ourdropzone" useCustomSlot>
       <b-img src="/images/upload_ico_grey.svg" />
       <div class="dz-message d-none" />
     </vue-dropzone>
@@ -27,129 +26,116 @@ export default {
       default: 1
     },
   },
+  data() {
+    return {
+      pendingFiles: []
+    }
+  },
   components: {
     vueDropzone: vue2Dropzone
   },
   computed: {
     dropzoneOptions() {
       return {
-        url: this.url,
+        url: "thisisrequired", // Required by dropzone but not used since we're not auto-uploading
         paramName: 'file',
-        uploadMultiple: true,
-        createImageThumbnails: true,
-        parallelUploads: 1, // Reduced from 100 to avoid overwhelming the server
-        addRemoveLinks: false,
-        thumbnailWidth: 120,
-        thumbnailHeight: 120,
+        uploadMultiple: false,
         maxFiles: this.maxFiles,
+        createImageThumbnails: true,
         resizeWidth: 800,
         resizeHeight: 800,
         thumbnailMethod: 'contain',
         previewsContainer: this.previewsContainer,
         dictRemoveFile: null,
         acceptedFiles: ".jpeg,.jpg,.png,.gif",
-        timeout: 30000, // 30 second timeout
+        manuallyAddFile: true,
+        autoProcessQueue: false, // Don't auto-upload
         previewTemplate:
-          '<div>' +
-          ' <div class="dz-preview dz-file-preview">' +
-          '   <div class="dz-image"><img data-dz-thumbnail /></div>' +
-          '   <div class="dz-progress">' +
-          '     <span data-dz-uploadprogress="" class="dz-upload"></span>' +
-          '   </div> ' +
-          '   <div class="dz-error-message">' +
-          '   <span data-dz-errormessage=""></span>' +
-          ' </div> ' +
+          '<div class="dz-preview dz-file-preview">' +
+          '  <div class="dz-image"><img data-dz-thumbnail /></div>' +
+          '  <div class="dz-progress" style="display: none;">' +
+          '    <span data-dz-uploadprogress="" class="dz-upload"></span>' +
+          '  </div>' +
+          '  <div class="dz-error-message">' +
+          '    <span data-dz-errormessage=""></span>' +
+          '  </div>' +
+          '  <div class="dz-remove" data-dz-remove>×</div>' +
           '</div>'
       }
     }
   },
   methods: {
-    sendingEvent(file, xhr, formData) {
-      // Add the CSRF token
-      formData.append('_token', this.$store.getters['auth/CSRF']);
-      console.log('Sending file:', file.name, 'to URL:', this.url);
-    },
+    fileAdded(file) {
+      console.log('File added:', file.name, file.size, file.type);
 
-    successMultiple(files, response) {
-      console.log("Multiple upload success:", files, response);
-      this.handleSuccess(files, response);
-    },
+      // Add to our pending files list
+      this.pendingFiles.push(file);
 
-    successSingle(file, response) {
-      console.log("Single upload success:", file, response);
-      this.handleSuccess([file], response);
-    },
-
-    handleSuccess(files, response) {
-      try {
-        // Parse response if it's a string
-        let parsedResponse = response;
-        if (typeof response === 'string') {
-          try {
-            parsedResponse = JSON.parse(response);
-          } catch (e) {
-            console.error('Failed to parse response as JSON:', response);
-            // If response is just a success message, assume upload worked
-            if (response.includes('success')) {
-              parsedResponse = { success: true, images: [] };
-            } else {
-              throw new Error('Invalid response format');
-            }
-          }
+      // Create data URL for preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        // Update the thumbnail with the data URL
+        const thumbnailImg = file.previewElement.querySelector('[data-dz-thumbnail]');
+        if (thumbnailImg) {
+          thumbnailImg.src = e.target.result;
         }
+      };
+      reader.readAsDataURL(file);
 
-        console.log("Parsed response:", parsedResponse);
-
-        // Handle different response structures
-        let images = [];
-        if (parsedResponse.images && Array.isArray(parsedResponse.images)) {
-          images = parsedResponse.images;
-        } else if (parsedResponse.success && parsedResponse.images) {
-          images = parsedResponse.images;
-        } else {
-          console.warn('No images found in response, assuming upload succeeded');
-          images = [];
-        }
-
-        console.log("Extracted images:", images);
-
-        // Emit the uploaded event with the images
-        this.$emit('uploaded', images);
-
-        // Remove the preview files - the parent component will handle displaying them
-        files.forEach(file => {
-          if (this.$refs.dropzone && this.$refs.dropzone.removeFile) {
-            this.$refs.dropzone.removeFile(file);
-          }
+      // Add remove functionality
+      const removeBtn = file.previewElement.querySelector('[data-dz-remove]');
+      if (removeBtn) {
+        removeBtn.addEventListener('click', () => {
+          this.removeFile(file);
         });
-
-      } catch (error) {
-        console.error('Error handling upload success:', error);
-        this.handleError(files, error.message);
       }
+
+      // Emit the files to parent component
+      this.$emit('files-changed', this.pendingFiles);
     },
 
-    errorEvent(file, errorMessage, xhr) {
-      console.error('Upload error:', file, errorMessage, xhr);
-      this.handleError([file], errorMessage);
+    removeFile(file) {
+      console.log('Removing file:', file.name);
+
+      // Remove from pending files
+      this.pendingFiles = this.pendingFiles.filter(f => f !== file);
+
+      // Remove from dropzone
+      if (this.$refs.dropzone && this.$refs.dropzone.removeFile) {
+        this.$refs.dropzone.removeFile(file);
+      }
+
+      // Emit updated files list
+      this.$emit('files-changed', this.pendingFiles);
     },
 
-    handleError(files, errorMessage) {
-      // Show error message to user
-      console.error('Upload failed:', errorMessage);
+    errorEvent(file, errorMessage) {
+      console.error('Dropzone error:', file, errorMessage);
 
-      // You could emit an error event here if needed
+      // Remove the file that caused the error
+      this.removeFile(file);
+
+      // Emit error event
       this.$emit('upload-error', {
-        files: files,
+        file: file,
         error: errorMessage
       });
+    },
 
-      // Remove failed files from dropzone
-      files.forEach(file => {
+    // Method to get current files (for parent component)
+    getPendingFiles() {
+      return this.pendingFiles;
+    },
+
+    // Method to clear all files
+    clearFiles() {
+      this.pendingFiles.forEach(file => {
         if (this.$refs.dropzone && this.$refs.dropzone.removeFile) {
           this.$refs.dropzone.removeFile(file);
         }
       });
+      this.pendingFiles = [];
+      this.$emit('files-changed', this.pendingFiles);
     }
   }
 }

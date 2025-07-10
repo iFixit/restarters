@@ -83,6 +83,7 @@ export default {
   },
   computed: {
     groupImage() {
+      console.log("groupImage", this.event.group);
       if (this.event.group && this.event.group.group_image && this.event.group.group_image.image) {
         const imagePath = this.event.group.group_image.image.path;
 

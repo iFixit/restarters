@@ -1,52 +1,49 @@
 <template>
   <b-form :class="{
-      'edit-device': edit,
-      'add-device': add
-      }">
+    'edit-device': edit,
+    'add-device': add
+  }">
     <div class="device-info">
       <div class="br d-flex flex-column botwhite">
         <b-card no-body class="p-3 flex-grow-1 border-0">
           <h3 class="mt-2 mb-4">{{ __('devices.title_items') }}</h3>
-          <DeviceType class="mb-2" :type.sync="currentDevice.item_type"
-                      :icon-variant="add ? 'black' : 'brand'" :disabled="disabled"
-                      :suppress-type-warning="suppressTypeWarning" :powered="powered"
-                      :unknown.sync="unknownItemType"
-                      :auto-focus="add"
-          />
+          <DeviceType class="mb-2" :type.sync="currentDevice.item_type" :icon-variant="add ? 'black' : 'brand'"
+            :disabled="disabled" :suppress-type-warning="suppressTypeWarning" :powered="powered"
+            :unknown.sync="unknownItemType" :auto-focus="add" />
           <DeviceCategorySelect :class="{
             'mb-2': true,
             'border-thick': missingCategory,
             'suggested': suggested,
-            }"
-            :category.sync="currentDevice.category" :clusters="clusters" :powered="powered" :key="currentDevice.item_type"
-            @open="suggested = false"
-            :icon-variant="add ? 'black' : 'brand'" :disabled="disabled"
-          />
+          }" :category.sync="currentDevice.category" :clusters="clusters" :powered="powered"
+            :key="currentDevice.item_type" @open="suggested = false" :icon-variant="add ? 'black' : 'brand'"
+            :disabled="disabled" />
           <DeviceBrand class="mb-2" :brand.sync="currentDevice.brand" :brands="brands" :disabled="disabled"
-                       :suppress-brand-warning="suppressBrandWarning"/>
+            :suppress-brand-warning="suppressBrandWarning" />
           <DeviceModel class="mb-2" :model.sync="currentDevice.model" :icon-variant="add ? 'black' : 'brand'"
-                       :disabled="disabled"/>
-          <DeviceAge :age.sync="currentDevice.age" :disabled="disabled"/>
-          <DeviceWeight v-if="showWeight" :weight.sync="currentDevice.estimate" :disabled="disabled" :required="weightRequired" />
-          <DeviceImages :id="idtouse" :add="add" :edit="edit" :disabled="disabled"
-                        class="mt-2" @remove="removeImage($event)"/>
+            :disabled="disabled" />
+          <DeviceAge :age.sync="currentDevice.age" :disabled="disabled" />
+          <DeviceWeight v-if="showWeight" :weight.sync="currentDevice.estimate" :disabled="disabled"
+            :required="weightRequired" />
+          <DeviceImages :id="idtouse" :add="add" :edit="edit" :disabled="disabled" class="mt-2"
+            @remove="removeImage($event)" @pending-files-changed="handlePendingFilesChanged"
+            @upload-error="handleUploadError" ref="deviceImages" />
         </b-card>
       </div>
       <div class="d-flex flex-column botwhite">
         <b-card no-body class="p-3 flex-grow-1 border-0">
           <h3 class="mt-2 mb-4">{{ __('devices.title_repair') }}</h3>
           <DeviceRepairStatus :status.sync="currentDevice.repair_status" :steps.sync="currentDevice.next_steps"
-                              :parts.sync="currentDevice.spare_parts" :barrier.sync="currentDevice.barrier"
-                              :barrierList="barrierList" :disabled="disabled"/>
+            :parts.sync="currentDevice.spare_parts" :barrier.sync="currentDevice.barrier" :barrierList="barrierList"
+            :disabled="disabled" />
         </b-card>
       </div>
       <div class="bl d-flex flex-column botwhite">
         <b-card no-body class="p-3 flex-grow-1 border-0">
           <h3 class="mt-2 mb-4">{{ __('devices.title_assessment') }}</h3>
           <DeviceProblem :problem.sync="currentDevice.problem" class="mb-4" :icon-variant="add ? 'black' : 'brand'"
-                         :disabled="disabled"/>
+            :disabled="disabled" />
           <DeviceNotes :notes.sync="currentDevice.notes" class="mb-4" :icon-variant="add ? 'black' : 'brand'"
-                       :disabled="disabled"/>
+            :disabled="disabled" />
         </b-card>
       </div>
     </div>
@@ -58,22 +55,29 @@
         {{ axiosError }}
       </p>
     </b-alert>
+    <b-alert :show="uploadError !== null" variant="danger">
+      <p>
+        <strong>{{ __('devices.image_upload_error') }}:</strong> {{ uploadError }}
+      </p>
+    </b-alert>
     <div class="d-flex justify-content-center flex-wrap pt-4 pb-4">
-      <b-btn variant="primary" class="mr-2" v-if="add" @click="addDevice">
-        {{ __('partials.add_device') }}
+      <b-btn variant="primary" class="mr-2" v-if="add" @click="addDevice" :disabled="uploading">
+        <b-spinner v-if="uploading" small class="mr-2"></b-spinner>
+        {{ uploading ? __('devices.uploading_images') : __('partials.add_device') }}
       </b-btn>
-      <b-btn variant="primary" class="mr-2" v-if="edit" @click="saveDevice">
-        {{ __('partials.save') }}
+      <b-btn variant="primary" class="mr-2" v-if="edit" @click="saveDevice" :disabled="uploading">
+        <b-spinner v-if="uploading" small class="mr-2"></b-spinner>
+        {{ uploading ? __('devices.uploading_images') : __('partials.save') }}
       </b-btn>
       <b-btn variant="primary" class="mr-2" v-if="edit && deleteButton" @click="confirmDeleteDevice">
         {{ __('devices.delete_device') }}
       </b-btn>
-      <DeviceQuantity v-if="add" :quantity.sync="currentDevice.quantity" class="flex-md-shrink-1 ml-2 mr-2"/>
+      <DeviceQuantity v-if="add" :quantity.sync="currentDevice.quantity" class="flex-md-shrink-1 ml-2 mr-2" />
       <b-btn variant="tertiary" class="ml-2 cancel" @click="cancel" v-if="cancelButton">
         {{ __('partials.cancel') }}
       </b-btn>
     </div>
-    <ConfirmModal @confirm="deleteDevice" ref="confirm"/>
+    <ConfirmModal @confirm="deleteDevice" ref="confirm" />
   </b-form>
 </template>
 <script>
@@ -168,10 +172,13 @@ export default {
       default: null
     },
   },
-  data () {
+  data() {
     return {
       currentDevice: {},
       axiosError: null,
+      uploadError: null,
+      uploading: false,
+      pendingFiles: [],
       missingCategory: false,
       unknownItemType: false,
       suggested: false
@@ -210,10 +217,10 @@ export default {
     idtouse() {
       return this.currentDevice ? this.currentDevice.id : null
     },
-    disabled () {
+    disabled() {
       return !this.edit && !this.add
     },
-    currentCategory () {
+    currentCategory() {
       return this.currentDevice ? this.currentDevice.category : null
     },
     currentType() {
@@ -257,27 +264,27 @@ export default {
 
       return ret
     },
-    showWeight () {
+    showWeight() {
       // Powered devices don't allow editing of the weight except for the "None of the above" category, whereas
       // unpowered do.
       return !this.powered || (this.currentDevice && this.currentDevice.category === CATEGORY_MISC_POWERED)
     },
-    suppressTypeWarning () {
+    suppressTypeWarning() {
       // We don't want to show the warning if we have not changed the type since it was last saved.
       return this.currentDevice && this.device && this.device.item_type === this.currentDevice.item_type
     },
-    suppressBrandWarning () {
+    suppressBrandWarning() {
       // We don't want to show the warning if we have not changed the brand since it was last saved.
       return this.currentDevice && this.device && this.device.brand === this.currentDevice.brand
     },
     weightRequired() {
       // Weight is required (if shown) for misc (powered or unpowered).
       return this.currentDevice &&
-          (this.powered && this.currentDevice.category === CATEGORY_MISC_POWERED ||
-            !this.powered && this.currentDevice.category === CATEGORY_MISC_UNPOWERED)
+        (this.powered && this.currentDevice.category === CATEGORY_MISC_POWERED ||
+          !this.powered && this.currentDevice.category === CATEGORY_MISC_UNPOWERED)
     }
   },
-  created () {
+  created() {
     // We take a copy of what's passed in so that we can then edit it in here before saving or cancelling.  We need
     this.currentDevice = {
       event_id: this.eventid,
@@ -306,7 +313,7 @@ export default {
   methods: {
     updateCurrentDevice(device) {
       // Take a deep clone because we're messing with arrays.
-      this.currentDevice = {...this.currentDevice, ...JSON.parse(JSON.stringify(device))}
+      this.currentDevice = { ...this.currentDevice, ...JSON.parse(JSON.stringify(device)) }
 
       // Some values we need to munge back to the id for our selects.  This is a bit ugly because we have two lots
       // of field names, depending on which API we're using.
@@ -323,47 +330,102 @@ export default {
 
       this.partsProvider()
     },
-    cancel () {
+    cancel() {
       this.$emit('close')
     },
-    partsProvider () {
+    partsProvider() {
       // Third party parts are indicated via the parts provider field.
       return this.currentDevice.spare_parts ? this.currentDevice.spare_parts : null
     },
-    async addDevice () {
+
+    handlePendingFilesChanged(files) {
+      console.log('Pending files changed:', files);
+      this.pendingFiles = files;
+    },
+
+    handleUploadError(error) {
+      console.error('Upload error:', error);
+      this.uploadError = error.error || 'Upload failed';
+    },
+
+    async uploadPendingImages() {
+      if (!this.$refs.deviceImages || this.pendingFiles.length === 0) {
+        return { success: true, images: [] };
+      }
+
+      this.uploading = true;
+      this.uploadError = null;
+
+      try {
+        const result = await this.$refs.deviceImages.uploadPendingFiles();
+
+        if (result.success) {
+          console.log('Images uploaded successfully:', result.images);
+          return result;
+        } else {
+          throw new Error(result.error || 'Upload failed');
+        }
+      } catch (error) {
+        console.error('Error uploading images:', error);
+        this.uploadError = error.message;
+        throw error;
+      } finally {
+        this.uploading = false;
+      }
+    },
+
+    async addDevice() {
       try {
         if (!this.currentDevice.category) {
           this.missingCategory = true
-        } else {
-          this.missingCategory = false
-
-          // The API only creates a single device, so we loop on the client to create multiple.
-          let toAdd = this.currentDevice
-          toAdd = JSON.parse(JSON.stringify(toAdd))
-
-          for (let i = 0; i < this.currentDevice.quantity; i++) {
-            toAdd.id = this.currentDevice.id--
-            await this.$store.dispatch('devices/add', toAdd)
-          }
-
-          console.log('Close')
-          this.$emit('close')
+          return;
         }
+
+        this.missingCategory = false
+        this.axiosError = null
+        this.uploadError = null
+
+        // Upload any pending images first
+        if (this.pendingFiles.length > 0) {
+          await this.uploadPendingImages();
+        }
+
+        // The API only creates a single device, so we loop on the client to create multiple.
+        let toAdd = this.currentDevice
+        toAdd = JSON.parse(JSON.stringify(toAdd))
+
+        for (let i = 0; i < this.currentDevice.quantity; i++) {
+          toAdd.id = this.currentDevice.id--
+          await this.$store.dispatch('devices/add', toAdd)
+        }
+
+        console.log('Close')
+        this.$emit('close')
       } catch (e) {
-        console.error('Edit failed', e)
-        this.axiosError = e
+        console.error('Add device failed', e)
+        this.axiosError = e.message || e
       }
     },
-    async saveDevice () {
+
+    async saveDevice() {
       try {
+        this.axiosError = null
+        this.uploadError = null
+
+        // Upload any pending images first
+        if (this.pendingFiles.length > 0) {
+          await this.uploadPendingImages();
+        }
+
         await this.$store.dispatch('devices/edit', this.currentDevice)
         this.$emit('close')
       } catch (e) {
-        console.error('Edit failed', e)
-        this.axiosError = e
+        console.error('Save device failed', e)
+        this.axiosError = e.message || e
       }
     },
-    async removeImage (image) {
+
+    async removeImage(image) {
       // TODO LATER The remove of the image should not happen until the edit completes.  At the moment we do it
       // immediately.  The way we set ids here is poor, but this is because the underlying API call for images
       // is weak.
@@ -374,10 +436,10 @@ export default {
 
       this.$store.dispatch('devices/fetch', this.id)
     },
-    confirmDeleteDevice () {
+    confirmDeleteDevice() {
       this.$refs.confirm.show()
     },
-    deleteDevice () {
+    deleteDevice() {
       this.$store.dispatch('devices/delete', this.id)
     },
   }
@@ -420,7 +482,7 @@ export default {
 
 .device-info {
   display: grid;
-  grid-template-columns: repeat( auto-fit, minmax(350px, 1fr) );
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
 
   @include media-breakpoint-down(sm) {
     grid-template-columns: 100%;
