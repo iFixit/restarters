@@ -361,6 +361,12 @@ export default {
 
         if (result.success) {
           console.log('Images uploaded successfully:', result.images);
+
+          // Refresh device data from server to get the updated images with proper URLs
+          if (this.id && this.id > 0) {
+            await this.$store.dispatch('devices/fetch', this.id);
+          }
+
           return result;
         } else {
           throw new Error(result.error || 'Upload failed');

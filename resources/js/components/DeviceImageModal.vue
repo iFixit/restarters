@@ -19,12 +19,28 @@ export default {
 				if (this.image instanceof File) {
 					return URL.createObjectURL(this.image);
 				}
-				// Check if we have a full URL (S3) or just a path (local)
-				if (this.image.startsWith("http")) {
-					return this.image;
+
+				// Use the url field if available (from server response)
+				if (this.image.url) {
+					return this.image.url;
 				}
 
-				return `/uploads/${this.image}`;
+				// Fallback: construct URL from path
+				if (this.image.path) {
+					// Check if we have a full URL (S3) or just a path (local)
+					if (this.image.path.startsWith("http")) {
+						return this.image.path;
+					}
+					return `/uploads/${this.image.path}`;
+				}
+
+				// Use string value directly if image is just a string
+				if (typeof this.image === 'string') {
+					if (this.image.startsWith("http")) {
+						return this.image;
+					}
+					return `/uploads/${this.image}`;
+				}
 			}
 			return "/images/upload_ico_grey.svg";
 		},
