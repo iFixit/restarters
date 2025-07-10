@@ -15,11 +15,18 @@ export default {
 	},
 	computed: {
 		imageUrl() {
-			// Check if we have a full URL (S3) or just a path (local)
-			if (this.image.path.startsWith("http")) {
-				return this.image.path;
+			if (this.image) {
+				if (this.image instanceof File) {
+					return URL.createObjectURL(this.image);
+				}
+				// Check if we have a full URL (S3) or just a path (local)
+				if (this.image.startsWith("http")) {
+					return this.image;
+				}
+
+				return `/uploads/${this.image}`;
 			}
-			return `/uploads/${this.image.path}`;
+			return "/images/upload_ico_grey.svg";
 		},
 	},
 	methods: {
