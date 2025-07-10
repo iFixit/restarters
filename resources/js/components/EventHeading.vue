@@ -81,7 +81,19 @@ export default {
   },
   computed: {
     groupImage() {
-      return this.event.group && this.event.group.group_image ? ('/uploads/mid_' + this.event.group.group_image.image.path) : DEFAULT_PROFILE
+      if (this.event.group && this.event.group.group_image && this.event.group.group_image.image) {
+        const imagePath = this.event.group.group_image.image.path;
+
+        // Use the global helper function to get the correct URL
+        if (window.getUploadUrl) {
+          return window.getUploadUrl(imagePath, 'mid');
+        }
+
+        // Fallback for older code - should not be needed
+        return `/uploads/mid_${imagePath}`;
+      }
+
+      return DEFAULT_PROFILE;
     },
     translatedOrganised() {
       // Existing translations may have a :group parameter, so set that empty so that it doesn't appear in the result.
