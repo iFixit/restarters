@@ -411,31 +411,63 @@ class FixometerFile extends Model
      */
     protected function saveToDatabase($data, $reference, $referenceType)
     {
-        // Create image record first
-        $image = Images::create([
-            'path' => $data['path'],
-        ]);
+        try {
+            // Create image record first
+            $image = Images::create([
+                'path' => $data['path'],
+            ]);
 
-        // Save to xref table with image ID
-        $idxref = Xref::create([
-            'object_type' => $data['object_type'],
-            'object' => $image->idimages,
-            'reference_type' => $referenceType,
-            'reference' => $reference
-        ]);
+            \Log::info('Image record created', [
+                'image_id' => $image->idimages,
+                'path' => $data['path']
+            ]);
 
-        return $idxref->idxref;
+            // Save to xref table with image ID
+            $idxref = Xref::create([
+                'object_type' => $data['object_type'],
+                'object' => $image->idimages,
+                'reference_type' => $referenceType,
+                'reference' => $reference
+            ]);
+
+            \Log::info('Xref record created', [
+                'xref_id' => $idxref->idxref,
+                'image_id' => $image->idimages,
+                'reference' => $reference,
+                'reference_type' => $referenceType
+            ]);
+
+            return $idxref->idxref;
+            
+        } catch (\Exception $e) {
+            \Log::error('Failed to save image to database', [
+                'error' => $e->getMessage(),
+                'path' => $data['path'],
+                'reference' => $reference,
+                'reference_type' => $referenceType,
+                'trace' => $e->getTraceAsString()
+            ]);
+            throw $e;
+        }
     }
 
     public function filename($tmp_name)
     {
         // Generate unique filename
-        $finfo = new \finfo(FILEINFO_EXTENSION);
-        $ext = $finfo->file($tmp_name);
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $mimeType = $finfo->file($tmp_name);
         
-        if (empty($ext)) {
-            $ext = 'jpg'; // Default extension
-        }
+        // Map MIME types to extensions
+        $mimeToExt = [
+            'image/jpeg' => 'jpg',
+            'image/jpg' => 'jpg',
+            'image/png' => 'png',
+            'image/gif' => 'gif',
+            'image/webp' => 'webp',
+            'image/bmp' => 'bmp',
+        ];
+        
+        $ext = $mimeToExt[$mimeType] ?? 'jpg'; // Default to jpg if unknown
         
         return time() . '_' . mt_rand(100000, 999999) . '.' . $ext;
     }
