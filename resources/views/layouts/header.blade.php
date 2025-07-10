@@ -58,7 +58,7 @@
       window.appDebug = "{{ env('APP_DEBUG', '0') }}";
       window.Laravel = {
         imageUploadEnabled: @json(config('restarters.features.image_upload_enabled', false)),
-        uploadsUsingS3: @json(config('filesystems.disks.uploads.driver', 'local') === 's3'),
+        uploadsUsingS3: @json(config('filesystems.default', 'public_uploads') === 's3'),
         aws_url: @json(env('AWS_URL', '')),
       };
       
