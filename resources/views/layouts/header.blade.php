@@ -68,7 +68,6 @@
           
           // Check if it's already a full URL (S3)
           if (filename.startsWith('http')) {
-              console.log("Image is a full URL", filename);
               return filename;
           }
           
@@ -82,12 +81,10 @@
           
           // Use CloudFront URL if available and using S3
           if (window.Laravel.uploadsUsingS3 && window.Laravel.aws_url) {
-              console.log("Image is a S3 URL", `${window.Laravel.aws_url}uploads/${prefix}${filename}`);
               return `${window.Laravel.aws_url}uploads/${prefix}${filename}`;
           }
           
           // Fallback to local storage URL
-          console.log("Image is a local URL", `/uploads/${prefix}${filename}`);
           return `/uploads/${prefix}${filename}`;
       };
     </script>

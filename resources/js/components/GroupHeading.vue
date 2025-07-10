@@ -8,7 +8,7 @@
     <div class="border-top-very-thick border-bottom-thin mb-3">
       <div class="d-flex flex-wrap mt-4 mb-3 mb-md-3">
         <div class="bord d-flex w-xs-100 w-md-50">
-          <b-img @error="brokenGroupImage" :src="group.group_image.image" class="groupImage align-self-start mr-4 mb-3" />
+          <b-img @error="brokenGroupImage" :src="groupImage" class="groupImage align-self-start mr-4 mb-3" />
           <h1>
             {{ group.name }}
           </h1>
@@ -61,16 +61,16 @@ export default {
     groupImage() {
       if (this.group && this.group.group_image && this.group.group_image.image) {
         const imagePath = this.group.group_image.image.path;
-        
+
         // Use the global helper function to get the correct URL
         if (window.getUploadUrl) {
           return window.getUploadUrl(imagePath, 'mid');
         }
-        
+
         // Fallback for older code - should not be needed
         return `/uploads/mid_${imagePath}`;
       }
-      
+
       return DEFAULT_PROFILE;
     },
     location() {

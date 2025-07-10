@@ -1345,23 +1345,3 @@ jQuery(document).ready(function () {
 	});
 	$(".vue-placeholder-large").hide();
 });
-
-// Global helper for upload URLs
-window.getUploadUrl = function (filename, type = "original") {
-	if (!filename) return null;
-
-	// Check if it's already a full URL (S3)
-	if (filename.startsWith("http")) {
-		return filename;
-	}
-
-	// For local storage, construct the asset URL
-	let prefix = "";
-	if (type === "thumbnail") {
-		prefix = "thumbnail_";
-	} else if (type === "mid") {
-		prefix = "mid_";
-	}
-
-	return `/uploads/${prefix}${filename}`;
-};

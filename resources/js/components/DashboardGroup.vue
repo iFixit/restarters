@@ -22,7 +22,7 @@ import { DEFAULT_PROFILE } from '../constants'
 import GroupArchivedBadge from "./GroupArchivedBadge.vue";
 
 export default {
-  components: {GroupArchivedBadge},
+  components: { GroupArchivedBadge },
   props: {
     group: {
       type: Object,
@@ -34,7 +34,19 @@ export default {
       return DEFAULT_PROFILE
     },
     groupImage() {
-      return this.group && this.group.group_image && this.group.group_image.image ? ('/uploads/mid_' + this.group.group_image.image.path) : DEFAULT_PROFILE
+      if (this.group && this.group.group_image && this.group.group_image.image) {
+        const imagePath = this.group.group_image.image.path;
+
+        // Use the global helper function to get the correct URL
+        if (window.getUploadUrl) {
+          return window.getUploadUrl(imagePath, 'mid');
+        }
+
+        // Fallback for older code - should not be needed
+        return `/uploads/mid_${imagePath}`;
+      }
+
+      return DEFAULT_PROFILE;
     },
   },
   methods: {
