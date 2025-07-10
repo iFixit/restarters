@@ -474,8 +474,12 @@ class FixometerFile extends Model
 
     public function findImages($of_ref_type, $ref_id)
     {
-        $images = Images::where('id_reference', $ref_id)
-                       ->where('reference_type', $of_ref_type)
+        // Query through the xref table to get images
+        $images = Images::join('xref', 'xref.object', '=', 'images.idimages')
+                       ->where('xref.reference_type', $of_ref_type)
+                       ->where('xref.reference', $ref_id)
+                       ->where('xref.object_type', 5) // 5 = images object type
+                       ->select('images.*', 'xref.idxref')
                        ->get();
         
         return $images;
