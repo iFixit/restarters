@@ -66,8 +66,11 @@
       window.getUploadUrl = function(filename, type = 'original') {
           if (!filename) return null;
           
+          console.log("filename", filename);
+
           // Check if it's already a full URL (S3)
           if (filename.startsWith('http')) {
+              console.log("filename is a full URL", filename);
               return filename;
           }
           
