@@ -44,8 +44,10 @@ export default {
 				}
 				// Check if we have a full URL (S3) or just a path (local)
 				if (this.image.startsWith("http")) {
+					console.log("Image is a full URL", this.image);
 					return this.image;
 				}
+				console.log("Image is a path", this.image);
 				return `/uploads/${this.image}`;
 			}
 			return "/images/upload_ico_grey.svg";
