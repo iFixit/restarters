@@ -8,12 +8,12 @@
         <FileUploader :url="uploadURL"
           v-if="(edit || add) && !disabled && (images.length + pendingFiles.length) < maxFiles"
           previews-container=".device-photos" @files-changed="handleFilesChanged" @upload-error="handleUploadError"
-          :max-files="maxFiles - images.length" ref="fileUploader" />
+          :max-files="maxFiles - images.length" :key="'uploader-' + (id || 'new')" ref="fileUploader" />
         <DeviceImage v-for="image in images" :key="'img-' + image.path" :image="image" @remove="$emit('remove', image)"
           :disabled="disabled" />
         <div v-for="(file, index) in pendingFiles" :key="'pending-' + index" class="pending-image-preview">
           <img :src="getFilePreviewUrl(file)" class="pending-image" />
-          <button type="button" @click="removePendingFile(index)" class="remove-pending-btn"
+          <button type="button" @click="removePendingFile(file)" class="remove-pending-btn"
             :disabled="disabled">×</button>
         </div>
       </div>
@@ -59,7 +59,8 @@ export default {
       maxFiles: 5,
       imagesDuringCreation: null,
       pendingFiles: [],
-      filePreviewUrls: {} // Cache for file preview URLs
+      filePreviewUrls: {}, // Cache for file preview URLs
+      isUploading: false, // Flag to prevent clearing pending files during upload
     }
   },
   computed: {
@@ -77,6 +78,24 @@ export default {
     },
     imageUploadEnabled() {
       return window.Laravel && window.Laravel.imageUploadEnabled;
+    }
+  },
+  watch: {
+    // Watch for changes in images prop but preserve pending files during upload
+    images: {
+      handler(newImages, oldImages) {
+        // Don't clear pending files if we're uploading
+        if (this.isUploading) {
+          console.log('Upload in progress, preserving pending files during images update');
+          return;
+        }
+        
+        // Handle normal images update when not uploading
+        if (newImages !== oldImages) {
+          console.log('Images updated:', newImages);
+        }
+      },
+      deep: true
     }
   },
   methods: {
@@ -100,21 +119,6 @@ export default {
       this.$emit('upload-error', error);
     },
 
-    removePendingFile(index) {
-      const file = this.pendingFiles[index];
-
-      // Clean up preview URL
-      if (this.filePreviewUrls[file.name]) {
-        URL.revokeObjectURL(this.filePreviewUrls[file.name]);
-        delete this.filePreviewUrls[file.name];
-      }
-
-      // Remove from FileUploader
-      if (this.$refs.fileUploader) {
-        this.$refs.fileUploader.removeFile(file);
-      }
-    },
-
     getFilePreviewUrl(file) {
       return this.filePreviewUrls[file.name] || URL.createObjectURL(file);
     },
@@ -127,6 +131,9 @@ export default {
 
       console.log('Uploading pending files sequentially:', this.pendingFiles);
 
+      // Set uploading flag to prevent clearing pending files during process
+      this.isUploading = true;
+
       try {
         const allUploadedImages = [];
 
@@ -134,8 +141,9 @@ export default {
         const filesToUpload = [...this.pendingFiles];
 
         // Upload files one by one sequentially to avoid server conflicts
-        for (const file of filesToUpload) {
-          console.log('Uploading file:', file.name);
+        for (let i = 0; i < filesToUpload.length; i++) {
+          const file = filesToUpload[i];
+          console.log(`Uploading file ${i + 1}/${filesToUpload.length}:`, file.name);
 
           const result = await this.uploadSingleFile(file);
 
@@ -143,10 +151,14 @@ export default {
             // Collect all uploaded images
             allUploadedImages.push(...result.images);
             console.log('Successfully uploaded:', file.name, result.images);
+
+            // Remove only this specific file from pending files
+            // but keep the others for continued preview
+            this.removePendingFile(file);
           }
         }
 
-        // Clear all pending files after successful upload
+        // Clear any remaining pending files after ALL uploads are complete
         this.clearPendingFiles();
 
         return { success: true, images: allUploadedImages };
@@ -154,6 +166,9 @@ export default {
       } catch (error) {
         console.error('Error uploading files:', error);
         return { success: false, error: error.message };
+      } finally {
+        // Clear uploading flag
+        this.isUploading = false;
       }
     },
 
@@ -187,7 +202,15 @@ export default {
     },
 
     clearPendingFiles() {
-      // Clean up all preview URLs
+      // Don't clear pending files if we're in the middle of uploading
+      if (this.isUploading) {
+        console.log('Upload in progress, not clearing pending files');
+        return;
+      }
+
+      console.log('Clearing pending files');
+
+      // Clean up preview URLs
       Object.values(this.filePreviewUrls).forEach(url => {
         URL.revokeObjectURL(url);
       });
@@ -196,7 +219,7 @@ export default {
       // Clear pending files
       this.pendingFiles = [];
 
-      // Clear FileUploader
+      // Clear FileUploader if it exists
       if (this.$refs.fileUploader) {
         this.$refs.fileUploader.clearFiles();
       }
@@ -205,6 +228,25 @@ export default {
     // Method to get pending files (for parent component)
     getPendingFiles() {
       return this.pendingFiles;
+    },
+
+    // Remove a specific file from pending files without clearing all
+    removePendingFile(fileToRemove) {
+      const index = this.pendingFiles.findIndex(file => file.name === fileToRemove.name && file.size === fileToRemove.size);
+      if (index > -1) {
+        this.pendingFiles.splice(index, 1);
+
+        // Clean up preview URL for this specific file
+        if (this.filePreviewUrls[fileToRemove.name]) {
+          URL.revokeObjectURL(this.filePreviewUrls[fileToRemove.name]);
+          delete this.filePreviewUrls[fileToRemove.name];
+        }
+
+        // Remove file from FileUploader component
+        if (this.$refs.fileUploader) {
+          this.$refs.fileUploader.removeFile(fileToRemove);
+        }
+      }
     }
   },
 

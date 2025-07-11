@@ -129,13 +129,23 @@ export default {
 
     // Method to clear all files
     clearFiles() {
-      this.pendingFiles.forEach(file => {
-        if (this.$refs.dropzone && this.$refs.dropzone.removeFile) {
-          this.$refs.dropzone.removeFile(file);
-        }
-      });
-      this.pendingFiles = [];
-      this.$emit('files-changed', this.pendingFiles);
+      // Only clear if not in the middle of processing
+      if (this.pendingFiles.length > 0) {
+        console.log('Clearing files from FileUploader');
+        this.pendingFiles.forEach(file => {
+          if (this.$refs.dropzone && this.$refs.dropzone.removeFile) {
+            this.$refs.dropzone.removeFile(file);
+          }
+        });
+        this.pendingFiles = [];
+        this.$emit('files-changed', this.pendingFiles);
+      }
+    },
+
+    // Method to prevent clearing files during external updates
+    preserveFiles() {
+      console.log('Preserving files in FileUploader:', this.pendingFiles.length);
+      return this.pendingFiles.length;
     }
   }
 }

@@ -357,14 +357,19 @@ export default {
       this.uploadError = null;
 
       try {
+        // Don't refetch device data during upload process to prevent 
+        // clearing pending file previews
+        console.log('Starting upload of', this.pendingFiles.length, 'pending files');
+
         const result = await this.$refs.deviceImages.uploadPendingFiles();
 
         if (result.success) {
           console.log('All images uploaded successfully:', result.images);
 
           // Only refresh device data from server after ALL uploads are complete
-          // This prevents interference with ongoing uploads
+          // This prevents interference with ongoing uploads and preserves pending previews
           if (this.id && this.id > 0) {
+            console.log('Refreshing device data after all uploads complete');
             await this.$store.dispatch('devices/fetch', this.id);
           }
 
