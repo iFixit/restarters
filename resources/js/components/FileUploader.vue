@@ -40,7 +40,7 @@ export default {
         url: "thisisrequired", // Required by dropzone but not used since we're not auto-uploading
         paramName: 'file',
         uploadMultiple: false,
-        maxFiles: this.maxFiles,
+        maxFiles: null, // Disable dropzone's built-in file limiting - we'll handle it ourselves
         createImageThumbnails: false, // Disable thumbnails
         resizeWidth: 800,
         resizeHeight: 800,
@@ -57,6 +57,25 @@ export default {
   methods: {
     fileAdded(file) {
       console.log('File added:', file.name, file.size, file.type);
+      console.log('Current pending files:', this.pendingFiles.length, 'Max allowed:', this.maxFiles);
+
+      // Check if we're at the limit (maxFiles is the remaining slots from DeviceImages)
+      if (this.pendingFiles.length >= this.maxFiles) {
+        console.warn('Cannot add more files, at limit:', this.maxFiles);
+
+        // Remove the file from dropzone since we can't accept it
+        if (this.$refs.dropzone && this.$refs.dropzone.removeFile) {
+          this.$refs.dropzone.removeFile(file);
+        }
+
+        // Emit error to parent for user feedback
+        this.$emit('upload-error', {
+          file: file,
+          error: `Cannot add more files. You can add ${this.maxFiles} image${this.maxFiles === 1 ? '' : 's'} total.`
+        });
+
+        return;
+      }
 
       // Add to our pending files list
       this.pendingFiles.push(file);
