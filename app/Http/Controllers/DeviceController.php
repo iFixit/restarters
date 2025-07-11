@@ -73,36 +73,112 @@ class DeviceController extends Controller
             $images = [];
 
             if (isset($_FILES) && ! empty($_FILES)) {
-                $file = new FixometerFile;
+                // Check if we have multiple files
+                $fileCount = 0;
+                $fileKeys = [];
+                
+                foreach ($_FILES as $key => $file) {
+                    if (is_array($file['name'])) {
+                        $fileCount += count($file['name']);
+                        $fileKeys[] = $key;
+                    } else {
+                        $fileCount++;
+                        $fileKeys[] = $key;
+                    }
+                }
+                
+                \Log::info('Processing image upload', [
+                    'device_id' => $id,
+                    'file_count' => $fileCount,
+                    'file_keys' => $fileKeys,
+                    'files_structure' => array_keys($_FILES)
+                ]);
 
+                $uploadedCount = 0;
+                
+                // Process each file
+                foreach ($_FILES as $fieldName => $fileData) {
+                    if (is_array($fileData['name'])) {
+                        // Multiple files in array format (file[0], file[1], etc.)
+                        for ($i = 0; $i < count($fileData['name']); $i++) {
+                            if ($fileData['error'][$i] == UPLOAD_ERR_OK) {
+                                // Create a temporary $_FILES entry for this specific file
+                                $tempFileKey = 'temp_file_' . $i;
+                                $_FILES[$tempFileKey] = [
+                                    'name' => $fileData['name'][$i],
+                                    'type' => $fileData['type'][$i],
+                                    'tmp_name' => $fileData['tmp_name'][$i],
+                                    'error' => $fileData['error'][$i],
+                                    'size' => $fileData['size'][$i],
+                                ];
+                                
+                                $file = new FixometerFile;
+                                $fn = $file->upload($tempFileKey, 'image', $id, env('TBL_DEVICES'), true, false, true);
+                                
+                                if ($fn) {
+                                    $uploadedCount++;
+                                    \Log::info('Successfully uploaded file', [
+                                        'device_id' => $id,
+                                        'file_name' => $fileData['name'][$i],
+                                        'file_index' => $i,
+                                        'upload_result' => $fn
+                                    ]);
+                                } else {
+                                    \Log::error('Failed to upload file', [
+                                        'device_id' => $id,
+                                        'file_name' => $fileData['name'][$i],
+                                        'file_index' => $i
+                                    ]);
+                                }
+                                
+                                // Clean up temporary $_FILES entry
+                                unset($_FILES[$tempFileKey]);
+                            }
+                        }
+                    } else {
+                        // Single file
+                        if ($fileData['error'] == UPLOAD_ERR_OK) {
+                            $file = new FixometerFile;
+                            $fn = $file->upload($fieldName, 'image', $id, env('TBL_DEVICES'), true, false, true);
+                            
+                            if ($fn) {
+                                $uploadedCount++;
+                                \Log::info('Successfully uploaded single file', [
+                                    'device_id' => $id,
+                                    'file_name' => $fileData['name'],
+                                    'upload_result' => $fn
+                                ]);
+                            } else {
+                                \Log::error('Failed to upload single file', [
+                                    'device_id' => $id,
+                                    'file_name' => $fileData['name']
+                                ]);
+                            }
+                        }
+                    }
+                }
+
+                \Log::info('Upload processing complete', [
+                    'device_id' => $id,
+                    'total_files' => $fileCount,
+                    'uploaded_count' => $uploadedCount
+                ]);
+
+                // Get current images for this device
                 if ($id > 0) {
-                    // We are adding a photo to an existing device.
-                    $fn = $file->upload('file', 'image', $id, env('TBL_DEVICES'), true, false, true);
-                    if ($fn) {
-                        $device = Device::findOrFail($id);
-                        $images = $device->getImages();
-                    } else {
-                        return response()->json([
-                            'success' => false,
-                            'error' => __('devices.image_upload_error'),
-                            'images' => []
-                        ], 400);
-                    }
+                    $device = Device::findOrFail($id);
+                    $images = $device->getImages();
                 } else {
-                    // We are adding a photo for a device that hasn't yet been added.  Upload the file. We will add
-                    // them to the device once the device is created.
-                    $fn = $file->upload('file', 'image', $id, env('TBL_DEVICES'), true, false, true);
+                    $File = new FixometerFile;
+                    $images = $File->findImages(env('TBL_DEVICES'), $id);
+                }
 
-                    if ($fn) {
-                        $File = new FixometerFile;
-                        $images = $File->findImages(env('TBL_DEVICES'), $id);
-                    } else {
-                        return response()->json([
-                            'success' => false,
-                            'error' => __('devices.image_upload_error'),
-                            'images' => []
-                        ], 400);
-                    }
+                if ($uploadedCount === 0) {
+                    return response()->json([
+                        'success' => false,
+                        'error' => __('devices.image_upload_error'),
+                        'images' => []
+                    ], 400);
                 }
             } else {
                 return response()->json([
