@@ -131,20 +131,31 @@ export default {
   },
   methods: {
     handleFilesChanged(files) {
-      console.log('DeviceImages: Files changed:', files.length, 'files received');
-      console.log('DeviceImages: Current state - existing images:', this.images.length, 'pending files:', this.pendingFiles.length);
+      console.log('Files changed:', files);
 
-      // FileUploader now handles file limiting, so we just accept what it gives us
-      this.pendingFiles = files;
+      // Validate that we don't exceed the maximum number of images
+      const totalAfterAdd = this.images.length + files.length;
+      if (totalAfterAdd > this.maxFiles) {
+        const allowedCount = this.maxFiles - this.images.length;
+        console.warn(`Too many files selected. Maximum ${this.maxFiles} images allowed. You can add ${allowedCount} more.`);
 
-      // Create preview URLs for the files
+        // Emit error to show user-friendly message
+        this.$emit('upload-error', {
+          error: `You can only add ${allowedCount} more image${allowedCount === 1 ? '' : 's'}. Maximum ${this.maxFiles} images per device.`
+        });
+
+        // Only keep the allowed number of files
+        this.pendingFiles = files.slice(0, allowedCount);
+      } else {
+        this.pendingFiles = files;
+      }
+
+      // Create preview URLs for the files we're keeping
       this.pendingFiles.forEach(file => {
         if (!this.filePreviewUrls[file.name]) {
           this.filePreviewUrls[file.name] = URL.createObjectURL(file);
         }
       });
-
-      console.log('DeviceImages: Final state - existing images:', this.images.length, 'pending files:', this.pendingFiles.length, 'total:', this.totalImages);
 
       // Emit event to parent component
       this.$emit('pending-files-changed', this.pendingFiles);
