@@ -1,14 +1,18 @@
 <template>
   <div v-if="imageUploadEnabled">
     <div class="device-photo-layout">
-      <label>
-        {{ __('devices.images') }}
-      </label>
+      <div class="d-flex justify-content-between align-items-center">
+        <label class="mb-0">
+          {{ __('devices.images') }}
+        </label>
+        <small class="text-muted">
+          {{ limitMessage }}
+        </small>
+      </div>
       <div class="d-flex flex-wrap device-photos dropzone-previews">
-        <FileUploader :url="uploadURL"
-          v-if="(edit || add) && !disabled && (images.length + pendingFiles.length) < maxFiles"
+        <FileUploader :url="uploadURL" v-if="(edit || add) && !disabled && canAddMoreImages"
           previews-container=".device-photos" @files-changed="handleFilesChanged" @upload-error="handleUploadError"
-          :max-files="maxFiles - images.length" :key="'uploader-' + (id || 'new')" ref="fileUploader" />
+          :max-files="remainingSlots" :key="'uploader-' + (id || 'new')" ref="fileUploader" />
         <DeviceImage v-for="image in images" :key="'img-' + image.path" :image="image" @remove="$emit('remove', image)"
           :disabled="disabled" />
         <div v-for="(file, index) in pendingFiles" :key="'pending-' + index" class="pending-image-preview">
@@ -17,6 +21,11 @@
             ×
           </div>
         </div>
+      </div>
+      <div v-if="!canAddMoreImages && (edit || add) && !disabled" class="mt-2">
+        <small class="text-warning">
+          <strong>{{ limitMessage }}</strong> - Remove an existing image to add a new one.
+        </small>
       </div>
       <div v-if="pendingFiles.length > 0" class="mt-2">
         <small class="text-muted">
@@ -82,6 +91,24 @@ export default {
     },
     imageUploadEnabled() {
       return window.Laravel && window.Laravel.imageUploadEnabled;
+    },
+    totalImages() {
+      return this.images.length + this.pendingFiles.length;
+    },
+    remainingSlots() {
+      return Math.max(0, this.maxFiles - this.totalImages);
+    },
+    canAddMoreImages() {
+      return this.remainingSlots > 0;
+    },
+    limitMessage() {
+      if (this.totalImages >= this.maxFiles) {
+        return `Maximum of ${this.maxFiles} images reached`;
+      } else if (this.remainingSlots === 1) {
+        return `You can add 1 more image (${this.totalImages}/${this.maxFiles})`;
+      } else {
+        return `You can add ${this.remainingSlots} more images (${this.totalImages}/${this.maxFiles})`;
+      }
     }
   },
   watch: {
@@ -105,17 +132,33 @@ export default {
   methods: {
     handleFilesChanged(files) {
       console.log('Files changed:', files);
-      this.pendingFiles = files;
 
-      // Create preview URLs for new files
-      files.forEach(file => {
+      // Validate that we don't exceed the maximum number of images
+      const totalAfterAdd = this.images.length + files.length;
+      if (totalAfterAdd > this.maxFiles) {
+        const allowedCount = this.maxFiles - this.images.length;
+        console.warn(`Too many files selected. Maximum ${this.maxFiles} images allowed. You can add ${allowedCount} more.`);
+
+        // Emit error to show user-friendly message
+        this.$emit('upload-error', {
+          error: `You can only add ${allowedCount} more image${allowedCount === 1 ? '' : 's'}. Maximum ${this.maxFiles} images per device.`
+        });
+
+        // Only keep the allowed number of files
+        this.pendingFiles = files.slice(0, allowedCount);
+      } else {
+        this.pendingFiles = files;
+      }
+
+      // Create preview URLs for the files we're keeping
+      this.pendingFiles.forEach(file => {
         if (!this.filePreviewUrls[file.name]) {
           this.filePreviewUrls[file.name] = URL.createObjectURL(file);
         }
       });
 
       // Emit event to parent component
-      this.$emit('pending-files-changed', files);
+      this.$emit('pending-files-changed', this.pendingFiles);
     },
 
     handleUploadError(error) {
