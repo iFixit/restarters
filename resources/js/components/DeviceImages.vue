@@ -93,7 +93,7 @@ export default {
       return window.Laravel && window.Laravel.imageUploadEnabled;
     },
     totalImages() {
-      return this.images.length + this.pendingFiles.length;
+      return this.images.length + this.pendingFiles.length - 1;
     },
     remainingSlots() {
       return Math.max(0, this.maxFiles - this.totalImages);
