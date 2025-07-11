@@ -10,9 +10,9 @@
         </small>
       </div>
       <div class="d-flex flex-wrap device-photos dropzone-previews">
-        <FileUploader :url="uploadURL" v-if="(edit || add) && !disabled" previews-container=".device-photos"
-          @files-changed="handleFilesChanged" @upload-error="handleUploadError" :key="'uploader-' + (id || 'new')"
-          ref="fileUploader" />
+        <FileUploader :url="uploadURL" v-if="(edit || add) && !disabled && canAddMoreImages"
+          previews-container=".device-photos" @files-changed="handleFilesChanged" @upload-error="handleUploadError"
+          :max-files="remainingSlots" :key="'uploader-' + (id || 'new')" ref="fileUploader" />
         <DeviceImage v-for="image in images" :key="'img-' + image.path" :image="image" @remove="$emit('remove', image)"
           :disabled="disabled" />
         <div v-for="(file, index) in pendingFiles" :key="'pending-' + index" class="pending-image-preview">
@@ -22,9 +22,9 @@
           </div>
         </div>
       </div>
-      <div v-if="totalImages >= maxFiles" class="mt-2">
+      <div v-if="!canAddMoreImages && (edit || add) && !disabled" class="mt-2">
         <small class="text-warning">
-          <strong>Maximum of {{ maxFiles }} images reached</strong> - Remove an existing image to add a new one.
+          <strong>{{ limitMessage }}</strong> - Remove an existing image to add a new one.
         </small>
       </div>
       <div v-if="pendingFiles.length > 0" class="mt-2">
@@ -95,11 +95,20 @@ export default {
     totalImages() {
       return this.images.length + this.pendingFiles.length;
     },
+    remainingSlots() {
+      return Math.max(0, this.maxFiles - this.totalImages);
+    },
     canAddMoreImages() {
-      return this.totalImages < this.maxFiles;
+      return this.remainingSlots > 0;
     },
     limitMessage() {
-      return `${this.totalImages}/${this.maxFiles} images`;
+      if (this.totalImages >= this.maxFiles) {
+        return `Maximum of ${this.maxFiles} images reached`;
+      } else if (this.remainingSlots === 1) {
+        return `You can add 1 more image (${this.totalImages}/${this.maxFiles})`;
+      } else {
+        return `You can add ${this.remainingSlots} more images (${this.totalImages}/${this.maxFiles})`;
+      }
     }
   },
   watch: {
@@ -123,8 +132,9 @@ export default {
   methods: {
     handleFilesChanged(files) {
       console.log('DeviceImages: Files changed:', files.length, 'files received');
+      console.log('DeviceImages: Current state - existing images:', this.images.length, 'pending files:', this.pendingFiles.length);
 
-      // Dropzone handles file limiting, so we just accept what it gives us
+      // FileUploader now handles file limiting, so we just accept what it gives us
       this.pendingFiles = files;
 
       // Create preview URLs for the files

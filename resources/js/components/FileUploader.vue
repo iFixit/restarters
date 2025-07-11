@@ -1,7 +1,7 @@
 <template>
   <div>
     <vue-dropzone ref="dropzone" id="dropzone" :options="dropzoneOptions" @vdropzone-file-added="fileAdded"
-      @vdropzone-error="errorEvent" @vdropzone-max-files-exceeded="maxFilesExceeded" class="ourdropzone" useCustomSlot>
+      @vdropzone-error="errorEvent" class="ourdropzone" useCustomSlot>
       <b-img src="/images/upload_ico_grey.svg" />
       <div class="dz-message d-none" />
     </vue-dropzone>
@@ -19,7 +19,12 @@ export default {
     previewsContainer: {
       type: String,
       required: true
-    }
+    },
+    maxFiles: {
+      type: Number,
+      required: false,
+      default: 1
+    },
   },
   data() {
     return {
@@ -35,7 +40,7 @@ export default {
         url: "thisisrequired", // Required by dropzone but not used since we're not auto-uploading
         paramName: 'file',
         uploadMultiple: false,
-        maxFiles: 5, // Fixed limit of 5 files total
+        maxFiles: null, // Disable dropzone's built-in file limiting - we'll handle it ourselves
         createImageThumbnails: false, // Disable thumbnails
         resizeWidth: 800,
         resizeHeight: 800,
@@ -52,7 +57,25 @@ export default {
   methods: {
     fileAdded(file) {
       console.log('File added:', file.name, file.size, file.type);
-      console.log('Current pending files:', this.pendingFiles.length);
+      console.log('Current pending files:', this.pendingFiles.length, 'Max allowed:', this.maxFiles);
+
+      // Check if we're at the limit (maxFiles is the remaining slots from DeviceImages)
+      if (this.pendingFiles.length >= this.maxFiles) {
+        console.warn('Cannot add more files, at limit:', this.maxFiles);
+
+        // Remove the file from dropzone since we can't accept it
+        if (this.$refs.dropzone && this.$refs.dropzone.removeFile) {
+          this.$refs.dropzone.removeFile(file);
+        }
+
+        // Emit error to parent for user feedback
+        this.$emit('upload-error', {
+          file: file,
+          error: `Cannot add more files. You can add ${this.maxFiles} image${this.maxFiles === 1 ? '' : 's'} total.`
+        });
+
+        return;
+      }
 
       // Add to our pending files list
       this.pendingFiles.push(file);
@@ -89,16 +112,6 @@ export default {
       });
     },
 
-    maxFilesExceeded(file) {
-      console.warn('Max files exceeded for:', file.name);
-
-      // Emit error to parent for user feedback
-      this.$emit('upload-error', {
-        file: file,
-        error: `Maximum of 5 images allowed per device.`
-      });
-    },
-
     // Method to get current files (for parent component)
     getPendingFiles() {
       return this.pendingFiles;
@@ -106,6 +119,7 @@ export default {
 
     // Method to clear all files
     clearFiles() {
+      // Only clear if not in the middle of processing
       if (this.pendingFiles.length > 0) {
         console.log('Clearing files from FileUploader');
 
