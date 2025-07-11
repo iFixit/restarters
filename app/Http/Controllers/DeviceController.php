@@ -73,96 +73,67 @@ class DeviceController extends Controller
             $images = [];
 
             if (isset($_FILES) && ! empty($_FILES)) {
-                // Check if we have multiple files
-                $fileCount = 0;
-                $fileKeys = [];
-                
-                foreach ($_FILES as $key => $file) {
-                    if (is_array($file['name'])) {
-                        $fileCount += count($file['name']);
-                        $fileKeys[] = $key;
-                    } else {
-                        $fileCount++;
-                        $fileKeys[] = $key;
-                    }
-                }
-                
-                \Log::info('Processing image upload', [
+                \Log::info('Processing image upload request', [
                     'device_id' => $id,
-                    'file_count' => $fileCount,
-                    'file_keys' => $fileKeys,
+                    'files_count' => count($_FILES),
                     'files_structure' => array_keys($_FILES)
                 ]);
 
+                // Process files - handle both single and multiple file scenarios
                 $uploadedCount = 0;
+                $errors = [];
                 
-                // Process each file
                 foreach ($_FILES as $fieldName => $fileData) {
-                    if (is_array($fileData['name'])) {
-                        // Multiple files in array format (file[0], file[1], etc.)
-                        for ($i = 0; $i < count($fileData['name']); $i++) {
-                            if ($fileData['error'][$i] == UPLOAD_ERR_OK) {
-                                // Create a temporary $_FILES entry for this specific file
-                                $tempFileKey = 'temp_file_' . $i;
-                                $_FILES[$tempFileKey] = [
-                                    'name' => $fileData['name'][$i],
-                                    'type' => $fileData['type'][$i],
-                                    'tmp_name' => $fileData['tmp_name'][$i],
-                                    'error' => $fileData['error'][$i],
-                                    'size' => $fileData['size'][$i],
-                                ];
-                                
-                                $file = new FixometerFile;
-                                $fn = $file->upload($tempFileKey, 'image', $id, env('TBL_DEVICES'), true, false, true);
-                                
-                                if ($fn) {
-                                    $uploadedCount++;
-                                    \Log::info('Successfully uploaded file', [
-                                        'device_id' => $id,
-                                        'file_name' => $fileData['name'][$i],
-                                        'file_index' => $i,
-                                        'upload_result' => $fn
-                                    ]);
-                                } else {
-                                    \Log::error('Failed to upload file', [
-                                        'device_id' => $id,
-                                        'file_name' => $fileData['name'][$i],
-                                        'file_index' => $i
-                                    ]);
-                                }
-                                
-                                // Clean up temporary $_FILES entry
-                                unset($_FILES[$tempFileKey]);
-                            }
-                        }
-                    } else {
-                        // Single file
-                        if ($fileData['error'] == UPLOAD_ERR_OK) {
-                            $file = new FixometerFile;
-                            $fn = $file->upload($fieldName, 'image', $id, env('TBL_DEVICES'), true, false, true);
+                    try {
+                        // Check if this is a single file or multiple files
+                        if (is_array($fileData['name'])) {
+                            // Handle multiple files in array format
+                            $fileCount = count($fileData['name']);
+                            \Log::info('Processing multiple files', ['count' => $fileCount]);
                             
-                            if ($fn) {
-                                $uploadedCount++;
-                                \Log::info('Successfully uploaded single file', [
-                                    'device_id' => $id,
-                                    'file_name' => $fileData['name'],
-                                    'upload_result' => $fn
-                                ]);
-                            } else {
-                                \Log::error('Failed to upload single file', [
-                                    'device_id' => $id,
-                                    'file_name' => $fileData['name']
-                                ]);
+                            for ($i = 0; $i < $fileCount; $i++) {
+                                if ($fileData['error'][$i] == UPLOAD_ERR_OK) {
+                                    $success = $this->processSingleFile($fileData, $i, $id);
+                                    if ($success) {
+                                        $uploadedCount++;
+                                    } else {
+                                        $errors[] = "Failed to upload file: " . $fileData['name'][$i];
+                                    }
+                                }
+                            }
+                        } else {
+                            // Handle single file
+                            if ($fileData['error'] == UPLOAD_ERR_OK) {
+                                $success = $this->processSingleFile($fileData, null, $id);
+                                if ($success) {
+                                    $uploadedCount++;
+                                } else {
+                                    $errors[] = "Failed to upload file: " . $fileData['name'];
+                                }
                             }
                         }
+                    } catch (\Exception $e) {
+                        \Log::error('Error processing file', [
+                            'field' => $fieldName,
+                            'error' => $e->getMessage()
+                        ]);
+                        $errors[] = "Error processing file: " . $e->getMessage();
                     }
                 }
 
                 \Log::info('Upload processing complete', [
                     'device_id' => $id,
-                    'total_files' => $fileCount,
-                    'uploaded_count' => $uploadedCount
+                    'uploaded_count' => $uploadedCount,
+                    'errors' => $errors
                 ]);
+
+                if ($uploadedCount === 0) {
+                    return response()->json([
+                        'success' => false,
+                        'error' => !empty($errors) ? implode(', ', $errors) : __('devices.image_upload_error'),
+                        'images' => []
+                    ], 400);
+                }
 
                 // Get current images for this device
                 if ($id > 0) {
@@ -173,13 +144,6 @@ class DeviceController extends Controller
                     $images = $File->findImages(env('TBL_DEVICES'), $id);
                 }
 
-                if ($uploadedCount === 0) {
-                    return response()->json([
-                        'success' => false,
-                        'error' => __('devices.image_upload_error'),
-                        'images' => []
-                    ], 400);
-                }
             } else {
                 return response()->json([
                     'success' => false,
@@ -201,7 +165,6 @@ class DeviceController extends Controller
                 ];
             }
 
-            // Return the current set of images for this device so that the client doesn't need to merge.
             return response()->json([
                 'success' => true,
                 'iddevices' => $id,
@@ -219,6 +182,58 @@ class DeviceController extends Controller
                 'error' => __('devices.image_upload_error'),
                 'images' => []
             ], 500);
+        }
+    }
+
+    /**
+     * Process a single file upload
+     */
+    private function processSingleFile($fileData, $index, $deviceId)
+    {
+        try {
+            $file = new FixometerFile;
+            
+            if ($index !== null) {
+                // Multiple files - create temporary $_FILES entry
+                $tempFileKey = 'temp_file_' . $index . '_' . time();
+                $_FILES[$tempFileKey] = [
+                    'name' => $fileData['name'][$index],
+                    'type' => $fileData['type'][$index],
+                    'tmp_name' => $fileData['tmp_name'][$index],
+                    'error' => $fileData['error'][$index],
+                    'size' => $fileData['size'][$index],
+                ];
+                
+                $result = $file->upload($tempFileKey, 'image', $deviceId, env('TBL_DEVICES'), true, false, true);
+                
+                // Clean up temporary $_FILES entry
+                unset($_FILES[$tempFileKey]);
+                
+                return $result !== false;
+            } else {
+                // Single file - find the field name
+                $fieldName = null;
+                foreach ($_FILES as $key => $data) {
+                    if ($data === $fileData) {
+                        $fieldName = $key;
+                        break;
+                    }
+                }
+                
+                if ($fieldName) {
+                    $result = $file->upload($fieldName, 'image', $deviceId, env('TBL_DEVICES'), true, false, true);
+                    return $result !== false;
+                }
+            }
+            
+            return false;
+        } catch (\Exception $e) {
+            \Log::error('Error processing single file', [
+                'device_id' => $deviceId,
+                'index' => $index,
+                'error' => $e->getMessage()
+            ]);
+            return false;
         }
     }
 

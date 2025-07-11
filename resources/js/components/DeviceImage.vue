@@ -58,12 +58,13 @@ export default {
 };
 </script>
 <style scoped lang="scss">
-.device-image {
-	width: 120px;
-	height: 120px;
+.device-photos .device-image,
+.device-photo-layout .device-image {
+	width: 120px !important;
+	height: 120px !important;
 	object-fit: cover;
 	border-radius: 4px;
-	border: 2px solid #ddd;
+	border: 2px solid #ddd !important;
 }
 
 .clickme {

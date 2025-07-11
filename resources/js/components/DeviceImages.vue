@@ -136,6 +136,7 @@ export default {
 
       try {
         const allUploadedImages = [];
+        let failedUploads = [];
 
         // Create a copy of pending files to avoid modifying array while iterating
         const filesToUpload = [...this.pendingFiles];
@@ -145,21 +146,49 @@ export default {
           const file = filesToUpload[i];
           console.log(`Uploading file ${i + 1}/${filesToUpload.length}:`, file.name);
 
-          const result = await this.uploadSingleFile(file);
+          try {
+            const result = await this.uploadSingleFile(file);
 
-          if (result.success && result.images) {
-            // Collect all uploaded images
-            allUploadedImages.push(...result.images);
-            console.log('Successfully uploaded:', file.name, result.images);
+            if (result.success && result.images) {
+              // Collect all uploaded images
+              allUploadedImages.push(...result.images);
+              console.log('Successfully uploaded:', file.name, result.images);
 
-            // Remove only this specific file from pending files
-            // but keep the others for continued preview
-            this.removePendingFile(file);
+              // Remove only this specific file from pending files
+              // but keep the others for continued preview
+              this.removePendingFile(file);
+            } else {
+              console.error('Upload failed for file:', file.name, result);
+              failedUploads.push({ file: file.name, error: result.error || 'Unknown error' });
+            }
+          } catch (error) {
+            console.error('Upload error for file:', file.name, error);
+            failedUploads.push({ file: file.name, error: error.message || 'Upload failed' });
+
+            // Don't break the entire upload process for one failed file
+            // Continue with remaining files
+          }
+
+          // Add a small delay between uploads to prevent server overload
+          if (i < filesToUpload.length - 1) {
+            await new Promise(resolve => setTimeout(resolve, 500));
           }
         }
 
         // Clear any remaining pending files after ALL uploads are complete
         this.clearPendingFiles();
+
+        // Report results
+        if (failedUploads.length > 0) {
+          console.warn('Some uploads failed:', failedUploads);
+          const errorMessage = `Failed to upload ${failedUploads.length} file(s): ${failedUploads.map(f => f.file).join(', ')}`;
+          return {
+            success: allUploadedImages.length > 0,
+            images: allUploadedImages,
+            error: errorMessage,
+            partialSuccess: allUploadedImages.length > 0
+          };
+        }
 
         return { success: true, images: allUploadedImages };
 
@@ -183,6 +212,7 @@ export default {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
+          timeout: 30000, // 30 second timeout per file
         });
 
         console.log('Upload response for', file.name, ':', response.data);
@@ -197,7 +227,17 @@ export default {
         }
       } catch (error) {
         console.error('Upload error for', file.name, ':', error);
-        throw error;
+
+        // Handle different types of errors
+        if (error.code === 'ECONNABORTED') {
+          throw new Error('Upload timeout - file may be too large');
+        } else if (error.response && error.response.status === 504) {
+          throw new Error('Server timeout - please try uploading fewer files at once');
+        } else if (error.response && error.response.status >= 500) {
+          throw new Error('Server error - please try again later');
+        } else {
+          throw error;
+        }
       }
     },
 
