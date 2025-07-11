@@ -41,26 +41,16 @@ export default {
         paramName: 'file',
         uploadMultiple: false,
         maxFiles: this.maxFiles,
-        createImageThumbnails: true,
+        createImageThumbnails: false, // Disable thumbnails
         resizeWidth: 800,
         resizeHeight: 800,
         thumbnailMethod: 'contain',
-        previewsContainer: this.previewsContainer,
+        previewsContainer: false, // Disable previews entirely
         dictRemoveFile: null,
         acceptedFiles: ".jpeg,.jpg,.png,.gif",
         manuallyAddFile: true,
         autoProcessQueue: false, // Don't auto-upload
-        previewTemplate:
-          '<div class="dz-preview dz-file-preview">' +
-          '  <div class="dz-image"><img data-dz-thumbnail /></div>' +
-          '  <div class="dz-progress" style="display: none;">' +
-          '    <span data-dz-uploadprogress="" class="dz-upload"></span>' +
-          '  </div>' +
-          '  <div class="dz-error-message">' +
-          '    <span data-dz-errormessage=""></span>' +
-          '  </div>' +
-          '  <div class="dz-remove" data-dz-remove></div>' +
-          '</div>'
+        previewTemplate: '<div style="display:none;"></div>' // Hide any preview
       }
     }
   },
@@ -70,25 +60,6 @@ export default {
 
       // Add to our pending files list
       this.pendingFiles.push(file);
-
-      // Create data URL for preview
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        // Update the thumbnail with the data URL
-        const thumbnailImg = file.previewElement.querySelector('[data-dz-thumbnail]');
-        if (thumbnailImg) {
-          thumbnailImg.src = e.target.result;
-        }
-      };
-      reader.readAsDataURL(file);
-
-      // Add remove functionality
-      const removeBtn = file.previewElement.querySelector('[data-dz-remove]');
-      if (removeBtn) {
-        removeBtn.addEventListener('click', () => {
-          this.removeFile(file);
-        });
-      }
 
       // Emit the files to parent component
       this.$emit('files-changed', this.pendingFiles);
@@ -132,13 +103,36 @@ export default {
       // Only clear if not in the middle of processing
       if (this.pendingFiles.length > 0) {
         console.log('Clearing files from FileUploader');
+
+        // Clear files from dropzone properly
         this.pendingFiles.forEach(file => {
           if (this.$refs.dropzone && this.$refs.dropzone.removeFile) {
             this.$refs.dropzone.removeFile(file);
           }
         });
+
+        // Reset dropzone state
+        this.resetDropzone();
+
         this.pendingFiles = [];
         this.$emit('files-changed', this.pendingFiles);
+      }
+    },
+
+    // Method to reset dropzone to clean state
+    resetDropzone() {
+      if (this.$refs.dropzone && this.$refs.dropzone.dropzone) {
+        const dropzone = this.$refs.dropzone.dropzone;
+
+        // Clear any queued files
+        dropzone.removeAllFiles(true);
+
+        // Reset internal state
+        dropzone.files = [];
+        dropzone.filesProcessing = [];
+        dropzone.filesQueue = [];
+
+        console.log('Dropzone reset to clean state');
       }
     },
 
@@ -170,35 +164,6 @@ export default {
 
   img {
     width: 100px !important;
-  }
-}
-
-.dz-preview {
-  position: relative;
-  margin-right: 0.5rem;
-}
-
-.dz-remove {
-  position: absolute;
-  top: -10px;
-  right: -8px;
-  font-size: 13px;
-  z-index: 2;
-  font-weight: 600;
-  color: $brand;
-  text-decoration: underline;
-  cursor: pointer;
-
-  &:hover {
-    text-decoration: none;
-  }
-
-  &:before {
-    content: "╳";
-    position: relative;
-    background-color: white;
-    border-radius: 50%;
-    padding: 3px;
   }
 }
 </style>

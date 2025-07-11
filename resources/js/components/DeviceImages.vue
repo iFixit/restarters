@@ -12,15 +12,19 @@
         <DeviceImage v-for="image in images" :key="'img-' + image.path" :image="image" @remove="$emit('remove', image)"
           :disabled="disabled" />
         <div v-for="(file, index) in pendingFiles" :key="'pending-' + index" class="pending-image-preview">
-          <img :src="getFilePreviewUrl(file)" class="pending-image" />
-          <button type="button" @click="removePendingFile(file)" class="remove-pending-btn"
-            :disabled="disabled">×</button>
+          <img :src="getFilePreviewUrl(file)" />
+          <div @click="removePendingFile(file)" class="remove-btn" v-if="!disabled && !isUploading">
+            ×
+          </div>
         </div>
       </div>
-      <div v-if="pendingFiles.length > 0" class="pending-files-info">
+      <div v-if="pendingFiles.length > 0" class="mt-2">
         <small class="text-muted">
           {{ pendingFiles.length }} {{ pendingFiles.length === 1 ? 'file' : 'files' }} ready to upload
         </small>
+      </div>
+      <div v-if="isUploading" class="uploading-text">
+        <small>Uploading images...</small>
       </div>
     </div>
   </div>
@@ -241,27 +245,30 @@ export default {
       }
     },
 
+    // Method to clear pending files and reset dropzone state
     clearPendingFiles() {
-      // Don't clear pending files if we're in the middle of uploading
-      if (this.isUploading) {
-        console.log('Upload in progress, not clearing pending files');
-        return;
-      }
+      // Only clear if not in the middle of processing
+      if (!this.isUploading) {
+        console.log('Clearing pending files');
 
-      console.log('Clearing pending files');
+        // Clean up preview URLs to prevent memory leaks
+        this.pendingFiles.forEach(file => {
+          if (this.filePreviewUrls[file.name]) {
+            URL.revokeObjectURL(this.filePreviewUrls[file.name]);
+            delete this.filePreviewUrls[file.name];
+          }
+        });
 
-      // Clean up preview URLs
-      Object.values(this.filePreviewUrls).forEach(url => {
-        URL.revokeObjectURL(url);
-      });
-      this.filePreviewUrls = {};
+        // Clear the file uploader (includes dropzone reset)
+        if (this.$refs.fileUploader) {
+          this.$refs.fileUploader.clearFiles();
+        }
 
-      // Clear pending files
-      this.pendingFiles = [];
+        // Clear our local state
+        this.pendingFiles = [];
+        this.filePreviewUrls = {};
 
-      // Clear FileUploader if it exists
-      if (this.$refs.fileUploader) {
-        this.$refs.fileUploader.clearFiles();
+        this.$emit('pending-files-changed', []);
       }
     },
 
@@ -313,46 +320,52 @@ export default {
 
 .pending-image-preview {
   position: relative;
-  margin-right: 10px;
-  margin-bottom: 10px;
-}
+  display: inline-block;
+  margin-right: 0.5rem;
 
-.pending-image {
-  width: 120px;
-  height: 120px;
-  object-fit: cover;
-  border-radius: 4px;
-  border: 2px solid #007bff;
-}
-
-.remove-pending-btn {
-  position: absolute;
-  top: -5px;
-  right: -5px;
-  background: #dc3545;
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  font-size: 12px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  &:hover {
-    background: #c82333;
+  img {
+    width: 120px !important;
+    height: 120px !important;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 2px solid #ddd !important;
+    cursor: pointer;
   }
 
-  &:disabled {
-    background: #6c757d;
-    cursor: not-allowed;
+  .remove-btn {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 24px;
+    height: 24px;
+    background: white;
+    border: 2px solid #666;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    color: #666;
+    z-index: 10;
+
+    &:hover {
+      background: #f0f0f0;
+      border-color: #333;
+    }
   }
 }
 
-.pending-files-info {
+.upload-error {
+  color: #dc3545;
   margin-top: 0.5rem;
-  text-align: center;
+  font-size: 0.875rem;
+}
+
+.uploading-text {
+  color: #007bff;
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
 }
 </style>
