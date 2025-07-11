@@ -1,6 +1,6 @@
 <template>
 	<div class="position-relative">
-		<b-img-lazy :src="imageUrl" class="align-self-start clickme" @click.native="zoom" />
+		<b-img-lazy :src="imageUrl" class="align-self-start clickme device-image" @click.native="zoom" />
 		<b-btn variant="none" class="remove align-content-center" @click="confirm" v-if="!disabled">
 			╳
 		</b-btn>
@@ -58,6 +58,18 @@ export default {
 };
 </script>
 <style scoped lang="scss">
+.device-image {
+	width: 120px;
+	height: 120px;
+	object-fit: cover;
+	border-radius: 4px;
+	border: 2px solid #ddd;
+}
+
+.clickme {
+	cursor: pointer;
+}
+
 .remove {
 	position: absolute;
 	right: 6px;

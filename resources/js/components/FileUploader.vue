@@ -59,7 +59,7 @@ export default {
           '  <div class="dz-error-message">' +
           '    <span data-dz-errormessage=""></span>' +
           '  </div>' +
-          '  <div class="dz-remove" data-dz-remove>×</div>' +
+          '  <div class="dz-remove" data-dz-remove></div>' +
           '</div>'
       }
     }

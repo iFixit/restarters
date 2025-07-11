@@ -89,7 +89,7 @@ export default {
           console.log('Upload in progress, preserving pending files during images update');
           return;
         }
-        
+
         // Handle normal images update when not uploading
         if (newImages !== oldImages) {
           console.log('Images updated:', newImages);
@@ -179,7 +179,7 @@ export default {
       formData.append('file', file);
 
       try {
-        const response = await axios.post(`/party/device/${this.id}/image-upload`, formData, {
+        const response = await axios.post(`/device/image-upload/${this.id}`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
