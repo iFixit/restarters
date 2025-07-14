@@ -1,8 +1,9 @@
 <template>
-  <div>
-    <b-img-lazy :src="thumbnailUrl" thumbnail class="mr-2 mb-2 size d-inline clickme" @error.native="brokenImage" @click.native="zoom" />
-    <EventImageModal :image="image" ref="modal" />
-  </div>
+	<div>
+		<b-img-lazy :src="thumbnailUrl" thumbnail class="mr-2 mb-2 size d-inline clickme" @error.native="brokenImage"
+			@click.native="zoom" />
+		<EventImageModal :image="image" ref="modal" />
+	</div>
 </template>
 <script>
 import CollapsibleSection from "./CollapsibleSection";
@@ -19,12 +20,18 @@ export default {
 	},
 	computed: {
 		thumbnailUrl() {
-			// Check if we have a full URL (S3) or just a path (local)
-			if (this.image.path.startsWith("http")) {
-				// For S3, we might have a direct URL to the thumbnail
-				return this.image.thumbnail_path || this.image.path;
+			if (this.image.url) {
+				return this.image.url;
 			}
-			return `/uploads/thumbnail_${this.image.path}`;
+
+			if (this.image.path) {
+				if (this.image.path.startsWith("http")) {
+					return this.image.path;
+				}
+				return `/uploads/thumbnail_${this.image.path}`;
+			}
+
+			return "/images/thumbnail_placeholder.png";
 		},
 	},
 	methods: {
@@ -39,11 +46,11 @@ export default {
 </script>
 <style scoped lang="scss">
 .size {
-  width: 80px;
-  height: 80px;
+	width: 80px;
+	height: 80px;
 }
 
 .clickme {
-  cursor: pointer;
+	cursor: pointer;
 }
 </style>
