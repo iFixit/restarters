@@ -98,11 +98,10 @@ export default {
       return this.images.length + this.pendingFiles.length;
     },
     remainingSlots() {
-      console.log("Remaining slots:", this.maxFiles - this.totalImages);
-      return Math.max(0, this.maxFiles - this.totalImages);
+      return Math.max(0, this.maxFiles - this.images.length);
     },
     canAddMoreImages() {
-      return this.remainingSlots > 0;
+      return this.maxFiles - this.totalImages > 0;
     },
     limitMessage() {
       if (this.totalImages >= this.maxFiles) {
