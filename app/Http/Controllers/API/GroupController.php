@@ -27,6 +27,7 @@ use Carbon\Carbon;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Notification;
 use Illuminate\Validation\ValidationException;
 
@@ -867,12 +868,29 @@ class GroupController extends Controller
             $file->upload('image', 'image', $idGroup, env('TBL_GROUPS'), false, true, true);
         }
 
-        // Notify relevant admins.
-        $notify_admins = Fixometer::usersWhoHavePreference('admin-moderate-group');
-        Notification::send($notify_admins, new AdminModerationGroup([
-                                                                        'group_name' => $name,
-                                                                        'group_url' => url('/group/edit/'.$idGroup),
-                                                                    ]));
+        // Check if groups should be auto-approved
+        if (env('FEATURE__AUTO_APPROVE_GROUPS', false) && $user->role <= ROLE::RESTARTER) {
+            // Auto-approve the group
+            $group->update(['approved' => true]);
+            
+            // Fire the approval event
+            event(new \App\Events\ApproveGroup($group, $data));
+            
+            // Notify the creator that their group was approved
+            Notification::send($user, new \App\Notifications\GroupConfirmed([
+                'group_name' => $name,
+                'group_url' => url('/group/view/'.$idGroup),
+            ]));
+            
+            Log::info("Auto-approved group: $idGroup for user {$user->id} (role {$user->role})");
+        } else {
+            // Notify relevant admins for moderation.
+            $notify_admins = Fixometer::usersWhoHavePreference('admin-moderate-group');
+            Notification::send($notify_admins, new AdminModerationGroup([
+                                                                            'group_name' => $name,
+                                                                            'group_url' => url('/group/edit/'.$idGroup),
+                                                                        ]));
+        }
 
         return response()->json([
             'id' => $idGroup,
