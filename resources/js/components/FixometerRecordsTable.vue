@@ -2,15 +2,8 @@
   <div>
     <p class="text-brand small pl-3">{{ __('devices.table_intro') }}</p>
     <div class="pl-md-3 pr-md-3">
-      <b-table
-          ref="table"
-          :id="tableId"
-          :fields="fields"
-          :items="items"
-          :per-page="perPage"
-          :current-page="currentPage"
-          sort-null-last
-      >
+      <b-table ref="table" :id="tableId" :fields="fields" :items="items" :per-page="perPage" :current-page="currentPage"
+        sort-null-last>
         <template slot="cell(item_type)" slot-scope="data">
           <span v-if="data.item.item_type">
             {{ data.item.item_type }}
@@ -56,7 +49,8 @@
             <span class="pl-0 pl-md-2 pr-2 clickme" @click="row.toggleDetails">
               <b-img class="icon" src="/icons/edit_ico_green.svg" />
             </span>
-            <ConfirmModal :key="'modal-' + row.item.id" ref="confirmDelete" @confirm="deleteConfirmed(row.item)" :message="__('devices.confirm_delete')" />
+            <ConfirmModal :key="'modal-' + row.item.id" ref="confirmDelete" @confirm="deleteConfirmed(row.item)"
+              :message="__('devices.confirm_delete')" />
           </div>
           <div v-else class="text-md-right">
             <span class="pl-0 pl-md-2 pr-2 clickme" @click="row.toggleDetails">
@@ -65,27 +59,14 @@
           </div>
         </template>
         <template slot="row-details" slot-scope="row">
-          <EventDevice
-              :device="row.item"
-              :powered="powered"
-              :add="false"
-              :edit="isAdmin"
-              :delete-button="true"
-              :clusters="clusters"
-              :eventid="row.item.event"
-              :brands="brands"
-              :barrier-list="barrierList"
-              :cancel-button="false"
-              @close="closed(row)" />
+          <EventDevice :id="row.item.id" :powered="powered" :add="false" :edit="isAdmin" :delete-button="true"
+            :clusters="clusters" :eventid="row.item.event" :brands="brands" :barrier-list="barrierList"
+            :cancel-button="false" @close="closed(row)" />
         </template>
       </b-table>
       <div class="d-flex justify-content-end" v-if="total > perPage">
-        <b-pagination
-            v-model="currentPage"
-            :total-rows="total"
-            :per-page="perPage"
-            :aria-controls="'recordstable-' + powered"
-        ></b-pagination>
+        <b-pagination v-model="currentPage" :total-rows="total" :per-page="perPage"
+          :aria-controls="'recordstable-' + powered"></b-pagination>
       </div>
     </div>
   </div>
@@ -106,7 +87,7 @@ Vue.use(lineClamp, {
 const bootaxios = require('axios')
 
 export default {
-  components: {EventDevice, ConfirmModal, DeviceModel},
+  components: { EventDevice, ConfirmModal, DeviceModel },
   props: {
     isAdmin: {
       type: Boolean,
@@ -183,7 +164,7 @@ export default {
       default: null
     }
   },
-  data () {
+  data() {
     return {
       currentPage: 1,
       perPage: 20,
@@ -198,7 +179,7 @@ export default {
     tableId() {
       return 'recordstable-' + this.powered
     },
-    fields () {
+    fields() {
       let ret = [
         {
           key: 'item_type',
@@ -216,11 +197,11 @@ export default {
       ]
 
       if (this.powered) {
-        ret.push({key: 'brand', label: this.__('devices.brand'), sortable: true, thClass: 'd-none d-md-table-cell', tdClass: 'd-none d-md-table-cell'})
+        ret.push({ key: 'brand', label: this.__('devices.brand'), sortable: true, thClass: 'd-none d-md-table-cell', tdClass: 'd-none d-md-table-cell' })
       }
 
-      ret.push({key: 'short_problem', label: this.__('devices.assessment'), thClass: 'width10 d-none d-md-table-cell', tdClass: 'width10 d-none d-md-table-cell'})
-      ret.push({key: 'groupname', label: this.__('devices.group'), sortable: true, thClass: 'd-none d-md-table-cell', tdClass: 'd-none d-md-table-cell'})
+      ret.push({ key: 'short_problem', label: this.__('devices.assessment'), thClass: 'width10 d-none d-md-table-cell', tdClass: 'width10 d-none d-md-table-cell' })
+      ret.push({ key: 'groupname', label: this.__('devices.group'), sortable: true, thClass: 'd-none d-md-table-cell', tdClass: 'd-none d-md-table-cell' })
       ret.push({
         key: 'repair_status',
         label: this.__('devices.status'),
@@ -291,7 +272,7 @@ export default {
     }
   },
   methods: {
-    items (ctx, callback) {
+    items(ctx, callback) {
       // We want to take advantage of the paging and sorting features of the table, and therefore we are using the
       // table's async method of providing data.
       //
@@ -317,35 +298,35 @@ export default {
           _showDetails: true
         }
       })
-          .then(ret => {
-            this.total = ret.data.count
-            this.weight = ret.data.weight
-            this.co2 = ret.data.co2
+        .then(ret => {
+          this.total = ret.data.count
+          this.weight = ret.data.weight
+          this.co2 = ret.data.co2
 
-            this.$nextTick(async () => {
-              // Update the store to contain (just) the items we have returned.  They need to be in the store for
-              // other components (e.g. EventDevice) to work correctly.
-              //
-              // We do this in nextTick because the tables component doesn't support async/await.
-              await this.$store.dispatch('devices/clear')
+          this.$nextTick(async () => {
+            // Update the store to contain (just) the items we have returned.  They need to be in the store for
+            // other components (e.g. EventDevice) to work correctly.
+            //
+            // We do this in nextTick because the tables component doesn't support async/await.
+            await this.$store.dispatch('devices/clear')
 
-              ret.data.items.forEach(item => {
-                this.$store.dispatch('devices/setForEvent', {
-                  eventid: item.eventid,
-                  devices: [ item ]
-                })
+            ret.data.items.forEach(item => {
+              this.$store.dispatch('devices/setForEvent', {
+                eventid: item.eventid,
+                devices: [item]
               })
             })
+          })
 
-            callback(ret.data.items)
-          }).catch(() => {
-        callback([])
-      })
+          callback(ret.data.items)
+        }).catch(() => {
+          callback([])
+        })
 
       // Indicate that callback is being used.
       return null
     },
-    showStatus (data) {
+    showStatus(data) {
       switch (data.item.repair_status) {
         case FIXED:
           return this.$lang.get('partials.fixed')
@@ -357,7 +338,7 @@ export default {
           return null
       }
     },
-    badgeClass (data) {
+    badgeClass(data) {
       switch (data.item.repair_status) {
         case FIXED:
           return 'badge badge-success'
@@ -369,7 +350,7 @@ export default {
           return null
       }
     },
-    formatDate (data) {
+    formatDate(data) {
       return new moment(data.item.created_at).format('DD/MM/YYYY')
     },
     deleteConfirm() {
@@ -432,7 +413,8 @@ export default {
       padding-bottom: 5px;
     }
 
-    th, td {
+    th,
+    td {
       width: 100%;
       border-bottom: none !important;
       padding-left: 0px;
@@ -449,5 +431,4 @@ export default {
 ::v-deep tr.b-table-details td {
   padding: 0px;
 }
-
 </style>
