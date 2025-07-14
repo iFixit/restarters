@@ -11,9 +11,9 @@
       </div>
       <div class="d-flex flex-wrap device-photos dropzone-previews">
         <FileUploader :url="uploadURL" v-if="(edit || add) && !disabled && images.length < maxFiles"
-          v-show="totalImages < maxFiles || pendingFiles.length > 0" previews-container=".device-photos"
-          @files-changed="handleFilesChanged" @upload-error="handleUploadError" :max-files="remainingSlots"
-          :key="'uploader-' + (id || 'new')" ref="fileUploader" />
+          v-show="totalImages < maxFiles" previews-container=".device-photos" @files-changed="handleFilesChanged"
+          @upload-error="handleUploadError" :max-files="remainingSlots" :key="'uploader-' + (id || 'new')"
+          ref="fileUploader" />
         <DeviceImage v-for="image in images" :key="'img-' + image.path" :image="image" @remove="$emit('remove', image)"
           :disabled="disabled" />
         <div v-for="(file, index) in pendingFiles" :key="'pending-' + index" class="pending-image-preview">
