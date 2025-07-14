@@ -20,16 +20,16 @@ export default {
 	},
 	computed: {
 		thumbnailUrl() {
-			if (this.image.url) {
-				return this.image.url;
+			if (this.image?.path) {
+				const imagePath = this.image.path;
+
+				if (window.getUploadUrl) {
+					return window.getUploadUrl(imagePath, 'thumbnail');
+				}
+
+				return `/uploads/thumbnail_${imagePath}`;
 			}
 
-			if (this.image.path) {
-				if (this.image.path.startsWith("http")) {
-					return this.image.path;
-				}
-				return `/uploads/thumbnail_${this.image.path}`;
-			}
 
 			return "/images/thumbnail_placeholder.png";
 		},
