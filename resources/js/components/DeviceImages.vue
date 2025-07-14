@@ -93,9 +93,12 @@ export default {
       return window.Laravel && window.Laravel.imageUploadEnabled;
     },
     totalImages() {
+      console.log("Total images:", this.images.length);
+      console.log("Pending files:", this.pendingFiles.length);
       return this.images.length + this.pendingFiles.length;
     },
     remainingSlots() {
+      console.log("Remaining slots:", this.maxFiles - this.totalImages);
       return Math.max(0, this.maxFiles - this.totalImages);
     },
     canAddMoreImages() {
