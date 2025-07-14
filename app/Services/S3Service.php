@@ -172,7 +172,13 @@ class S3Service
             $prefix = 'mid_';
         }
 
-        return 'uploads/' . $prefix . $filename;
+        // For S3, we need the uploads/ prefix, but for local storage, 
+        // the disk URL configuration already includes it
+        if ($this->isUsingS3()) {
+            return 'uploads/' . $prefix . $filename;
+        }
+
+        return $prefix . $filename;
     }
 
     /**
