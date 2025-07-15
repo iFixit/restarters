@@ -581,19 +581,37 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
      */
     public static function syncFromExternal(array $externalUserData): User
     {
-        return self::updateOrCreate(
-            ['external_user_id' => $externalUserData['userid']],
-            [
+        $user = self::where('external_user_id', $externalUserData['userid'])->first();
+        
+        if ($user) {
+            // User exists, update without changing role to preserve manual changes
+            $user->update([
+                'name' => $externalUserData['username'],
+                'email' => $externalUserData['login'],
+                'external_username' => $externalUserData['unique_username'] ?? null,
+                'username' => $externalUserData['unique_username'] ?? null,
+            ]);
+            
+            return $user;
+        } else {
+            // User doesn't exist, create with mapped role from iFixit privilege level
+            $role = Role::RESTARTER; // Default role for external users
+            
+            if (isset($externalUserData['greatest_privilege']) && $externalUserData['greatest_privilege'] === 'Admin') {
+                $role = Role::ADMINISTRATOR;
+            }
+            
+            return self::create([
                 'name' => $externalUserData['username'],
                 'email' => $externalUserData['login'],
                 'external_user_id' => $externalUserData['userid'],
                 'external_username' => $externalUserData['unique_username'] ?? null,
-                'role' => 4, // Default role for external users
+                'role' => $role,
                 'username' => $externalUserData['unique_username'] ?? null,
                 'password' => null, // External users don't have local passwords
                 'repairdir_role' => Role::REPAIR_DIRECTORY_NONE,
-            ]
-        );
+            ]);
+        }
     }
 
     public static function userCanSeeEvent($user, $event) {
