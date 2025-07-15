@@ -8,9 +8,6 @@
         <b-dropdown-item :href="'/party/create/' + idgroups" v-if="canedit">
           {{ __('groups.add_event') }}
         </b-dropdown-item>
-        <b-dropdown-item  data-toggle="modal" data-target="#invite-to-group" v-if="canedit">
-          {{ __('groups.invite_volunteers') }}
-        </b-dropdown-item>
         <b-dropdown-item :href="'/group/nearby/' + idgroups" v-if="canedit">
           {{ __('groups.volunteers_nearby') }}
         </b-dropdown-item>
@@ -39,10 +36,7 @@
     </div>
     <div v-else>
       <b-dropdown variant="primary" :text="__('groups.group_actions')" class="deepnowrap">
-        <b-dropdown-item data-toggle="modal" data-target="#invite-to-group" v-if="ingroup">
-          {{ __('groups.invite_volunteers') }}
-        </b-dropdown-item>
-        <b-dropdown-item :href="'/group/join/' + idgroups" v-else>
+        <b-dropdown-item :href="'/group/join/' + idgroups" v-if="!ingroup">
           {{ __('groups.join_group_button') }}
         </b-dropdown-item>
         <b-dropdown-item  data-toggle="modal" data-target="#group-share-stats">

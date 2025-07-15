@@ -1,49 +1,4 @@
 <div class="edit-panel">
-
-    <div class="form-row">
-    <div class="col-lg-6">
-        <h4>@lang('auth.change_password')</h4>
-        <p>@lang('auth.change_password_text')</p>
-    </div>
-    </div>
-
-    <form action="/profile/edit-password" method="post">
-    @csrf
-
-    {{ Form::hidden('id', $user->id) }}
-
-    <fieldset class="registration__offset2">
-        <div class="form-row">
-        <div class="form-group col-lg-6">
-            <label for="current-password">@lang('auth.current_password'):</label>
-            <input type="password" class="form-control" id="current-password" name="current-password">
-        </div>
-        </div>
-        <div class="form-row">
-        <div class="form-group col-lg-6">
-            <label for="new-password">@lang('auth.new_password'):</label>
-            <input type="password" class="form-control" id="new-password" name="new-password">
-        </div>
-        <div class="form-group col-lg-6">
-            <label for="new-password-repeat">@lang('auth.new_repeat_password'):</label>
-            <input type="password" class="form-control" id="new-password-repeat" name="new-password-repeat">
-        </div>
-        </div>
-    </fieldset>
-
-    <div class="form-row">
-        <div class="form-group col-lg-12">
-        <div class="d-flex justify-content-end">
-            <button type="submit" class="btn btn-primary">@lang('auth.change_password')</button>
-        </div>
-        </div>
-    </div>
-    </form>
-
-
-</div>
-
-<div class="edit-panel">
     <div class="form-row">
         <div class="col">
             <h4>@lang('profile.language_panel_title')</h4>

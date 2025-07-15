@@ -169,16 +169,10 @@ Route::middleware('ensureAPIToken')->group(function () {
     
     Route::get('/party/view/{id}', [PartyController::class, 'view']);
     
-    // Registration and user management (guest accessible)
+    // User management (guest accessible)
     Route::prefix('user')->group(function () {
         Route::get('/', [HomeController::class, 'index']);
-        Route::get('reset', [UserController::class, 'reset']);
-        Route::post('reset', [UserController::class, 'reset']);
-        Route::get('recover', [UserController::class, 'recover']);
-        Route::post('recover', [UserController::class, 'recover']);
-        Route::get('register/{hash?}', [UserController::class, 'getRegister'])->name('registration');
-        Route::post('register/check-valid-email', [UserController::class, 'postEmail']);
-        Route::post('register/{hash?}', [UserController::class, 'postRegister']);
+
         Route::get('/thumbnail/', [UserController::class, 'getThumbnail']);
         Route::get('/menus/', [UserController::class, 'getUserMenus']);
         Route::get('/forbidden', function () {
@@ -203,8 +197,7 @@ Route::middleware('ensureAPIToken')->group(function () {
         return redirect()->route('auth.ifixit.login', ['redirect' => $redirectUrl]);
     })->name('register');
     
-    // Redirect legacy routes
-    Route::redirect('user/register', '/login');
+
     
     // iFixit authentication routes
     Route::get('/auth/ifixit/login', function (App\Services\IFixitAuthService $iFixitAuthService) {
