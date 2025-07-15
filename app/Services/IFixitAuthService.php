@@ -59,7 +59,7 @@ class IFixitAuthService
      */
     public function getLoginUrl(string $callbackUrl): string
     {
-        return "{$this->baseUrl}/login?redirect=" . urlencode($callbackUrl);
+        return "{$this->baseUrl}/login?last_page=" . urlencode($callbackUrl);
     }
     
     /**
@@ -67,7 +67,7 @@ class IFixitAuthService
      */
     public function getLogoutUrl(string $callbackUrl): string
     {
-        return "{$this->baseUrl}/user/logout?redirect=" . urlencode($callbackUrl);
+        return "{$this->baseUrl}/user/logout?last_page=" . urlencode($callbackUrl);
     }
     
     /**

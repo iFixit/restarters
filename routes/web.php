@@ -180,20 +180,22 @@ Route::middleware('ensureAPIToken')->group(function () {
         });
     });
     
-    // Home routes for guests
+    // Home routes
+    Route::get('/', [HomeController::class, 'index'])->name('home');
+    
+    // About route for guests only
     Route::middleware('guest')->group(function () {
-        Route::get('/', [HomeController::class, 'index'])->name('home');
         Route::get('/about', [HomeController::class, 'index']);
     });
     
     // Redirect Laravel auth routes to iFixit
     Route::get('/login', function () {
-        $redirectUrl = request()->get('redirect', '/dashboard');
+        $redirectUrl = request()->get('redirect', url('/dashboard'));
         return redirect()->route('auth.ifixit.login', ['redirect' => $redirectUrl]);
     })->name('login');
     
     Route::get('/register', function () {
-        $redirectUrl = request()->get('redirect', '/dashboard');
+        $redirectUrl = request()->get('redirect', url('/dashboard'));
         return redirect()->route('auth.ifixit.login', ['redirect' => $redirectUrl]);
     })->name('register');
     
@@ -201,7 +203,7 @@ Route::middleware('ensureAPIToken')->group(function () {
     
     // iFixit authentication routes
     Route::get('/auth/ifixit/login', function (App\Services\IFixitAuthService $iFixitAuthService) {
-        $callbackUrl = request()->get('redirect', '/');
+        $callbackUrl = request()->get('redirect', url('/dashboard'));
         $iFixitLoginUrl = $iFixitAuthService->getLoginUrl($callbackUrl);
         return redirect($iFixitLoginUrl);
     })->name('auth.ifixit.login');
@@ -213,7 +215,7 @@ Route::middleware('ensureAPIToken')->group(function () {
         session()->flush();
         
         // Get redirect URL from query parameter
-        $redirectUrl = request()->get('redirect', '/');
+        $redirectUrl = request()->get('redirect', url('/'));
         
         // Clear session cookie and redirect
         return redirect($redirectUrl)->withCookie(cookie('session', null, -1, '/'));
@@ -226,7 +228,7 @@ Route::middleware('ensureAPIToken')->group(function () {
             'has_session_cookie' => request()->hasCookie('session'),
         ]);
         
-        $redirectUrl = request()->get('redirect', '/');
+        $redirectUrl = request()->get('redirect', url('/'));
         
         // Clear local session first
         session()->flush();

@@ -69,17 +69,34 @@ class ExternalSessionGuard implements Guard
     
     private function getSessionCookie(): ?string
     {
-        // Try to get session cookie from request
-        return $this->request->cookie('session') ?? 
-               $this->request->header('Cookie') ? 
-               $this->extractSessionFromCookieHeader($this->request->header('Cookie')) : 
-               null;
+        // Get the session cookie from request
+        $sessionCookie = $this->request->cookie('session');
+        
+        // Validate that this is actually an iFixit session cookie (32 characters)
+        // and not a Laravel encrypted session cookie
+        if ($sessionCookie && strlen($sessionCookie) === 32 && ctype_alnum($sessionCookie)) {
+            return $sessionCookie;
+        }
+        
+        // If the session cookie is not valid, try to extract from Cookie header
+        $cookieHeader = $this->request->header('Cookie');
+        if ($cookieHeader) {
+            return $this->extractSessionFromCookieHeader($cookieHeader);
+        }
+        
+        return null;
     }
     
     private function extractSessionFromCookieHeader(string $cookieHeader): ?string
     {
-        if (preg_match('/session=([^;]+)/', $cookieHeader, $matches)) {
-            return $matches[1];
+        // Find all session cookies in the header
+        if (preg_match_all('/session=([^;]+)/', $cookieHeader, $matches)) {
+            foreach ($matches[1] as $sessionValue) {
+                // Return the first valid iFixit session cookie (32 alphanumeric characters)
+                if (strlen($sessionValue) === 32 && ctype_alnum($sessionValue)) {
+                    return $sessionValue;
+                }
+            }
         }
         return null;
     }

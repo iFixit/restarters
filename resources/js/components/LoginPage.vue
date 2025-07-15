@@ -65,7 +65,7 @@ export default {
   methods: {
     loginWithIFixit() {
       // Get the current URL for redirect after login
-      const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || '/dashboard'
+      const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || (window.location.origin + '/dashboard')
 
       // Construct the iFixit login URL with redirect
       const iFixitLoginUrl = `/auth/ifixit/login?redirect=${encodeURIComponent(redirectUrl)}`
