@@ -1207,7 +1207,6 @@ class UserController extends Controller
             'name' => Lang::get('general.general'),
             'items' => [
                 Lang::get('general.profile') => url('/profile/edit/'.$user->id),
-                Lang::get('auth.change_password') => url('/profile/edit/'.$user->id.'#change-password'),
                 Lang::get('general.logout') => url('/logout'),
             ],
             'svg' => self::generalMenuSvg,

@@ -161,7 +161,6 @@
                       @endif
                       <ul>
                           <li><a href="/profile/edit/{{{ Auth::user()->id }}}">@lang('general.profile')</a></li>
-                          <li><a href="/profile/edit/{{{ Auth::user()->id }}}#change-password">@lang('auth.change_password')</a></li>
                           <li><a href="/logout">@lang('general.logout')</a></li>
                       </ul>
                   </li>
