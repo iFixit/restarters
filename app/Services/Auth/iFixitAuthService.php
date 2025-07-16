@@ -77,4 +77,17 @@ class iFixitAuthService
         $userData = $this->validateSession($sessionCookie);
         return $userData !== null;
     }
+    
+    /**
+     * Get current user data from iFixit session
+     */
+    public function getCurrentUser(): ?array
+    {
+        $sessionCookie = request()->cookie('session');
+        if (!$sessionCookie) {
+            return null;
+        }
+        
+        return $this->validateSession($sessionCookie);
+    }
 } 

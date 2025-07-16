@@ -2,8 +2,9 @@
 
 namespace App\Services\Auth;
 
-use Illuminate\Http\Request;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
 class iFixitAuthStrategy implements AuthStrategyInterface
@@ -19,8 +20,44 @@ class iFixitAuthStrategy implements AuthStrategyInterface
 
     public function isAuthenticated(): bool
     {
-        // Check if user is authenticated with iFixit service
-        return $this->ifixitService->isAuthenticated();
+        // First check if user is already authenticated in Laravel
+        if (Auth::check()) {
+            return true;
+        }
+
+        // Check if user has valid iFixit session
+        $sessionCookie = request()->cookie('session');
+        if (!$sessionCookie) {
+            return false;
+        }
+
+        // Validate session with iFixit API
+        $userData = $this->ifixitService->validateSession($sessionCookie);
+        if (!$userData) {
+            return false;
+        }
+
+        try {
+            // Sync/create user from iFixit data
+            $user = User::syncFromExternal($userData);
+            
+            // Log the user in
+            Auth::login($user);
+            
+            Log::debug('iFixit user authenticated', [
+                'user_id' => $user->id,
+                'external_id' => $userData['userid'],
+                'email' => $userData['login']
+            ]);
+            
+            return true;
+        } catch (\Exception $e) {
+            Log::error('Failed to sync iFixit user', [
+                'error' => $e->getMessage(),
+                'user_data' => $userData
+            ]);
+            return false;
+        }
     }
 
     public function hasConsent(): bool

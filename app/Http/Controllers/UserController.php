@@ -908,7 +908,20 @@ class UserController extends Controller
 
     public function logout(): RedirectResponse
     {
+        $user = Auth::user();
+        $isExternalUser = $user && $user->isExternalUser();
+        
         Auth::logout();
+        
+        // If user is from iFixit, redirect to iFixit logout
+        if ($isExternalUser && config('restarters.auth.strategy') === 'ifixit') {
+            $ifixitService = app(\App\Services\Auth\iFixitAuthService::class);
+            $logoutUrl = $ifixitService->getLogoutUrl(url('/'));
+
+            session()->flush();
+
+            return redirect($logoutUrl);
+        }
 
         return redirect('/login');
     }
