@@ -42,10 +42,13 @@ class CentralizedAuth
      */
     private function handleOptionalAuth(Request $request, Closure $next, $authStrategy): Response
     {
+        // Check authentication before running controller logic
+        // This allows controllers to see if user is authenticated and act accordingly
+        $isAuthenticated = $authStrategy->isAuthenticated();
+
         $response = $next($request);
         
-        // Only run auth logic if user is actually authenticated
-        if ($authStrategy->isAuthenticated()) {
+        if ($isAuthenticated) {
             return $authStrategy->handlePostAuth($request, $response);
         }
         

@@ -68,10 +68,8 @@ function registerGameRoutes($prefix) {
 Route::middleware('centralizedAuth:optional')->group(function () {
     
     // === HOME & LANDING ===
-    Route::middleware('guest')->group(function () {
-        Route::get('/', [HomeController::class, 'index'])->name('home');
-        Route::get('/about', [HomeController::class, 'index']);
-    });
+    Route::get('/', [HomeController::class, 'index'])->name('home');
+    Route::get('/about', [HomeController::class, 'index']);
     
     // === AUTHENTICATION & USER REGISTRATION ===
     Route::prefix('user')->group(function () {
