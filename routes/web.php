@@ -65,7 +65,7 @@ function registerGameRoutes($prefix) {
 // PUBLIC ROUTES (No Authentication Required)
 // =============================================================================
 
-Route::middleware('ensureAPIToken')->group(function () {
+Route::middleware('centralizedAuth:optional')->group(function () {
     
     // === HOME & LANDING ===
     Route::middleware('guest')->group(function () {
@@ -180,7 +180,7 @@ Route::middleware('ensureAPIToken')->group(function () {
 // AUTHENTICATED ROUTES
 // =============================================================================
 
-Route::middleware(['auth', 'verifyUserConsent', 'ensureAPIToken'])->group(function () {
+Route::middleware(['centralizedAuth'])->group(function () {
     
     // === USER PROFILE & SETTINGS ===
     Route::prefix('profile')->group(function () {

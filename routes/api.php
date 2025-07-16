@@ -47,7 +47,7 @@ Route::prefix('')->group(function () {
 // AUTHENTICATED API ROUTES (v1 - Legacy)
 // =============================================================================
 
-Route::middleware('auth:api')->group(function () {
+Route::middleware(['centralizedAuth'])->group(function () {
     // User management
     Route::prefix('users')->group(function () {
         Route::get('me', [ApiController::class, 'getUserInfo']);
@@ -101,7 +101,7 @@ Route::prefix('v2')->middleware(\App\Http\Middleware\APISetLocale::class)->group
         Route::patch('{id}', [API\GroupController::class, 'updateGroupv2']);
         
         // Authenticated group endpoints
-        Route::middleware(['auth:api'])->group(function () {
+        Route::middleware(['centralizedAuth'])->group(function () {
             Route::patch('{id}/volunteers/{iduser}', [API\GroupController::class, 'patchVolunteerForGroupv2']);
             Route::delete('{id}/volunteers/{iduser}', [API\GroupController::class, 'deleteVolunteerForGroupv2']);
         });
@@ -148,13 +148,13 @@ Route::prefix('v2')->middleware(\App\Http\Middleware\APISetLocale::class)->group
     });
 
     // Moderation API
-    Route::prefix('moderate')->middleware('auth:api')->group(function () {
+    Route::prefix('moderate')->middleware(['centralizedAuth'])->group(function () {
         Route::get('groups', [API\GroupController::class, 'moderateGroupsv2']);
         Route::get('events', [API\EventController::class, 'moderateEventsv2']);
     });
 
     // Admin API
-    Route::prefix('admin')->middleware(['auth:api', 'admin'])->group(function () {
+    Route::prefix('admin')->middleware(['centralizedAuth', 'admin'])->group(function () {
         Route::prefix('groups')->group(function () {
             Route::get('/', [App\Http\Controllers\API\GroupsController::class, 'index']);
             Route::get('export', [App\Http\Controllers\API\GroupsController::class, 'exportGroups']);
