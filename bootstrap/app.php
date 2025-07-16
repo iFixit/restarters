@@ -58,7 +58,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'wiki_dev_mw_UserID',
             'wiki_dev_mw_UserName',
             'authenticated',
-            'restarters_apitoken'
+            'restarters_apitoken',
+            'session'
         ]);
 
         $middleware->append(\App\Http\Middleware\HttpsProtocol::class);
