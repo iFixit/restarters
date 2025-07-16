@@ -405,8 +405,9 @@ Route::middleware('auth', 'verifyUserConsent', 'ensureAPIToken')->group(function
     });
 
     //Admin Controller
-    Route::prefix('admin')->group(function () {
+    Route::prefix('admin')->middleware(App\Http\Middleware\AdminMiddleware::class)->group(function () {
         Route::get('/stats', [AdminController::class, 'stats']);
+        Route::get('/groups', [AdminController::class, 'groups'])->name('admin.groups');
     });
 
     //Category Controller

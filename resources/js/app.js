@@ -40,6 +40,7 @@ import EventAddEdit from './components/EventAddEdit.vue'
 import EventsRequiringModeration from './components/EventsRequiringModeration'
 import EventPage from './components/EventPage.vue'
 import FixometerPage from './components/FixometerPage'
+import GroupsManagement from './components/admin/GroupsManagement.vue'
 import GroupsPage from './components/GroupsPage.vue'
 import GroupPage from './components/GroupPage.vue'
 import GroupAddEditPage from './components/GroupAddEditPage.vue'
@@ -1309,6 +1310,7 @@ jQuery(document).ready(function () {
         'eventsrequiringmoderation': EventsRequiringModeration,
         'eventpage': EventPage,
         'fixometerpage': FixometerPage,
+        'groupsmanagement': GroupsManagement,
         'groupspage': GroupsPage,
         'grouppage': GroupPage,
         'groupaddeditpage': GroupAddEditPage,

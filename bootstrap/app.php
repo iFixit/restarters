@@ -83,6 +83,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'AcceptUserInvites' => \App\Http\Middleware\AcceptUserInvites::class,
             'ensureAPIToken' => \App\Http\Middleware\EnsureAPIToken::class,
             'customApiAuth' => \App\Http\Middleware\CustomApiTokenAuth::class,
+            'admin' => \App\Http\Middleware\AdminMiddleware::class,
             'localeSessionRedirect' => \Mcamara\LaravelLocalization\Middleware\LocaleSessionRedirect::class,
             'localeViewPath' => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationViewPath::class,
             'localizationRedirect' => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRedirectFilter::class,

@@ -105,4 +105,9 @@ class AdminController extends Controller
             'wasteTotal' => $stats[0]->powered_waste, // + $stats[0]->unpowered_waste,
         ];
     }
+
+    public static function groups()
+    {
+        return view('admin.groups');
+    }
 }
