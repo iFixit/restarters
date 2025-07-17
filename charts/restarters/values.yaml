@@ -343,19 +343,6 @@ envGroups:
     MAPBOX_TOKEN: ""
     GOOGLE_API_CONSOLE_KEY: ""
 
-  # Monitoring
-  SEND_COMMAND_LOGS_TO: ""
-  CALENDAR_HASH: ""
-  SENTRY_LARAVEL_DSN: ""
-  SENTRY_TRACES_SAMPLE_RATE: "1"
-
-  # Security
-  HONEYPOT_DISABLE: "false"
-  L5_SWAGGER_GENERATE_ALWAYS: "false"
-
-  # Meta
-  META_TWITTER_SITE: ""
-  META_TWITTER_IMAGE_ALT: ""
   # Monitoring and analytics
   monitoring:
     SENTRY_LARAVEL_DSN: ""
