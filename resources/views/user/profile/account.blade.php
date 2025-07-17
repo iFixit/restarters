@@ -1,3 +1,4 @@
+@if(config('restarters.auth.strategy') == 'local')
 <div class="edit-panel">
 
     <div class="form-row">
@@ -42,6 +43,7 @@
 
 
 </div>
+@endif
 
 <div class="edit-panel">
     <div class="form-row">

@@ -1,19 +1,15 @@
 <template>
-  <b-modal
-      id="addvolunteermodal"
-      v-model="showModal"
-      :title="translatedAddVolunteerModalHeading"
-      no-stacking
-  >
+  <b-modal id="addvolunteermodal" v-model="showModal" :title="translatedAddVolunteerModalHeading" no-stacking>
     <template slot="default">
       <div class="form-group">
         <label for="group_member">{{ translatedGroupMember }}:</label>
         <b-select v-model="user" :options="options" id="group_member" />
       </div>
-      <div v-if="user === 'not-registered'">
+      <div v-if="user === 'not-registered' && isLocalAuth">
         <div class="form-group">
           <label for="full_name">{{ translatedFullName }}:</label>
-          <b-input id="full_name" type="text" class="form-control field" v-model="fullName" :placeholder="translatedFullNameHelper" />
+          <b-input id="full_name" type="text" class="form-control field" v-model="fullName"
+            :placeholder="translatedFullNameHelper" />
         </div>
 
         <div class="form-group">
@@ -42,8 +38,8 @@ export default {
       required: true,
     }
   },
-  mixins: [ event, auth ],
-  data: function() {
+  mixins: [event, auth],
+  data: function () {
     return {
       showModal: false,
       user: null,
@@ -55,6 +51,9 @@ export default {
   computed: {
     groupVolunteers() {
       return this.groupId ? this.$store.getters['volunteers/byGroup'](this.groupId) : []
+    },
+    isLocalAuth() {
+      return (window.Laravel?.authStrategy || 'local') === 'local'
     },
     options() {
       const ret = [
@@ -71,15 +70,18 @@ export default {
         })
       })
 
-      ret.push({
-        value: 'not-registered',
-        text: this.translatedOptionNotRegistered
-      })
+      // Only show "not-registered" option when Local Auth is enabled
+      if (this.isLocalAuth) {
+        ret.push({
+          value: 'not-registered',
+          text: this.translatedOptionNotRegistered
+        })
+      }
 
       return ret
     },
     disabled() {
-      // Name and email are optional, but not both.
+      // Name and email are optional for non-registered volunteers, but not both.
       return this.user === null || (this.user === 'not-registered' && !this.volunteerEmailAddress && !this.fullName)
     },
     translatedOptionDefault() {

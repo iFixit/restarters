@@ -393,6 +393,7 @@ export default {
         if (this.$v.$invalid) {
           // It's not.
           this.validationFocusFirstError()
+          if (callback) callback(false)
         } else {
           if (this.creating) {
             const id = await this.$store.dispatch('groups/create', {
@@ -413,15 +414,18 @@ export default {
 
             if (id) {
               // Success.  Go to the edit page.
+              if (callback) callback(true)
               window.location = '/group/edit/' + id
               success = true
             } else {
               this.failed = true
+              if (callback) callback(false)
             }
           } else {
             if (this.$v.$invalid) {
               // It's not.
               this.validationFocusFirstError()
+              if (callback) callback(false)
             } else {
               let id = await this.$store.dispatch('groups/edit', {
                 id: this.idgroups,
@@ -456,9 +460,12 @@ export default {
             }
           }
         }
+      } else {
+        // Duplicate name detected - don't submit
+        success = false
       }
 
-      callback(success)
+      if (callback) callback(success)
     },
     async handleLocationChanged({ lat, lng }) {
       if (!this.overrideTimezone && lat && lng) {

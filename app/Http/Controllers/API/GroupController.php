@@ -877,10 +877,7 @@ class GroupController extends Controller
             event(new \App\Events\ApproveGroup($group, $data));
             
             // Notify the creator that their group was approved
-            Notification::send($user, new \App\Notifications\GroupConfirmed([
-                'group_name' => $name,
-                'group_url' => url('/group/view/'.$idGroup),
-            ]));
+            Notification::send($user, new \App\Notifications\GroupConfirmed($group));
             
             Log::info("Auto-approved group: $idGroup for user {$user->id} (role {$user->role})");
         } else {

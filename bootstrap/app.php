@@ -12,6 +12,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withProviders([
         // App Service Providers
         \App\Providers\TranslationServiceProvider::class,
+        \App\Providers\AuthServiceProvider::class,
         
         // Package Service Providers
         \Mariuzzo\LaravelJsLocalization\LaravelJsLocalizationServiceProvider::class,
@@ -57,7 +58,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'wiki_dev_mw_UserID',
             'wiki_dev_mw_UserName',
             'authenticated',
-            'restarters_apitoken'
+            'restarters_apitoken',
+            'session'
         ]);
 
         $middleware->append(\App\Http\Middleware\HttpsProtocol::class);
@@ -81,14 +83,13 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'AcceptUserInvites' => \App\Http\Middleware\AcceptUserInvites::class,
-            'ensureAPIToken' => \App\Http\Middleware\EnsureAPIToken::class,
             'customApiAuth' => \App\Http\Middleware\CustomApiTokenAuth::class,
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
             'localeSessionRedirect' => \Mcamara\LaravelLocalization\Middleware\LocaleSessionRedirect::class,
             'localeViewPath' => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationViewPath::class,
             'localizationRedirect' => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRedirectFilter::class,
             'localize' => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRoutes::class,
-            'verifyUserConsent' => \App\Http\Middleware\VerifyUserConsent::class,
+            'centralizedAuth' => \App\Http\Middleware\CentralizedAuth::class,
         ]);
 
         $middleware->priority([
