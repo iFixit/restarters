@@ -13,7 +13,7 @@ return [
   'email_alerts_pref2' => 'I would like to receive email notifications about events or groups near me',
   'login' => 'Login',
   'profile' => 'Your profile',
-  'profile_content' => 'Please share some information about yourself, so you can connect with other organisers and fixers, and so we can understand the community better',
+  'profile_content' => 'Please share some information about yourself, so you can connect with other organizers and fixers, and so we can understand the community better',
   'logout' => 'Logout',
   'new_group' => 'Create a new group',
   'alert_uptodate' => 'Thanks! You are up to date',

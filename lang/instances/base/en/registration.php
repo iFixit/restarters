@@ -22,7 +22,7 @@ return [
   'reg-step-2-heading' => 'Tell us a little bit about yourself',
   'reg-step-3-heading' => 'How would you like us to keep in touch?',
   'reg-step-4-heading' => 'Uses of the data you enter',
-  'reg-step-1-1' => 'This is optional but helps us to improve your experience and helps organise events.  You can change these later in your profile.',
+  'reg-step-1-1' => 'This is optional but helps us to improve your experience and helps organize events.  You can change these later in your profile.',
   'reg-step-2-1' => 'This information is useful for us to serve the community better. Of your personal data, only your skills, town/city and name will be visible to other community members.',
   'reg-step-2-2' => 'To create an account, you must set a password',
   'reg-step-3-1a' => 'We can send you email updates about events and groups related to you, and about Restart Project activities in general.',

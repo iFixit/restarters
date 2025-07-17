@@ -75,7 +75,7 @@ return [
   'no_upcoming_for_your_groups' => 'There are currently no upcoming events for your groups',
   'youre_going' => 'You\'re going!',
   'online_event_question' => 'Online event?',
-  'organised_by' => 'Organised by :group',
+  'organised_by' => 'Organized by :group',
   'event_actions' => 'Event actions',
   'request_review' => 'Request review',
   'share_event_stats' => 'Share event stats',
