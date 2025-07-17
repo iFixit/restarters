@@ -19,7 +19,6 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SkillsController;
 use App\Http\Controllers\StyleController;
 use App\Http\Controllers\UserController;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\View;
@@ -72,25 +71,25 @@ Route::middleware('centralizedAuth:optional')->group(function () {
     Route::get('/about', [HomeController::class, 'index']);
     
     // === AUTHENTICATION & USER REGISTRATION ===
+    Route::get('login', [App\Http\Controllers\Auth\LoginController::class, 'showLoginForm'])->name('login');
+    Route::post('login', [App\Http\Controllers\Auth\LoginController::class, 'login']);
+    Route::get('logout', [App\Http\Controllers\Auth\LoginController::class, 'logout'])->name('logout');
+    Route::get('register', [UserController::class, 'getRegister']);
+
     Route::prefix('user')->group(function () {
         Route::get('/', [HomeController::class, 'index']);
+        Route::get('register/{hash?}', [UserController::class, 'getRegister'])->name('registration');
+        Route::post('register/check-valid-email', [UserController::class, 'postEmail']);
+        Route::post('register/{hash?}', [UserController::class, 'postRegister']);
         Route::get('reset', [UserController::class, 'reset']);
         Route::post('reset', [UserController::class, 'reset']);
         Route::get('recover', [UserController::class, 'recover']);
         Route::post('recover', [UserController::class, 'recover']);
-        Route::get('register/{hash?}', [UserController::class, 'getRegister'])->name('registration');
-        Route::post('register/check-valid-email', [UserController::class, 'postEmail']);
-        Route::post('register/{hash?}', [UserController::class, 'postRegister']);
         Route::get('thumbnail', [UserController::class, 'getThumbnail']);
         Route::get('menus', [UserController::class, 'getUserMenus']);
         Route::get('forbidden', fn() => view('user.forbidden', ['title' => 'Oops']));
     });
-    
-    // Laravel auth routes
-    Auth::routes();
-    Route::redirect('register', '/user/register');
-    Route::get('logout', [UserController::class, 'logout']);
-    
+
     // === PARTY/EVENT VIEWING ===
     Route::get('party/view/{id}', [PartyController::class, 'view']);
     

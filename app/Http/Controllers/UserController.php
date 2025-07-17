@@ -406,8 +406,15 @@ class UserController extends Controller
         return redirect()->back()->with('message', __('profile.admin_success'));
     }
 
-    public function recover(Request $request): View
+    public function recover(Request $request): View|RedirectResponse
     {
+        $authManager = app(\App\Services\Auth\AuthStrategyManager::class);
+        
+        // Password recovery not available for external auth
+        if ($authManager->isUsingIFixitAuth()) {
+            return redirect('/login')->with('warning', 'Password recovery is not available for iFixit users. Please use iFixit\'s password recovery system.');
+        }
+        
         $User = new User;
 
         $email = $request->get('email');
@@ -460,8 +467,15 @@ class UserController extends Controller
         ]);
     }
 
-    public function reset(Request $request)
+    public function reset(Request $request): View|RedirectResponse
     {
+        $authManager = app(\App\Services\Auth\AuthStrategyManager::class);
+        
+        // Password reset not available for external auth
+        if ($authManager->isUsingIFixitAuth()) {
+            return redirect('/login')->with('warning', 'Password reset is not available for iFixit users. Please use iFixit\'s password recovery system.');
+        }
+        
         $User = new User;
         $user = null;
 
@@ -906,28 +920,18 @@ class UserController extends Controller
         }
     }
 
-    public function logout(): RedirectResponse
-    {
-        $user = Auth::user();
-        $isExternalUser = $user && $user->isExternalUser();
-        
-        Auth::logout();
-        
-        // If user is from iFixit, redirect to iFixit logout
-        if ($isExternalUser && config('restarters.auth.strategy') === 'ifixit') {
-            $ifixitService = app(\App\Services\Auth\iFixitAuthService::class);
-            $logoutUrl = $ifixitService->getLogoutUrl(url('/'));
 
-            session()->flush();
-
-            return redirect($logoutUrl);
-        }
-
-        return redirect('/login');
-    }
 
     public function getRegister($hash = null)
     {
+        // Check if we should redirect to external registration
+        $authManager = app(\App\Services\Auth\AuthStrategyManager::class);
+        
+        if ($authManager->isUsingIFixitAuth()) {
+            return redirect($authManager->getRegisterUrl(url('/dashboard')));
+        }
+
+        // For local auth, show registration form
         if (Auth::check() && Auth::user()->hasUserGivenConsent()) {
             return redirect('dashboard');
         }
@@ -947,6 +951,15 @@ class UserController extends Controller
             'deviceCount' => $deviceCount,
             'showNewsletterSignup' => $showNewsletterSignup,
         ]);
+    }
+
+    /**
+     * Get registration URL for current auth strategy
+     */
+    public function getRegisterUrl(string $callbackUrl = null): string
+    {
+        $authManager = app(\App\Services\Auth\AuthStrategyManager::class);
+        return $authManager->getRegisterUrl($callbackUrl);
     }
 
     public function postRegister(Request $request, $hash = null): RedirectResponse

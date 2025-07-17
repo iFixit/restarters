@@ -55,6 +55,11 @@ class iFixitAuthService
     {
         return "{$this->baseUrl}/login?last_page=" . urlencode($callbackUrl);
     }
+
+    public function getRegisterUrl(string $callbackUrl): string
+    {
+        return "{$this->baseUrl}/Join?last_page=" . urlencode($callbackUrl);
+    }
     
     /**
      * Get iFixit logout URL with callback

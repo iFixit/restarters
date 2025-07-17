@@ -46,6 +46,48 @@ class LoginController extends Controller implements HasMiddleware
     }
 
     /**
+     * Show the application's login form or redirect to external auth
+     */
+    public function showLoginForm(): View|\Illuminate\Http\RedirectResponse
+    {
+        $authManager = app(\App\Services\Auth\AuthStrategyManager::class);
+        
+        if ($authManager->isUsingIFixitAuth()) {
+            // For iFixit, redirect to external login
+            return redirect($authManager->getLoginUrl(url('/dashboard')));
+        }
+        
+        // For local auth, show login form
+        $stats = Fixometer::loginRegisterStats();
+        $deviceCount = array_key_exists(0, $stats['device_count_status']) ? $stats['device_count_status'][0]->counter : 0;
+
+        return view('auth.login', [
+          'co2Total' => $stats['waste_stats'][0]->powered_footprint + $stats['waste_stats'][0]->unpowered_footprint,
+          'wasteTotal' => $stats['waste_stats'][0]->powered_waste + $stats['waste_stats'][0]->unpowered_waste,
+          'partiesCount' => count($stats['allparties']),
+          'deviceCount' => $deviceCount,
+        ]);
+    }
+
+    /**
+     * Handle logout for any auth strategy
+     */
+    public function logout(): \Illuminate\Http\RedirectResponse
+    {
+        $authManager = app(\App\Services\Auth\AuthStrategyManager::class);
+        return $authManager->handleLogout();
+    }
+
+    /**
+     * Get login URL for current auth strategy
+     */
+    public function getLoginUrl(string $callbackUrl = null): string
+    {
+        $authManager = app(\App\Services\Auth\AuthStrategyManager::class);
+        return $authManager->getLoginUrl($callbackUrl);
+    }
+
+    /**
      * Override login from AuthenticateUsers
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\Http\JsonResponse
@@ -95,23 +137,6 @@ class LoginController extends Controller implements HasMiddleware
             'password' => 'required|string',
             'my_name'   => 'honeypot',
             'my_time'   => 'required|honeytime:1',
-        ]);
-    }
-
-    /**
-     * Override showLoginForm from AuthenticateUsers
-     */
-    public function showLoginForm(): View
-    {
-        $stats = Fixometer::loginRegisterStats();
-
-        $deviceCount = array_key_exists(0, $stats['device_count_status']) ? $stats['device_count_status'][0]->counter : 0;
-
-        return view('auth.login', [
-          'co2Total' => $stats['waste_stats'][0]->powered_footprint + $stats['waste_stats'][0]->unpowered_footprint,
-          'wasteTotal' => $stats['waste_stats'][0]->powered_waste + $stats['waste_stats'][0]->unpowered_waste,
-          'partiesCount' => count($stats['allparties']),
-          'deviceCount' => $deviceCount,
         ]);
     }
 }
