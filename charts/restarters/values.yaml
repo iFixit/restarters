@@ -266,6 +266,11 @@ envGroups:
     QUEUE_CONNECTION: "sync"
     SANCTUM_STATEFUL_DOMAINS: ""
 
+  auth:
+    AUTH_STRATEGY: "local"
+    AUTH_REQUIRE_CONSENT: "true"
+    AUTH_REQUIRE_API_TOKEN: "true"
+
   # Redis configuration
   redis:
     REDIS_HOST: "127.0.0.1"

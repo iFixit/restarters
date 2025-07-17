@@ -24,6 +24,9 @@ data:
         # Session and Cache Configuration
         {{- include "restarters.envGroup" (dict "groupName" "session" "context" .) | nindent 8 }}
 
+        # Auth Configuration
+        {{- include "restarters.envGroup" (dict "groupName" "auth" "context" .) | nindent 8 }}
+
         # Redis Configuration
         {{- include "restarters.envGroup" (dict "groupName" "redis" "context" .) | nindent 8 }}
 
