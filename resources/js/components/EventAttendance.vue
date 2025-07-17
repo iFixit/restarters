@@ -6,34 +6,38 @@
     <template slot="content">
       <div class="mt-2">
         <div :class="{
-      attendance: true,
-      upcoming: upcoming
-      }">
+          attendance: true,
+          upcoming: upcoming
+        }">
           <div class="counts">
             <div v-if="!upcoming" class="count-participants">
               <b>
                 <b-img src="/icons/group_ico.svg" class="mr-2 icon" />
                 {{ __('events.stat-0') }}
               </b>
-              <EventAttendanceCount :count="event.participants" class="mt-2 mb-4" @change="changeParticipants($event)" :canedit="canedit" />
+              <EventAttendanceCount :count="event.participants" class="mt-2 mb-4" @change="changeParticipants($event)"
+                :canedit="canedit" />
             </div>
             <div v-if="!upcoming" class="count-volunteers">
               <b>
                 <b-img src="/icons/volunteer_ico.svg" class="mr-2 icon" />
                 {{ __('events.stat-2') }}
               </b>
-              <EventAttendanceCount :count="event.volunteers" class="mt-2"  @change="changeVolunteers($event)" :canedit="canedit" />
+              <EventAttendanceCount :count="event.volunteers" class="mt-2" @change="changeVolunteers($event)"
+                :canedit="canedit" />
             </div>
           </div>
           <div class="spacer" />
           <div class="thetabs">
-            <b-tabs class="ourtabs attendance-tabs w-100">
+            <!-- Show tabs when Local Auth is enabled (multiple tabs) -->
+            <b-tabs v-if="isLocalAuth" class="ourtabs attendance-tabs w-100">
               <b-tab active title-item-class="w-50" class="pt-2">
                 <template slot="title">
                   <b>{{ __('events.confirmed') }}</b> ({{ confirmed.length }})
                 </template>
                 <div v-if="confirmed.length" class="maxheight" :key="'confirm-' + confirmed.length">
-                  <EventAttendee v-for="a in confirmed" :key="'eventattendee-' + a.idevents_users" :attendee="a" :canedit="canedit" />
+                  <EventAttendee v-for="a in confirmed" :key="'eventattendee-' + a.idevents_users" :attendee="a"
+                    :canedit="canedit" />
                 </div>
                 <p v-else>
                   {{ __('events.confirmed_none') }}
@@ -59,7 +63,7 @@
                   {{ __('events.invited_none') }}
                 </p>
                 <hr />
-                <div v-if="upcoming && approved" class="d-flex justify-content-between">
+                <div v-if="upcoming && approved && isLocalAuth" class="d-flex justify-content-between">
                   <a data-toggle="modal" data-target="#event-invite-to" href="#" class="ml-2">
                     <img class="icon" src="/images/add-icon.svg" />
                     {{ __('events.invite_to_join') }}
@@ -67,6 +71,29 @@
                 </div>
               </b-tab>
             </b-tabs>
+
+            <!-- Show single content when Local Auth is disabled (single content) -->
+            <div v-else class="single-content pt-2">
+              <h4 class="mb-3">
+                <b>{{ __('events.confirmed') }}</b> ({{ confirmed.length }})
+              </h4>
+              <div v-if="confirmed.length" class="maxheight" :key="'confirm-' + confirmed.length">
+                <EventAttendee v-for="a in confirmed" :key="'eventattendee-' + a.idevents_users" :attendee="a"
+                  :canedit="canedit" />
+              </div>
+              <p v-else>
+                {{ __('events.confirmed_none') }}
+              </p>
+              <hr />
+              <div>
+                <div class="d-flex justify-content-between" v-if="!upcoming">
+                  <b-btn variant="link" @click="addVolunteer">
+                    {{ __('events.add_volunteer_modal_heading') }}
+                  </b-btn>
+                  <EventAddVolunteerModal :idevents="idevents" ref="addVolunteerModal" @hide="fetchVolunteers" />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -91,17 +118,20 @@ export default {
       required: false,
       default: false
     },
-    invitations:  {
+    invitations: {
       type: Array,
       required: false,
       default: function () { return [] }
     }
   },
-  components: {EventAddVolunteerModal, CollapsibleSection, EventAttendee, EventAttendanceCount},
+  components: { EventAddVolunteerModal, CollapsibleSection, EventAttendee, EventAttendanceCount },
   mixins: [event],
   computed: {
     attendance() {
       return this.$store.getters['attendance/byEvent'](this.idevents)
+    },
+    isLocalAuth() {
+      return (window.Laravel?.authStrategy || 'local') === 'local'
     }
   },
   methods: {
@@ -217,6 +247,17 @@ export default {
 
   ::v-deep .nav-item {
     width: 50%;
+  }
+}
+
+.single-content {
+  min-height: 320px;
+
+  h4 {
+    font-size: 18px;
+    font-weight: bold;
+    color: $black;
+    margin-bottom: 1rem;
   }
 }
 

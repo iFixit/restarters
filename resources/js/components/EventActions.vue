@@ -26,13 +26,15 @@
           </b-dropdown-item>
         </div>
         <div v-else>
-          <b-dropdown-item data-toggle="modal" data-target="#event-invite-to" v-if="isAttending && upcoming && approved">
+          <b-dropdown-item data-toggle="modal" data-target="#event-invite-to"
+            v-if="isAttending && upcoming && approved && isLocalAuth">
             {{ __('events.invite_volunteers') }}
           </b-dropdown-item>
-          <b-dropdown-item v-b-tooltip.hover id="invite-when-approved" data-toggle="modal" v-else-if="isAttending && upcoming" :title="__('events.invite_when_approved')" disabled>
+          <b-dropdown-item v-b-tooltip.hover id="invite-when-approved" data-toggle="modal"
+            v-else-if="isAttending && upcoming && isLocalAuth" :title="__('events.invite_when_approved')" disabled>
             {{ __('events.invite_volunteers') }}
           </b-dropdown-item>
-          <b-dropdown-item :href="'/party/join/' + idevents" v-else>
+          <b-dropdown-item :href="'/party/join/' + idevents" v-else-if="!isAttending && !upcoming">
             {{ __('events.RSVP') }}
           </b-dropdown-item>
           <b-dropdown-item :href="'/group/join/' + event.group.idgroups" v-if="!inGroup">
@@ -48,7 +50,8 @@
           <b-dropdown-item :href="'/group/join/' + event.group.idgroups" v-if="!inGroup">
             {{ __('events.follow_group') }}
           </b-dropdown-item>
-          <b-dropdown-item data-toggle="modal" data-target="#event-invite-to" v-if="attending && upcoming">
+          <b-dropdown-item data-toggle="modal" data-target="#event-invite-to"
+            v-if="attending && upcoming && isLocalAuth">
             {{ __('events.invite_volunteers') }}
           </b-dropdown-item>
           <b-dropdown-item :href="'/party/join/' + idevents" v-else>
@@ -96,6 +99,11 @@ export default {
       required: false,
       default: false
     },
+  },
+  computed: {
+    isLocalAuth() {
+      return (window.Laravel?.authStrategy || 'local') === 'local'
+    }
   },
   methods: {
     confirmDelete() {
