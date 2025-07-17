@@ -24,7 +24,9 @@
                   </h1>
           <div class="button-group-filters ml-auto">
             <button class="ml-auto reveal-filters btn btn-secondary d-md-none d-lg-none d-xl-none" type="button" data-toggle="collapse" data-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">Reveal filters</button>
-            <a href="#" data-toggle="modal" data-target="#add" class="btn btn-primary ml-auto">Create new user</a>
+            @if(config('restarters.auth.strategy') == 'local')
+              <a href="#" data-toggle="modal" data-target="#add" class="btn btn-primary ml-auto">Create new user</a>
+            @endif
           </div>
         </div>
       </div>

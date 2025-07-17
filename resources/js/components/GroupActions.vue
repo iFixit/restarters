@@ -8,13 +8,13 @@
         <b-dropdown-item :href="'/party/create/' + idgroups" v-if="canedit">
           {{ __('groups.add_event') }}
         </b-dropdown-item>
-        <b-dropdown-item  data-toggle="modal" data-target="#invite-to-group" v-if="canedit">
+        <b-dropdown-item data-toggle="modal" data-target="#invite-to-group" v-if="canedit && isLocalAuth">
           {{ __('groups.invite_volunteers') }}
         </b-dropdown-item>
         <b-dropdown-item :href="'/group/nearby/' + idgroups" v-if="canedit">
           {{ __('groups.volunteers_nearby') }}
         </b-dropdown-item>
-        <b-dropdown-item  data-toggle="modal" data-target="#group-share-stats" v-if="canedit">
+        <b-dropdown-item data-toggle="modal" data-target="#group-share-stats" v-if="canedit">
           {{ __('groups.share_group_stats') }}
         </b-dropdown-item>
         <b-dropdown-item :href="'/export/devices/group/' + idgroups">
@@ -45,7 +45,7 @@
         <b-dropdown-item :href="'/group/join/' + idgroups" v-else>
           {{ __('groups.join_group_button') }}
         </b-dropdown-item>
-        <b-dropdown-item  data-toggle="modal" data-target="#group-share-stats">
+        <b-dropdown-item data-toggle="modal" data-target="#group-share-stats">
           {{ __('groups.share_group_stats') }}
         </b-dropdown-item>
         <b-dropdown-item data-toggle="modal" @click="leaveGroup" v-if="ingroup">
@@ -53,7 +53,8 @@
         </b-dropdown-item>
       </b-dropdown>
     </div>
-    <ConfirmModal :key="'leavegroupmodal-' + idgroups" ref="confirmLeave" @confirm="leaveConfirmed" :message="__('groups.leave_group_confirm')" />
+    <ConfirmModal :key="'leavegroupmodal-' + idgroups" ref="confirmLeave" @confirm="leaveConfirmed"
+      :message="__('groups.leave_group_confirm')" />
     <ConfirmModal :key="'deletegroupmodal-' + idgroups" ref="confirmDelete" @confirm="deleteConfirmed" :message="__('groups.delete_group_confirm', {
       name: group.name
     })" />
@@ -67,8 +68,8 @@ import group from '../mixins/group'
 import ConfirmModal from './ConfirmModal'
 
 export default {
-  components: {ConfirmModal},
-  mixins: [ group ],
+  components: { ConfirmModal },
+  mixins: [group],
   props: {
     idgroups: {
       type: Number,
@@ -93,6 +94,9 @@ export default {
   computed: {
     group() {
       return this.$store.getters['groups/get'](this.idgroups)
+    },
+    isLocalAuth() {
+      return (window.Laravel?.authStrategy || 'local') === 'local'
     }
   },
   methods: {

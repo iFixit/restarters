@@ -49,6 +49,7 @@
             window.appDebug = "{{ env('APP_DEBUG', '0') }}";
             window.Laravel = {
                 imageUploadEnabled: @json(config('restarters.features.image_upload_enabled', false)),
+                authStrategy: "{{ config('restarters.auth.strategy') }}",
             };
         </script>
 

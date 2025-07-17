@@ -4,7 +4,7 @@
       <span>
         {{ __('groups.volunteers') }}
         <span v-if="volunteers.length" class="font-weight-normal d-none d-md-inline">
-          ({{ volunteers.length}})
+          ({{ volunteers.length }})
         </span>
       </span>
     </template>
@@ -12,10 +12,12 @@
       <div class="mt-2">
         <div v-if="volunteers.length">
           <div class="maxheight" :key="'confirm-' + volunteers.length">
-            <GroupVolunteer v-for="a in volunteers" :key="'group-' + a.id" :id="a.id" :canedit="canedit" :candemote="candemote" />
+            <GroupVolunteer v-for="a in volunteers" :key="'group-' + a.id" :id="a.id" :canedit="canedit"
+              :candemote="candemote" />
           </div>
           <div class="d-flex justify-content-between">
-            <a class="justify-content-end" href="#" data-toggle="modal" data-target="#invite-to-group">
+            <a class="justify-content-end" href="#" data-toggle="modal" data-target="#invite-to-group"
+              v-if="isLocalAuth">
               {{ __('groups.invite_to_group') }}
             </a>
           </div>
@@ -34,7 +36,7 @@ import CollapsibleSection from './CollapsibleSection'
 import Group from '../mixins/group'
 
 export default {
-  components: {Group, CollapsibleSection, GroupVolunteer},
+  components: { Group, CollapsibleSection, GroupVolunteer },
   mixins: [group],
   props: {
     idgroups: {
@@ -46,6 +48,11 @@ export default {
     // Get the list of group volunteers
     this.$store.dispatch('volunteers/fetchGroup', this.idgroups)
   },
+  computed: {
+    isLocalAuth() {
+      return (window.Laravel?.authStrategy || 'local') === 'local'
+    }
+  }
 }
 </script>
 <style scoped lang="scss">
