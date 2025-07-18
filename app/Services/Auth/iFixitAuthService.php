@@ -95,4 +95,38 @@ class iFixitAuthService
         
         return $this->validateSession($sessionCookie);
     }
+
+    /**
+     * Get user data by user ID
+     * 
+     * @note: This endpoint will not return the user's email address if the caller is not authenticated.
+     */
+    public function getUserById(int $userId): ?array
+    {
+        try {
+            $response = Http::withHeaders([
+                'Accept' => 'application/json',
+                'User-Agent' => 'RestartProject/1.0',
+            ])->get("{$this->apiUrl}/users/{$userId}");
+            
+            if ($response->successful()) {
+                $userData = $response->json();
+                
+                // Validate required fields
+                if (!isset($userData['userid'])) {
+                    return null;
+                }
+                
+                return $userData;
+            }
+            
+            return null;
+        } catch (\Exception $e) {
+            Log::error('iFixit API user fetch by ID failed', [
+                'error' => $e->getMessage(),
+                'user_id' => $userId
+            ]);
+            return null;
+        }
+    }
 } 
