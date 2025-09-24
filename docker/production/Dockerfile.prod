@@ -66,11 +66,11 @@ FROM php:8.2-fpm AS production
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         default-mysql-client \
-        libpnglite0 \
-        libjpeg62 \
+        libpng16-16t64 \
+        libjpeg62-turbo \
         libfreetype6 \
-        libzip4 \
-        libicu72 && \
+        libzip5 \
+        libicu76 && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
