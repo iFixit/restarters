@@ -18,7 +18,7 @@ class TimeZoneController extends Controller
             return response()->json(['error' => 'Missing lat/lng'], 400);
         }
 
-        $apiKey = env('GOOGLE_API_CONSOLE_KEY');
+        $apiKey = env('GOOGLE_MAPS_BACKEND_KEY');
         $url = "https://maps.googleapis.com/maps/api/timezone/json?location={$lat},{$lng}&timestamp={$timestamp}&key={$apiKey}";
 
         $response = Http::get($url);

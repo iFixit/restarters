@@ -177,10 +177,12 @@ secrets:
     secretName: "restarters-map-keys"
     keys:
       mapboxToken: "MAPBOX_TOKEN"
-      googleApiKey: "GOOGLE_API_CONSOLE_KEY"
+      googleMapsFrontendKey: "GOOGLE_MAPS_FRONTEND_KEY"
+      googleMapsBackendKey: "GOOGLE_MAPS_BACKEND_KEY"
     data:
       mapboxToken: "your-mapbox-token-here"
-      googleApiKey: "your-google-api-key-here"
+      googleMapsFrontendKey: "your-google-frontend-key-here"
+      googleMapsBackendKey: "your-google-backend-key-here"
   # External database credentials
   # IMPORTANT: For production deployments, create the secret externally and set createSecret: false
   # For development, you can set createSecret: true and provide values in the data section
@@ -341,7 +343,8 @@ envGroups:
   # Maps integration
   mapKeys:
     MAPBOX_TOKEN: ""
-    GOOGLE_API_CONSOLE_KEY: ""
+    GOOGLE_MAPS_FRONTEND_KEY: ""
+    GOOGLE_MAPS_BACKEND_KEY: ""
 
   # Monitoring and analytics
   monitoring:
