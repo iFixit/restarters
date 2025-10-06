@@ -60,11 +60,16 @@ Helper to generate environment variables from secrets
     secretKeyRef:
       name: {{ .Values.secrets.mapKeys.secretName }}
       key: {{ .Values.secrets.mapKeys.keys.mapboxToken }}
-- name: GOOGLE_API_CONSOLE_KEY
+- name: GOOGLE_MAPS_FRONTEND_KEY
   valueFrom:
     secretKeyRef:
       name: {{ .Values.secrets.mapKeys.secretName }}
-      key: {{ .Values.secrets.mapKeys.keys.googleApiKey }}
+      key: {{ .Values.secrets.mapKeys.keys.googleMapsFrontendKey }}
+- name: GOOGLE_MAPS_BACKEND_KEY
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.secrets.mapKeys.secretName }}
+      key: {{ .Values.secrets.mapKeys.keys.googleMapsBackendKey }}
 {{- end }}
 - name: DB_HOST
   valueFrom:
