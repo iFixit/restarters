@@ -29,6 +29,13 @@ data:
         gzip_proxied expired no-cache no-store private auth;
         gzip_types text/plain text/css text/xml text/javascript application/x-javascript application/xml+rss;
 
+        # Nginx-only health check endpoint (no PHP-FPM dependency)
+        location /nginx-health {
+            access_log off;
+            return 200 "nginx ok\n";
+            add_header Content-Type text/plain;
+        }
+
         # Handle Laravel routes (including /healthz)
         location / {
             try_files $uri $uri/ @php;
