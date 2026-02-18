@@ -13,12 +13,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Log;
 use OwenIt\Auditing\Contracts\Auditable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Group extends Model implements Auditable
 {
     use HasFactory;
 
     use \OwenIt\Auditing\Auditable;
+    use SoftDeletes;
 
     protected $table = 'groups';
     protected $primaryKey = 'idgroups';
@@ -129,6 +131,7 @@ class Group extends Model implements Auditable
                 FROM `'.$this->table.'` AS `g`
                 LEFT JOIN `users_groups` AS `ug` ON `g`.`idgroups` = `ug`.`group`
                 LEFT JOIN `users` AS `u` ON `ug`.`user` = `u`.`id`
+                WHERE `g`.`deleted_at` IS NULL
                 GROUP BY `g`.`idgroups`
                 ORDER BY `g`.`name` ASC');
         } catch (\Illuminate\Database\QueryException $e) {
@@ -158,6 +161,7 @@ class Group extends Model implements Auditable
             ) AS `xi`
             ON `xi`.`reference` = `g`.`idgroups`
 
+            WHERE `g`.`deleted_at` IS NULL
             GROUP BY `g`.`idgroups`
 
             ORDER BY `g`.`name` ASC');
@@ -182,6 +186,7 @@ class Group extends Model implements Auditable
                 ON `xi`.`reference` = `g`.`idgroups`
 
                 WHERE `ug`.`user` = :id
+                AND `g`.`deleted_at` IS NULL
                 ORDER BY `g`.`name` ASC', ['id' => $id]);
     }
 
