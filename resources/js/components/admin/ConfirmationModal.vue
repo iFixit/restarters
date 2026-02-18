@@ -76,8 +76,9 @@ export default {
                 unapprove: "Unapproval",
                 archive: "Archiving",
                 unarchive: "Unarchiving",
+                restore: "Restoration",
             };
-            return `Confirm ${actions[this.action]}` || "Confirm Action";
+            return `Confirm ${actions[this.action] || 'Action'}`;
         },
 
         confirmButtonClass() {
@@ -87,6 +88,7 @@ export default {
                 unapprove: "btn btn-warning",
                 archive: "btn btn-info",
                 unarchive: "btn-outline-info",
+                restore: "btn btn-success",
             };
             return classes[this.action] || "btn btn-primary";
         },
@@ -98,6 +100,7 @@ export default {
                 unapprove: "Unapprove",
                 archive: "Archive",
                 unarchive: "Unarchive",
+                restore: "Restore",
             };
             return texts[this.action]
         },

@@ -11,7 +11,7 @@
       </div>
     </div>
 
-    <!-- Search Bar -->
+    <!-- Search Bar and Filters -->
     <div class="row mb-4">
       <div class="col-md-6">
         <div class="input-group">
@@ -27,6 +27,13 @@
           {{ searchResultsText }}
         </small>
       </div>
+      <div class="col-md-3">
+        <select class="form-control" v-model="deletedFilter" @change="handleDeletedFilterChange">
+          <option value="active">Active Groups</option>
+          <option value="only">Deleted Groups</option>
+          <option value="all">All Groups</option>
+        </select>
+      </div>
     </div>
 
     <div v-if="alert.message" :class="`alert alert-${alert.type}`" class="alert-dismissible fade show">
@@ -39,13 +46,13 @@
     <GroupsCsvUploadModal :show="showCsvUploadModal" @close="showCsvUploadModal = false" @upload="handleUpload"
       :upload-progress="uploadProgress" :uploading="uploading" />
 
-    <GroupsBulkAction :selected-groups="selectedGroups" :total-count="totalCount" @action="handleBulkAction"
-      @clear-selection="clearSelection" />
+    <GroupsBulkAction :selected-groups="selectedGroups" :total-count="totalCount" :deleted-filter="deletedFilter"
+      :loading="loading" @action="handleBulkAction" @clear-selection="clearSelection" />
 
     <GroupsTable :groups="groups" :loading="loading" :selected-groups="selectedGroups" :pagination="pagination"
-      :sort-field="sortField" :sort-direction="sortDirection" @action="handleAction" @select="handleGroupSelect"
-      @select-all="handleSelectAll" @page-change="handlePageChange" @page-size-change="handlePageSizeChange"
-      @sort-change="handleSortChange" />
+      :sort-field="sortField" :sort-direction="sortDirection" :deleted-filter="deletedFilter" @action="handleAction"
+      @select="handleGroupSelect" @select-all="handleSelectAll" @page-change="handlePageChange"
+      @page-size-change="handlePageSizeChange" @sort-change="handleSortChange" />
 
     <ConfirmationModal :show="confirmationModal.show" :action="confirmationModal.action"
       :groups="confirmationModal.groups" :error="confirmationModal.error" @confirm="handleModalConfirm"
@@ -111,6 +118,7 @@ export default {
       sortDirection: "asc",
 
       searchQuery: "",
+      deletedFilter: "active",
       searchTimeout: null,
 
       uploadProgress: 0,
@@ -166,6 +174,11 @@ export default {
         // Add search parameter if search query exists
         if (this.searchQuery.trim()) {
           params.search = this.searchQuery.trim();
+        }
+
+        // Add deleted filter parameter
+        if (this.deletedFilter !== 'active') {
+          params.deleted = this.deletedFilter;
         }
 
         const response = await groupsApi.fetchGroups(params);
@@ -238,6 +251,12 @@ export default {
     clearSearch() {
       this.searchQuery = '';
       this.pagination.currentPage = 1;
+      this.loadGroups();
+    },
+
+    handleDeletedFilterChange() {
+      this.pagination.currentPage = 1;
+      this.selectedGroups = [];
       this.loadGroups();
     },
 

@@ -57,9 +57,12 @@
                         <td>
                             <div class="d-flex align-items-center">
                                 <div>
-                                    <a :href="'/group/view/' + group.idgroups" class="fw-bold">{{ group.name }}</a>
+                                    <a v-if="!group.deleted_at" :href="'/group/view/' + group.idgroups" class="fw-bold">{{ group.name }}</a>
+                                    <span v-else class="fw-bold">{{ group.name }}</span>
                                     <span v-if="group.archived_at"
                                         class="badge nounderline badge-secondary badge-pill">Archived</span>
+                                    <span v-if="group.deleted_at"
+                                        class="badge nounderline badge-danger badge-pill">Deleted</span>
                                     <div v-if="group.networks && group.networks.length > 0" class="small text-muted">
                                         {{group.networks.map(n => n.name).join(', ')}}
                                     </div>
@@ -94,7 +97,7 @@
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-right"
                                     :aria-labelledby="'dropdown-' + group.idgroups">
-                                    <li>
+                                    <li v-if="!group.deleted_at">
                                         <a class="dropdown-item" :href="'/group/edit/' + group.idgroups">
                                             Edit
                                         </a>
@@ -119,9 +122,14 @@
                                             Unapprove
                                         </a>
                                     </li>
-                                    <li>
+                                    <li v-if="!group.deleted_at">
                                         <a class="dropdown-item text-danger" @click="handleAction(group, 'delete')">
                                             Delete
+                                        </a>
+                                    </li>
+                                    <li v-if="group.deleted_at">
+                                        <a class="dropdown-item text-success" @click="handleAction(group, 'restore')">
+                                            Restore
                                         </a>
                                     </li>
                                 </ul>
@@ -213,6 +221,10 @@ export default {
         sortDirection: {
             type: String,
             default: "asc",
+        },
+        deletedFilter: {
+            type: String,
+            default: "active",
         },
     },
 
