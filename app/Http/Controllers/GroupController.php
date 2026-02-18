@@ -440,34 +440,23 @@ class GroupController extends Controller
     {
         $group = Group::where('idgroups', $id)->first();
 
+        if (!$group) {
+            return redirect('/group')->with('warning', 'Group not found.');
+        }
+
         $name = $group->name;
 
-        if (Auth::user()->hasRole('Administrator') && $group->canDelete()) {
-            // We know we can delete the group; if it has any past events they must be empty, so delete all
-            // events (including future).
-            $allEvents = Party::withTrashed()->where('events.group', $id)->get();
+        if (Auth::user()->hasRole('Administrator')) {
+            // Soft-delete all group events (preserving devices and volunteer data).
+            Party::where('events.group', $id)->each(function ($event) {
+                $event->delete();
+            });
 
-            foreach ($allEvents as $event) {
-                // Delete any users - these are not cascaded in the DB.
-                $users = EventsUsers::where('event', $event->idevents)->get();
+            $group->delete();
 
-                foreach ($users as $user) {
-                    // Need to force delete to get rid of the row and avoid constraint violations.
-                    $user->forceDelete();
-                }
-
-                $event->forceDelete();
-            }
-
-            $r = $group->delete($id);
-
-            if (! $r) {
-                return redirect('/user/forbidden');
-            } else {
-                return redirect('/group')->with('success', __('groups.delete_succeeded', [
-                    'name' => $name,
-                ]));
-            }
+            return redirect('/group')->with('success', __('groups.delete_succeeded', [
+                'name' => $name,
+            ]));
         } else {
             return redirect('/user/forbidden');
         }
