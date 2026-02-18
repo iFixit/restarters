@@ -162,5 +162,10 @@ Route::prefix('v2')->middleware(\App\Http\Middleware\APISetLocale::class)->group
             Route::post('bulk/{action}', [App\Http\Controllers\API\GroupsController::class, 'performBulkActions']);
             Route::post('{id}/{action}', [App\Http\Controllers\API\GroupsController::class, 'performSingleAction']);
         });
+
+        Route::prefix('events')->group(function () {
+            Route::get('/', [App\Http\Controllers\API\EventsController::class, 'index']);
+            Route::post('{id}/{action}', [App\Http\Controllers\API\EventsController::class, 'performSingleAction']);
+        });
     });
 });
