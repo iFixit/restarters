@@ -130,12 +130,24 @@ export default {
       return 'impact-stat impact-stat-' + this.size + ' impact-stat-' + this.variant + (this.border ? ' hasBorder' : '')
     },
     translatedTitle() {
+      if (!this.title) {
+        return ''
+      }
+
       return this.translate ? this.$lang.choice(this.title, this.roundedCount) : this.title
     },
     translatedSubtitle() {
+      if (!this.subtitle) {
+        return ''
+      }
+
       return this.translate ? this.$lang.get(this.subtitle) : this.subtitle
     },
     translatedDescription() {
+      if (!this.description) {
+        return ''
+      }
+
       return this.translate ? this.$lang.get(this.description) : this.description
     },
     roundedCount() {
