@@ -33,6 +33,9 @@ class GroupDeleteTest extends TestCase
         $this->assertStringContainsString(__('groups.delete_succeeded', [
             'name' => $name,
         ]), $response->getContent());
+
+        // Verify soft-delete
+        $this->assertSoftDeleted('groups', ['idgroups' => $id]);
     }
 
     public function testCanDeleteWithEmptyEvent(): void
@@ -55,13 +58,15 @@ class GroupDeleteTest extends TestCase
         ]), $response->getContent());
     }
 
-    public function testCantDeleteWithDevice(): void
+    public function testCanDeleteWithDevice(): void
     {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
         $id = $this->createGroup();
         $this->assertNotNull($id);
+        $group = Group::where('idgroups', $id)->first();
+        $name = $group->name;
 
-        // Add an event with a device - should not  be able to delete.
+        // Add an event with a device - soft-delete should work regardless.
         $idevents = $this->createEvent($id, 'yesterday');
         $iddevices = $this->createDevice($idevents, 'misc');
 
@@ -69,13 +74,18 @@ class GroupDeleteTest extends TestCase
         $this->actingAs($user);
         $this->followingRedirects();
         $response = $this->get("/group/delete/$id");
-        $this->assertStringContainsString('Sorry, but you do not have the permissions to perform that action.', $response->getContent());
+        $this->assertStringContainsString(__('groups.delete_succeeded', [
+            'name' => $name,
+        ]), $response->getContent());
 
-        // Delete the event - still shouldn't be deletable as a device exists.
-        Party::find($idevents)->delete();
+        // Group should be soft-deleted
+        $this->assertSoftDeleted('groups', ['idgroups' => $id]);
 
-        $response = $this->get("/group/delete/$id");
-        $response->assertRedirect('/user/forbidden');
+        // Event should also be soft-deleted
+        $this->assertSoftDeleted('events', ['idevents' => $idevents]);
+
+        // Device should still exist
+        $this->assertGreaterThan(0, \App\Models\Device::where('event', $idevents)->count());
     }
 
     public function testCanDeleteWithDeletedEvent(): void
@@ -87,7 +97,7 @@ class GroupDeleteTest extends TestCase
         // Create a past event
         $event = Party::factory()->moderated()->create([
                                                                         'event_start_utc' => '2000-01-01T10:15:05+05:00',
-                                                                        'event_end_utc' => '2000-01-0113:45:05+05:00',
+                                                                        'event_end_utc' => '2000-01-01 13:45:05+05:00',
                                                                         'group' => $id,
                                                                     ]);
 
