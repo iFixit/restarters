@@ -834,16 +834,6 @@ class PartyController extends Controller
             return redirect()->back()->with('warning', __('events.delete_permission'));
         }
 
-        $event = Party::findOrFail($id);
-
-        Audits::where('auditable_type', \App\Models\Party::class)->where('auditable_id', $id)->delete();
-        Device::where('event', $id)->delete();
-
-        // We have to do a loop to avoid the gotcha where bulk delete operations don't invoke observers.
-        foreach (EventsUsers::where('event', $id)->get() as $delete) {
-            $delete->delete();
-        };
-
         $event->delete();
 
         event(new EventDeleted($event));

@@ -45,7 +45,7 @@
           $can_edit_group = App\Helpers\Fixometer::hasRole($user, 'Administrator') || $isCoordinatorForGroup || $is_host_of_group;
           $can_demote = App\Helpers\Fixometer::hasRole($user, 'Administrator') || $isCoordinatorForGroup;
           $can_see_delete = App\Helpers\Fixometer::hasRole($user, 'Administrator');
-          $can_perform_delete = $can_see_delete && $group->canDelete();
+          $can_perform_delete = $can_see_delete;
           $can_perform_archive = App\Helpers\Fixometer::hasRole($user, 'Administrator') || $isCoordinatorForGroup;
 
           $showCalendar = Auth::check() && (($group && $group->isVolunteer()) || App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator'));

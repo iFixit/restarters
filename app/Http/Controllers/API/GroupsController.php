@@ -29,6 +29,17 @@ class GroupsController extends Controller
                 });
             }
 
+            // Apply deleted filter
+            if ($request->filled('deleted')) {
+                $deletedFilter = $request->input('deleted');
+                if ($deletedFilter === 'only') {
+                    $query->onlyTrashed();
+                } elseif ($deletedFilter === 'all') {
+                    $query->withTrashed();
+                }
+                // Default (no filter or 'active') shows only non-deleted
+            }
+
             // Handle sorting
             $sortBy = $request->input('sort_by', 'name');
             $sortDirection = $request->input('sort_direction', 'asc');
@@ -85,7 +96,7 @@ class GroupsController extends Controller
     public static function performSingleAction(int $group_id, string $action): JsonResponse
     {
         try {
-            $group = Group::findOrFail($group_id);
+            $group = Group::withTrashed()->findOrFail($group_id);
 
             $result = self::performAction($group, $action);
 
@@ -98,8 +109,8 @@ class GroupsController extends Controller
             Log::error('Error performing action: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to perform action'
-            ], 500);
+                'message' => $e->getMessage(),
+            ], 422);
         }
     }
 
@@ -107,7 +118,7 @@ class GroupsController extends Controller
     {
         try {
             $group_ids = $request->input('group_ids');
-            $groups = Group::whereIn('idgroups', $group_ids)->get();
+            $groups = Group::withTrashed()->whereIn('idgroups', $group_ids)->get();
 
             $failedGroups = [];
 
@@ -161,11 +172,25 @@ class GroupsController extends Controller
                 break;
 
             case 'delete':
-                $groupName = $group->name;
-                if (!$group->canDelete()) {
-                    throw new \Exception("Group '{$groupName}' cannot be deleted because it has events with devices.");
-                }
+                // Soft-delete all group events (preserving devices and volunteer data)
+                \App\Models\Party::where('events.group', $group->idgroups)->each(function ($event) {
+                    $event->delete();
+                });
                 $group->delete();
+                break;
+
+            case 'restore':
+                if (!$group->trashed()) {
+                    break; // Skip non-deleted groups silently (relevant for bulk actions)
+                }
+                $group->restore();
+                // Also restore soft-deleted events for this group
+                \App\Models\Party::withTrashed()
+                    ->where('events.group', $group->idgroups)
+                    ->whereNotNull('events.deleted_at')
+                    ->each(function ($event) {
+                        $event->restore();
+                    });
                 break;
 
             default:
@@ -428,6 +453,7 @@ class GroupsController extends Controller
             'country_display' => $countryDisplay,
             'approved' => (bool) $group->approved,
             'archived_at' => $group->archived_at,
+            'deleted_at' => $group->deleted_at,
             'created_at' => $group->created_at,
             'networks' => $group->networks,
             'group_tags' => $group->group_tags,

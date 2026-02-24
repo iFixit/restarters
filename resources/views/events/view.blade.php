@@ -64,7 +64,7 @@
 
         <?php
           $can_edit_event = App\Helpers\Fixometer::userHasEditPartyPermission($event->idevents);
-          $can_delete_event = App\Helpers\Fixometer::userHasDeletePartyPermission($event->idevents) && $event->canDelete();
+          $can_delete_event = App\Helpers\Fixometer::userHasDeletePartyPermission($event->idevents);
           $is_admin = Auth::check() && App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator');
           $is_attending = is_object($is_attending) && $is_attending->status == 1;
 

@@ -26,9 +26,13 @@
                                 :disabled="loading">
                                 Unarchive
                             </button>
-                            <button type="button" class="btn btn-danger" @click="handleAction('delete')"
-                                :disabled="loading">
+                            <button v-if="deletedFilter !== 'only'" type="button" class="btn btn-danger"
+                                @click="handleAction('delete')" :disabled="loading">
                                 Delete
+                            </button>
+                            <button v-if="deletedFilter === 'only' || deletedFilter === 'all'" type="button"
+                                class="btn btn-success" @click="handleAction('restore')" :disabled="loading">
+                                Restore
                             </button>
                         </div>
                     </div>
@@ -58,6 +62,10 @@ export default {
         loading: {
             type: Boolean,
             default: false,
+        },
+        deletedFilter: {
+            type: String,
+            default: "active",
         },
     },
 
