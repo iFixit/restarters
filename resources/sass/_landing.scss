@@ -49,19 +49,25 @@
 
 // ─── Fix-O-Meter Hero (sticky morph) ────────────────────────────────────────
 
+$fixometer-transition-duration: 0.35s;
+$fixometer-transition-easing: ease;
+$fixometer-transition: $fixometer-transition-duration $fixometer-transition-easing;
+
 .fixometer {
+    --fixometer-expanded-height: 0px;
     position: sticky;
     top: 0;
     z-index: 1000;
     padding: 30px 0 50px;
     margin-bottom: 0;
     background: transparent;
-    transition: padding 0.35s ease, background-color 0.35s ease, box-shadow 0.35s ease, border-bottom-color 0.35s ease;
+    transition: padding $fixometer-transition, background-color $fixometer-transition, box-shadow $fixometer-transition, border-bottom-color $fixometer-transition;
     border-bottom: 2px solid transparent;
 }
 
 // Compact state — position: fixed takes it out of flow entirely,
 // so height changes can't cause a layout feedback loop.
+.fixometer[data-fixometer-state='compact'],
 .fixometer--compact {
     position: fixed;
     top: 0;
@@ -77,6 +83,7 @@
 // During reverse animation (compact → expanded), keeps position: fixed
 // so the element stays out of flow while children animate back.
 // Prevents the layout feedback loop without suppressing transitions.
+.fixometer[data-fixometer-state='expanding'],
 .fixometer--expanding {
     position: fixed;
     top: 0;
@@ -90,7 +97,7 @@
 .fixometer__header {
     max-height: 100px;
     overflow: hidden;
-    transition: max-height 0.35s ease, opacity 0.35s ease;
+    transition: max-height $fixometer-transition, opacity $fixometer-transition;
 
     .fixometer--compact & {
         max-height: 0;
@@ -106,7 +113,7 @@
     margin-bottom: 30px;
     max-height: 80px;
     overflow: hidden;
-    transition: max-height 0.35s ease, margin 0.35s ease, opacity 0.35s ease;
+    transition: max-height $fixometer-transition, margin $fixometer-transition, opacity $fixometer-transition;
 
     .fixometer--compact & {
         max-height: 0;
@@ -123,7 +130,7 @@
     display: grid;
     grid-template-columns: 1fr;
     gap: 16px;
-    transition: gap 0.35s ease;
+    transition: gap $fixometer-transition;
 
     @media (min-width: 576px) {
         grid-template-columns: repeat(2, 1fr);
@@ -152,7 +159,7 @@
     border: 1px solid black;
     box-shadow: 6px 6px 0 0 black;
     text-align: center;
-    transition: padding 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease, background-color 0.35s ease, flex-direction 0.35s ease, gap 0.35s ease;
+    transition: padding $fixometer-transition, box-shadow $fixometer-transition, border-color $fixometer-transition, background-color $fixometer-transition, flex-direction $fixometer-transition, gap $fixometer-transition;
 
     &--gold {
         background-color: #FFBE5F;
@@ -203,7 +210,7 @@
     height: 46px;
     width: auto;
     margin-bottom: 10px;
-    transition: height 0.35s ease, margin 0.35s ease, opacity 0.35s ease;
+    transition: height $fixometer-transition, margin $fixometer-transition, opacity $fixometer-transition;
 
     .fixometer--compact & {
         height: 0;
@@ -217,7 +224,7 @@
     font-weight: 700;
     font-size: 36px;
     line-height: 1.1;
-    transition: font-size 0.35s ease;
+    transition: font-size $fixometer-transition;
 
     @media (min-width: 992px) {
         font-size: 42px;
@@ -233,7 +240,7 @@
     font-size: 16px;
     font-weight: 700;
     margin-bottom: 4px;
-    transition: font-size 0.35s ease, margin 0.35s ease;
+    transition: font-size $fixometer-transition, margin $fixometer-transition;
 
     .fixometer--compact & {
         font-size: 12px;
@@ -245,7 +252,7 @@
     font-family: 'Open Sans', sans-serif;
     font-size: 14px;
     color: $brand;
-    transition: font-size 0.35s ease;
+    transition: font-size $fixometer-transition;
 
     .fixometer--compact & {
         font-size: 11px;
@@ -267,12 +274,24 @@
     margin-bottom: 0;
     max-height: 60px;
     overflow: hidden;
-    transition: max-height 0.35s ease, margin 0.35s ease, opacity 0.35s ease;
+    transition: max-height $fixometer-transition, margin $fixometer-transition, opacity $fixometer-transition;
 
     .fixometer--compact & {
         max-height: 0;
         margin: 0;
         opacity: 0;
+    }
+}
+
+#fixometer-spacer {
+    height: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .fixometer,
+    .fixometer * {
+        transition: none !important;
+        animation: none !important;
     }
 }
 

@@ -21,33 +21,33 @@
       <div class="fixometer__grid">
 
         <div class="fixometer__card fixometer__card--gold">
-          <img class="fixometer__icon" src="{{ asset('/images/trash.svg') }}" alt="" />
+          <img class="fixometer__icon" src="{{ asset('/images/trash.svg') }}" alt="" aria-hidden="true" />
           <div class="fixometer__value">{{ number_format($wasteTotalLbs, 0, '.', ',') }}</div>
           <div class="fixometer__unit">lbs</div>
           <div class="fixometer__label">{{ __('landing.fixometer_waste') }}</div>
         </div>
 
         <div class="fixometer__card fixometer__card--teal">
-          <img class="fixometer__icon" src="{{ asset('/images/cloud_empty.svg') }}" alt="" />
+          <img class="fixometer__icon" src="{{ asset('/images/cloud_empty.svg') }}" alt="" aria-hidden="true" />
           <div class="fixometer__value">{{ number_format($co2Total, 0, '.', ',') }}</div>
           <div class="fixometer__unit">lbs</div>
           <div class="fixometer__label">{{ __('landing.fixometer_co2') }}</div>
         </div>
 
         <div class="fixometer__card fixometer__card--pink">
-          <img class="fixometer__icon" src="{{ asset('/images/fixed.svg') }}" alt="" />
+          <img class="fixometer__icon" src="{{ asset('/images/fixed.svg') }}" alt="" aria-hidden="true" />
           <div class="fixometer__value">{{ number_format($deviceCount, 0, '.', ',') }}</div>
           <div class="fixometer__label">{{ __('landing.fixometer_devices') }}</div>
         </div>
 
         <div class="fixometer__card fixometer__card--purple">
-          <img class="fixometer__icon" src="{{ asset('/images/participants.svg') }}" alt="" />
+          <img class="fixometer__icon" src="{{ asset('/images/participants.svg') }}" alt="" aria-hidden="true" />
           <div class="fixometer__value">{{ number_format($volunteerCount, 0, '.', ',') }}</div>
           <div class="fixometer__label">{{ __('landing.fixometer_volunteers') }}</div>
         </div>
 
         <div class="fixometer__card fixometer__card--light">
-          <img class="fixometer__icon" src="{{ asset('/images/parties.svg') }}" alt="" />
+          <img class="fixometer__icon" src="{{ asset('/images/parties.svg') }}" alt="" aria-hidden="true" />
           <div class="fixometer__value">{{ number_format($partiesCount, 0, '.', ',') }}</div>
           <div class="fixometer__label">{{ __('landing.fixometer_events') }}</div>
         </div>

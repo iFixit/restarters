@@ -54,6 +54,7 @@ import RichTextEditor from './components/RichTextEditor'
 import Notifications from './components/Notifications'
 import GroupTimeZone from './components/GroupTimeZone'
 import StatsShare  from './components/StatsShare.vue'
+import initFixometerTransition from './landing/fixometerTransition'
 
 // Without this, the default map marker doesn't appear in production.  Fairly well-known problem.
 // eslint-disable-next-line
@@ -1261,55 +1262,7 @@ jQuery(document).ready(function () {
     lastScrollPosition = currentScrollPosition
   })
 
-  // Fixometer morph — compact when sentinel scrolls out of view.
-  // Compact mode uses position:fixed (out of flow), so the spacer
-  // takes the full expanded height to prevent any layout shift.
-  var sentinel = document.getElementById('fixometer-sentinel');
-  var fixometer = document.getElementById('fixometer-hero');
-  var spacer = document.getElementById('fixometer-spacer');
-
-  if (sentinel && fixometer && spacer) {
-    // Measure expanded height eagerly at page load
-    var expandedHeight = fixometer.offsetHeight;
-
-    // Use negative top rootMargin so the sentinel is considered "out of view"
-    // when it scrolls behind the fixometer — i.e. the trigger fires when the
-    // hero top meets the fixometer bottom, not the viewport top.
-    var observer = new IntersectionObserver(function(entries) {
-      entries.forEach(function(entry) {
-        if (entry.isIntersecting) {
-          // Scroll UP — animate the reverse morph (compact → expanded)
-          // while keeping position:fixed so height changes don't cause
-          // a layout feedback loop. The spacer stays at expandedHeight
-          // during the animation to keep content stable.
-          fixometer.classList.add('fixometer--expanding');
-          fixometer.classList.remove('fixometer--compact');
-
-          // After the animation completes, return to normal sticky flow.
-          // Collapsing the spacer and re-entering flow happen in the same
-          // synchronous block, so the fixometer's flow height replaces the
-          // spacer's height with no net content shift.
-          setTimeout(function() {
-            requestAnimationFrame(function() {
-              spacer.style.height = '0px';
-              fixometer.classList.remove('fixometer--expanding');
-            });
-          }, 350);
-        } else {
-          // Scroll DOWN — go compact with full animation.
-          // The spacer fills the fixometer's flow height so content
-          // doesn't jump when it switches to position:fixed.
-          spacer.style.height = expandedHeight + 'px';
-          fixometer.classList.add('fixometer--compact');
-        }
-      });
-    }, {
-      threshold: 0,
-      rootMargin: '-' + expandedHeight + 'px 0px 0px 0px'
-    });
-
-    observer.observe(sentinel);
-  }
+  initFixometerTransition()
 
   // Sentry error
   Sentry.init({
@@ -1380,4 +1333,3 @@ jQuery(document).ready(function () {
   })
   $(".vue-placeholder-large").hide()
 })
-
