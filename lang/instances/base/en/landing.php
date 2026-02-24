@@ -1,37 +1,47 @@
 <?php
 
 return [
-  'title' => 'Welcome to Restarters!',
-  'intro' => 'We are a global network of people who help others repair at community events.',
-  'join' => 'Join us',
-  'login' => 'Log in',
-  'learn' => 'Learn and share repair skills with others',
-  'landing_1_alt' => 'Repair Skills (credit Mark Phillips)',
-  'landing_2_alt' => 'Restart Party (credit Mark Phillips)',
-  'landing_3_alt' => 'Restart Crowd (credit Mark Phillips)',
-  'repair_skills' => 'Brush up on your repair skills with our repair wiki',
-  'repair_advice' => 'Get or share repair advice on the forum',
-  'repair_group' => 'Follow your local community repair group',
-  'repair_start' => 'Start repairing',
-  'organise' => 'Organize community repair events',
-  'organise_advice' => 'Get advice and support from other organizers',
-  'organise_manage' => 'Manage your group and find volunteers',
-  'organise_publicise' => 'Publicise repair events and measure your impact',
-  'organise_start' => 'Start organizing',
-  'campaign' => 'Bring down the barriers to repair',
-  'campaign_join' => 'Keep up with the global Right to Repair movement',
-  'campaign_barriers' => 'Document the barriers to repair',
-  'campaign_data' => 'Analyse repair data',
-  'campaign_start' => 'Join the movement',
+  // Hero
+  'title' => 'The Platform for Community Repair Organizers',
+  'subtitle' => 'Everything you need to run successful repair events and measure your impact.',
+  'intro' => 'Schedule events, recruit volunteers, log repair data, and automatically calculate the environmental impact of your community\'s work. Join thousands of organizers worldwide.',
+  'cta_primary' => 'START YOUR GROUP',
+  'cta_secondary' => 'LOG IN',
+
+  // How It Works
+  'how_title' => 'How It Works',
+  'how_step1_title' => 'Create Your Group',
+  'how_step1_desc' => 'Create and publicize community repair events, coordinate volunteers, and get support from other organizers.',
+  'how_step2_title' => 'Run Events',
+  'how_step2_desc' => 'Log repair data from your events and automatically calculate waste diversion and CO2 savings to share with funders.',
+  'how_step3_title' => 'Grow Your Community',
+  'how_step3_desc' => 'Connect with a global network of repair organizers, find skilled volunteers, and access repair guides and forums.',
+
+  // Fix-O-Meter
+  'fixometer_title' => 'Our Global Impact',
+  'fixometer_waste' => 'Waste diverted from landfills',
+  'fixometer_co2' => 'CO2 emissions prevented',
+  'fixometer_devices' => 'Devices fixed',
+  'fixometer_volunteers' => 'Volunteers',
+  'fixometer_events' => 'Events held',
+  'fixometer_disclaimer' => 'Impact figures are estimates based on our repair data.',
+
+  // Social proof
+  'social_proof' => 'Trusted by :groups repair groups worldwide',
+
+  // Final CTA
+  'cta_banner_title' => 'Ready to organize your community?',
+  'cta_banner_desc' => 'Join thousands of repair organizers making a difference.',
+
+  // Landing images
+  'landing_1_alt' => 'Community repair event with organizers and volunteers',
+  'landing_2_alt' => 'Volunteers logging repair data at an event',
+  'landing_3_alt' => 'Group of repair organizers collaborating',
+
+  // Network section
   'need_more' => 'Need more?',
   'network' => 'Empower your network',
-  'network_blurb' => 'If you co-ordinate a network of community repair groups, we also offer affordable, custom packages to make your work easier.',
-  'network_tools' => 'Give your groups access to event management and GDPR-compliant communication tools',
-  'network_events' => 'Display your groups and events on your website automatically',
-  'network_record' => 'Allow your volunteers to easily record repair data',
-  'network_impact' => 'Measure and track your network\'s overall impact',
-  'network_brand' => 'Custom-branding and localisation: use your logo and language',
-  'network_power' => 'Help power the Right to Repair movement',
+  'network_blurb' => 'Co-ordinate a network of community repair groups? We offer affordable, custom packages with event management tools, GDPR-compliant communications, impact tracking, and custom branding.',
   'network_start' => 'Get in touch',
   'network_start_url' => 'https://therestartproject.org/contact',
 ];

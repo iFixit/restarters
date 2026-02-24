@@ -16,7 +16,7 @@ class HomeTest extends TestCase
     {
         $response = $this->get($url);
         $response->assertSuccessful();
-        $response->assertSee(__('landing.learn'));
+        $response->assertSee(__('landing.title'));
         $response->assertSee('language-bar');
     }
 

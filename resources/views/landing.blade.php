@@ -2,258 +2,135 @@
 
 @yield('content')
 
-<style>
-    .landing-page {
-        padding-top: 31px;
-    }
-
-    .landing-page .row-expanded {
-        width: 100%;
-    }
-
-    .landing-section {
-        display: flex;
-        background-color: #fff;
-        border: 1px solid black;
-        -webkit-box-shadow: 6px 6px 0 0 black;
-        box-shadow: 6px 6px 0 0 black;
-    }
-
-    .landing-section img {
-        max-height: 250px;
-        object-fit: cover;
-    }
-
-    .landing-section > div {
-        padding: 20px;
-    }
-
-    .landing-section .landing-icon {
-        max-height: 30px;
-        width: 30px !important;
-        margin-right: 5px;
-    }
-
-    .landing-page .has-background-gold {background-color: #FFBE5F;}
-    .landing-page .has-background-teal {background-color: #4AAEBC;}
-    .landing-page .has-background-pink {background-color: #F49292;}
-    .landing-page .has-background-purple {background-color: #80a4e0; }
-
-    .landing-page h1, h2 {
-        font-weight: bold;
-    }
-
-    .landing-page .landing-hr {
-        border-top: 3px dashed black;
-    }
-
-    .landing-page .network-left {
-        width: 45%;
-        padding-right: 1rem;
-    }
-
-    .landing-page .network-right {
-        width: 55%;
-        padding-left: 1rem;
-    }
-
-    @media only screen and (max-width: 767px) {
-        .landing-page .network-left {
-            width: 100%;
-            padding-right: 0;
-        }
-        .landing-page .network-right {
-            width: 100%;
-            padding-left: 0rem;
-        }
-    }
-
-    .landing-section p:not(.noindent) {
-        padding-left: 39px;
-        text-indent: -39px;
-    }
-
-    .textlarge {
-        font-size: 20px;
-    }
-
-    .hero-section {
-        text-align: center;
-
-        @media (max-width: 767px) {
-          margin-top: 40px;
-        }
-    }
-
-    .hero-title {
-        margin-bottom: 25px;
-    }
-
-    .hero-description {
-        max-width: 800px;
-        margin: 0 auto 30px;
-        text-align: left;
-    }
-
-    .hero-buttons {
-        margin-top: 30px;
-        display: flex;
-        justify-content: center;
-        gap: 20px;
-    }
-
-    .footer-wrapper {
-        margin-top: 1rem;
-    }
-</style>
-
 @php
   $instance = env('APP_INSTANCE') === 'base' ? 'restarters' : (env('APP_INSTANCE') ?: 'restarters');
 @endphp
 
 <section class="landing-page">
+
+  {{-- Fix-O-Meter (sticks to top, morphs to compact bar on scroll) --}}
+  <section class="fixometer" id="fixometer-hero">
+    <div class="container">
+      {{-- Header lives inside the fixometer so it's part of the same
+           sticky/fixed element — no separate flow element to cause
+           layout jumps on scroll-up --}}
+      <div class="fixometer__header">
+        @include('includes.info')
+      </div>
+      <h2 class="fixometer__title">{{ __('landing.fixometer_title') }}</h2>
+      <div class="fixometer__grid">
+
+        <div class="fixometer__card fixometer__card--gold">
+          <img class="fixometer__icon" src="{{ asset('/images/trash.svg') }}" alt="" />
+          <div class="fixometer__value">{{ number_format($wasteTotalLbs, 0, '.', ',') }}</div>
+          <div class="fixometer__unit">lbs</div>
+          <div class="fixometer__label">{{ __('landing.fixometer_waste') }}</div>
+        </div>
+
+        <div class="fixometer__card fixometer__card--teal">
+          <img class="fixometer__icon" src="{{ asset('/images/cloud_empty.svg') }}" alt="" />
+          <div class="fixometer__value">{{ number_format($co2Total, 0, '.', ',') }}</div>
+          <div class="fixometer__unit">lbs</div>
+          <div class="fixometer__label">{{ __('landing.fixometer_co2') }}</div>
+        </div>
+
+        <div class="fixometer__card fixometer__card--pink">
+          <img class="fixometer__icon" src="{{ asset('/images/fixed.svg') }}" alt="" />
+          <div class="fixometer__value">{{ number_format($deviceCount, 0, '.', ',') }}</div>
+          <div class="fixometer__label">{{ __('landing.fixometer_devices') }}</div>
+        </div>
+
+        <div class="fixometer__card fixometer__card--purple">
+          <img class="fixometer__icon" src="{{ asset('/images/participants.svg') }}" alt="" />
+          <div class="fixometer__value">{{ number_format($volunteerCount, 0, '.', ',') }}</div>
+          <div class="fixometer__label">{{ __('landing.fixometer_volunteers') }}</div>
+        </div>
+
+        <div class="fixometer__card fixometer__card--light">
+          <img class="fixometer__icon" src="{{ asset('/images/parties.svg') }}" alt="" />
+          <div class="fixometer__value">{{ number_format($partiesCount, 0, '.', ',') }}</div>
+          <div class="fixometer__label">{{ __('landing.fixometer_events') }}</div>
+        </div>
+
+      </div>
+      <p class="fixometer__disclaimer">{{ __('landing.fixometer_disclaimer') }}</p>
+    </div>
+  </section>
+
+  {{-- Spacer absorbs the height difference when fixometer compacts, preventing layout jump --}}
+  <div id="fixometer-spacer"></div>
+
   <div class="container">
-    <div class="d-flex justify-content-around justify-content-md-start">
-      @include('includes.info')
-    </div>
 
-    <div class="hero-section">
-      <h1 class="hero-title">{{ __('landing.title') }}</h1>
-      <div class="hero-description textlarge">
-        {!! __('landing.intro') !!}
-      </div>
-      <div class="hero-buttons">
-        <a href="/user/register" class="btn btn-primary">{{ __('landing.join') }}</a>
-        <a href="/login" class="btn btn-primary">{{ __('landing.login') }}</a>
-      </div>
-    </div>
+    {{-- Sentinel: when this scrolls out of view, hero has reached the top --}}
+    <div id="fixometer-sentinel"></div>
 
-    <div class="row mt-5">
-      <div class="col-12 col-md-8 offset-md-2">
-        <div class="landing-section has-background-gold">
-          <img src="{{ asset('/images/landing/'. $instance .'/landing1.jpg') }}" alt="{{ __('landing.landing_1_alt') }}" class="d-none d-md-block" />
-          <div>
-            <h2>{{ __('landing.organise') }}</h2>
-            <p>
-              <img class="landing-icon" src="{{ asset('/images/landing/icon-chat-bubble.svg') }}" /> {{ __('landing.organise_advice') }}
-            </p>
-            <p>
-              <img class="landing-icon" src="{{ asset('/images/landing/icon-group.svg') }}" /> {{ __('landing.organise_manage') }}
-            </p>
-            <p>
-              <img class="landing-icon" src="{{ asset('/images/landing/icon-drill.svg') }}" /> {{ __('landing.organise_publicise') }}
-            </p>
-            <div class="d-flex justify-content-around justify-content-md-start">
-              <a href="/user/register" class="btn btn-primary">{{ __('landing.organise_start') }}</a>
-            </div>
-          </div>
+    {{-- Hero — Split layout: text left, image right --}}
+    <div class="hero hero--split">
+      <div class="hero__content">
+        <h1>{{ __('landing.title') }}</h1>
+        <p class="hero__subtitle">{{ __('landing.subtitle') }}</p>
+        <div class="hero__description">
+          {!! __('landing.intro') !!}
+        </div>
+        <div class="hero__actions">
+          <a href="/user/register" class="btn btn-primary btn-lg">{{ __('landing.cta_primary') }}</a>
+          <a href="/login" class="btn btn-primary btn-lg">{{ __('landing.cta_secondary') }}</a>
         </div>
       </div>
-    </div>
-
-    <div class="row mt-4">
-      <div class="col-12 col-md-8 offset-md-2">
-        <div class="landing-section has-background-teal justify-content-between">
-          <div>
-            <h2>{{ __('landing.campaign') }}</h2>
-            <p>
-              <img class="landing-icon" src="{{ asset('/images/landing/icon-group.svg') }}" /> {{ __('landing.campaign_join') }}
-            </p>
-            <p>
-              <img class="landing-icon" src="{{ asset('/images/landing/icon-book.svg') }}" /> {{ __('landing.campaign_barriers') }}
-            </p>
-            <p>
-              <img class="landing-icon" src="{{ asset('/images/landing/icon-microscope.svg') }}" /> {{ __('landing.campaign_data') }}
-            </p>
-            <div class="d-flex justify-content-around justify-content-md-start">
-              <a href="/user/register" class="btn btn-primary">{{ __('landing.campaign_start') }}</a>
-            </div>
-          </div>
-          <img src="{{ asset('/images/landing/'. $instance .'/landing2.jpg') }}" alt="{{ __('landing.landing_2_alt') }}" class="d-none d-md-block" />
-        </div>
+      <div class="hero__image d-none d-md-block">
+        <img src="{{ asset('/images/landing/'. $instance .'/landing1.jpg') }}" alt="{{ __('landing.landing_1_alt') }}" />
       </div>
     </div>
 
-    <div class="row">
-      <div class="col-12 col-md-8 offset-md-2 mt-4">
-        <div class="landing-section has-background-pink">
-          <img src="{{ asset('/images/landing/'. $instance .'/landing3.jpg') }}" alt="{{ __('landing.landing_3_alt') }}" class="d-none d-md-block" />
-                    <div>
-            <h2>{{ __('landing.learn') }}</h2>
-            <p>
-              <img class="landing-icon" src="{{ asset('/images/landing/icon-book.svg') }}" /> {{ __('landing.repair_skills') }}
-            </p>
-            <p>
-              <img class="landing-icon" src="{{ asset('/images/landing/icon-chat-bubble.svg') }}" /> {{ __('landing.repair_advice') }}
-            </p>
-            <p>
-              <img class="landing-icon" src="{{ asset('/images/landing/icon-group.svg') }}" /> {{ __('landing.repair_group') }}
-            </p>
-            <div class="d-flex justify-content-around justify-content-md-start">
-              <a href="/user/register" class="btn btn-primary">{{ __('landing.repair_start') }}</a>
-            </div>
+    {{-- How It Works — 3-step journey with photos --}}
+    <section class="how-it-works">
+      <h2 class="how-it-works__title">{{ __('landing.how_title') }}</h2>
+      <div class="how-it-works__steps">
+
+        <div class="how-it-works__step how-it-works__step--gold">
+          <img class="how-it-works__photo" src="{{ asset('/images/landing/'. $instance .'/landing1.jpg') }}" alt="{{ __('landing.landing_1_alt') }}" />
+          <div class="how-it-works__body">
+            <div class="how-it-works__number">1</div>
+            <h3>{{ __('landing.how_step1_title') }}</h3>
+            <p>{{ __('landing.how_step1_desc') }}</p>
           </div>
         </div>
-      </div>
-    </div>
 
-    <div class="row">
-      <div class="col-12 col-md-8 offset-md-2 mt-4">
-        <hr class="landing-hr" />
-      </div>
-    </div>
-
-    <div class="row">
-      @if(env('APP_INSTANCE') != 'fixitclinic')
-        <div class="col-12 col-md-8 offset-md-2 mt-4">
-          <h1>
-            {{ __('landing.need_more') }}
-          </h1>
-          <div class="landing-section has-background-purple mt-4 mb-4">
-            <div class="d-flex justify-content-between flex-wrap">
-              <div class="network-left">
-                <div class="d-flex flex-column justify-content-between h-100">
-                  <div class="flex-grow-1">
-                    <h2>{{ __('landing.network') }}</h2>
-                    <p class="noindent">{{ __('landing.network_blurb') }}</p>
-                  </div>
-                  <div class="d-none d-md-block">
-                    <a href="{{ __('landing.network_start_url') }}" class="btn btn-primary">{{ __('landing.network_start') }}</a>
-                  </div>
-                </div>
-              </div>
-              <div class="network-right">
-                <p>
-                  <img class="landing-icon" src="{{ asset('/images/landing/icon-chat-bubble.svg') }}" /> {{ __('landing.network_tools') }}
-                </p>
-                <p>
-                  <img class="landing-icon" src="{{ asset('/images/landing/icon-cal.svg') }}" /> {{ __('landing.network_events') }}
-                </p>
-                <p>
-                  <img class="landing-icon" src="{{ asset('/images/landing/icon-drill.svg') }}" /> {{ __('landing.network_record') }}
-                </p>
-                <p>
-                  <img class="landing-icon" src="{{ asset('/images/landing/icon-microscope.svg') }}" /> {{ __('landing.network_impact') }}
-                </p>
-                <p>
-                  <img class="landing-icon" src="{{ asset('/images/landing/icon-group.svg') }}" /> {{ __('landing.network_brand') }}
-                </p>
-                <p class="mb-0">
-                  <img class="landing-icon" src="{{ asset('/images/landing/icon-book.svg') }}" /> {{ __('landing.network_power') }}
-                </p>
-                <div class="d-flex d-md-none mt-2 justify-content-around">
-                  <a href="https://therestartproject.org/contact/" class="btn btn-primary">{{ __('landing.network_start') }}</a>
-                </div>
-              </div>
-            </div>
+        <div class="how-it-works__step how-it-works__step--teal">
+          <img class="how-it-works__photo" src="{{ asset('/images/landing/'. $instance .'/landing2.jpg') }}" alt="{{ __('landing.landing_2_alt') }}" />
+          <div class="how-it-works__body">
+            <div class="how-it-works__number">2</div>
+            <h3>{{ __('landing.how_step2_title') }}</h3>
+            <p>{{ __('landing.how_step2_desc') }}</p>
           </div>
         </div>
-      @endif
-    </div>
+
+        <div class="how-it-works__step how-it-works__step--pink">
+          <img class="how-it-works__photo" src="{{ asset('/images/landing/'. $instance .'/landing3.jpg') }}" alt="{{ __('landing.landing_3_alt') }}" />
+          <div class="how-it-works__body">
+            <div class="how-it-works__number">3</div>
+            <h3>{{ __('landing.how_step3_title') }}</h3>
+            <p>{{ __('landing.how_step3_desc') }}</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
   </div>
-  
+
+  {{-- Final CTA Banner --}}
+  <section class="cta-banner">
+    <div class="container">
+      <h2>{{ __('landing.cta_banner_title') }}</h2>
+      <p>{{ __('landing.cta_banner_desc') }}</p>
+      <div class="cta-banner__actions">
+        <a href="/user/register" class="btn btn-light btn-lg">{{ __('landing.cta_primary') }}</a>
+      </div>
+    </div>
+  </section>
+
   @include('layouts.footer')
 </section>
 </body>
 </html>
-
