@@ -145,4 +145,5 @@ class PublicEventController extends Controller
             $query->where('events.updated_at', '<=', $updatedEnd);
         }
     }
+
 }
