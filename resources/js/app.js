@@ -1330,4 +1330,3 @@ jQuery(document).ready(function () {
   })
   $(".vue-placeholder-large").hide()
 })
-
