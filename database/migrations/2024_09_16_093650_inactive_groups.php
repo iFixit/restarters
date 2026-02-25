@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -11,18 +12,25 @@ return new class extends Migration
      */
     public function up(): void
     {
-        $groups = \App\Models\Group::join('grouptags_groups', 'groups.idgroups', '=', 'grouptags_groups.group')
+        // Use query builder instead of Eloquent model to avoid SoftDeletes
+        // scope referencing a deleted_at column that doesn't exist yet.
+        $groups = DB::table('groups')
+            ->join('grouptags_groups', 'groups.idgroups', '=', 'grouptags_groups.group')
             ->join('group_tags', 'grouptags_groups.group_tag', '=', 'group_tags.id')
             ->where('group_tags.id', \App\Models\GroupTags::INACTIVE)
+            ->select('groups.*')
             ->get();
 
         foreach ($groups as $group) {
-            $group->archived_at = $group->updated_at;
+            $name = str_replace('[INACTIVE] ', '', $group->name);
+            $name = str_replace('[INACTIVE]', '', $name);
 
-            // Remove [INACTIVE] from the group name - this is now indicated via archived_at.
-            $group->name = str_replace('[INACTIVE] ', '', $group->name);
-            $group->name = str_replace('[INACTIVE]', '', $group->name);
-            $group->save();
+            DB::table('groups')
+                ->where('idgroups', $group->idgroups)
+                ->update([
+                    'archived_at' => $group->updated_at,
+                    'name' => $name,
+                ]);
         }
     }
 
@@ -32,11 +40,12 @@ return new class extends Migration
     public function down(): void
     {
         // Add [INACTIVE] into all groups with archived_at.
-        $groups = \App\Models\Group::whereNotNull('archived_at')->get();
+        $groups = DB::table('groups')->whereNotNull('archived_at')->get();
 
         foreach ($groups as $group) {
-            $group->name = '[INACTIVE] ' . $group->name;
-            $group->save();
+            DB::table('groups')
+                ->where('idgroups', $group->idgroups)
+                ->update(['name' => '[INACTIVE] ' . $group->name]);
         }
     }
 };
