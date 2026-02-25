@@ -237,6 +237,7 @@ envGroups:
     FEATURE__DISCOURSE_INTEGRATION: "false"
     FEATURE__AUTO_APPROVE_GROUPS: "false"
     FEATURE__AUTO_APPROVE_EVENTS: "false"
+    FEATURE__PUBLIC_EVENTS_API: "false"
 
   # Logging configuration
   logging:

@@ -33,6 +33,14 @@ return Application::configure(basePath: dirname(__DIR__))
             RateLimiter::for('api', function (Request $request) {
                 return Limit::perMinute(300)->by($request->user()?->id ?: $request->ip());
             });
+
+            RateLimiter::for('public-api', function (Request $request) {
+                $client = $request->attributes->get('apiClient');
+                $perMinute = $client?->rate_limit_per_minute ?? 120;
+                $clientId = $client?->id ?: 'anonymous';
+
+                return Limit::perMinute($perMinute)->by("{$clientId}:{$request->ip()}");
+            });
         }
     )
     ->withMiddleware(function (Middleware $middleware) {
@@ -85,10 +93,14 @@ return Application::configure(basePath: dirname(__DIR__))
             'AcceptUserInvites' => \App\Http\Middleware\AcceptUserInvites::class,
             'customApiAuth' => \App\Http\Middleware\CustomApiTokenAuth::class,
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
+            'apiClient' => \App\Http\Middleware\AuthenticateApiClient::class,
+            'apiClientOrigin' => \App\Http\Middleware\EnforceApiClientOrigin::class,
             'localeSessionRedirect' => \Mcamara\LaravelLocalization\Middleware\LocaleSessionRedirect::class,
             'localeViewPath' => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationViewPath::class,
             'localizationRedirect' => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRedirectFilter::class,
             'localize' => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRoutes::class,
+            'publicEventsApiEnabled' => \App\Http\Middleware\EnsurePublicEventsApiEnabled::class,
+            'publicApiCors' => \App\Http\Middleware\PublicApiCors::class,
             'centralizedAuth' => \App\Http\Middleware\CentralizedAuth::class,
         ]);
 
