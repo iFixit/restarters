@@ -33,6 +33,14 @@ return Application::configure(basePath: dirname(__DIR__))
             RateLimiter::for('api', function (Request $request) {
                 return Limit::perMinute(300)->by($request->user()?->id ?: $request->ip());
             });
+
+            RateLimiter::for('public-api', function (Request $request) {
+                $client = $request->attributes->get('apiClient');
+                $perMinute = $client?->rate_limit_per_minute ?? 120;
+                $clientId = $client?->id ?: 'anonymous';
+
+                return Limit::perMinute($perMinute)->by("{$clientId}:{$request->ip()}");
+            });
         }
     )
     ->withMiddleware(function (Middleware $middleware) {

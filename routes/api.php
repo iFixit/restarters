@@ -43,6 +43,19 @@ Route::prefix('')->group(function () {
     Route::get('timezone', [API\TimeZoneController::class, 'lookup']);
 });
 
+Route::prefix('public/v2')
+    ->withoutMiddleware('customApiAuth')
+    ->middleware(['publicEventsApiEnabled', 'publicApiCors'])
+    ->group(function () {
+        Route::options('{any}', fn () => response()->noContent())->where('any', '.*');
+
+        Route::middleware(['apiClient:events:read', 'apiClientOrigin', 'throttle:public-api'])->group(function () {
+            Route::get('events', [API\PublicEventController::class, 'listEvents']);
+            Route::get('events/{id}', [API\PublicEventController::class, 'showEvent']);
+            Route::get('groups/{id}/events', [API\PublicEventController::class, 'listGroupEvents']);
+        });
+    });
+
 // =============================================================================
 // AUTHENTICATED API ROUTES (v1 - Legacy)
 // =============================================================================
