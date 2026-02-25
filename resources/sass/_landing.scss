@@ -47,62 +47,16 @@
     }
 }
 
-// ─── Fix-O-Meter Hero (sticky morph) ────────────────────────────────────────
-
-$fixometer-transition-duration: 0.35s;
-$fixometer-transition-easing: ease;
-$fixometer-transition: $fixometer-transition-duration $fixometer-transition-easing;
+// ─── Fix-O-Meter Hero ────────────────────────────────────────────────────────
 
 .fixometer {
-    --fixometer-expanded-height: 0px;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
     padding: 30px 0 50px;
     margin-bottom: 0;
     background: transparent;
-    transition: padding $fixometer-transition, background-color $fixometer-transition, box-shadow $fixometer-transition, border-bottom-color $fixometer-transition;
-    border-bottom: 2px solid transparent;
-}
-
-// Compact state — position: fixed takes it out of flow entirely,
-// so height changes can't cause a layout feedback loop.
-.fixometer[data-fixometer-state='compact'],
-.fixometer--compact {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    padding: 8px 0;
-    margin-bottom: 0;
-    background: #fff;
-    border-bottom-color: black;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-// During reverse animation (compact → expanded), keeps position: fixed
-// so the element stays out of flow while children animate back.
-// Prevents the layout feedback loop without suppressing transitions.
-.fixometer[data-fixometer-state='expanding'],
-.fixometer--expanding {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    background: #fff;
-    border-bottom-color: black;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .fixometer__header {
-    max-height: 100px;
-    overflow: hidden;
-    transition: max-height $fixometer-transition, opacity $fixometer-transition;
-
-    .fixometer--compact & {
-        max-height: 0;
-        opacity: 0;
-    }
+    margin-bottom: 16px;
 }
 
 .fixometer__title {
@@ -111,15 +65,6 @@ $fixometer-transition: $fixometer-transition-duration $fixometer-transition-easi
     font-weight: 700;
     font-size: 28px;
     margin-bottom: 30px;
-    max-height: 80px;
-    overflow: hidden;
-    transition: max-height $fixometer-transition, margin $fixometer-transition, opacity $fixometer-transition;
-
-    .fixometer--compact & {
-        max-height: 0;
-        margin: 0;
-        opacity: 0;
-    }
 
     @media (max-width: 767px) {
         font-size: 24px;
@@ -130,7 +75,6 @@ $fixometer-transition: $fixometer-transition-duration $fixometer-transition-easi
     display: grid;
     grid-template-columns: 1fr;
     gap: 16px;
-    transition: gap $fixometer-transition;
 
     @media (min-width: 576px) {
         grid-template-columns: repeat(2, 1fr);
@@ -139,27 +83,19 @@ $fixometer-transition: $fixometer-transition-duration $fixometer-transition-easi
     @media (min-width: 992px) {
         grid-template-columns: repeat(5, 1fr);
     }
-
-    .fixometer--compact & {
-        grid-template-columns: repeat(5, 1fr);
-        gap: 8px;
-
-        @media (max-width: 575px) {
-            grid-template-columns: repeat(3, 1fr);
-        }
-    }
 }
 
 .fixometer__card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    display: grid;
+    grid-template-rows: 46px auto auto;
+    justify-items: center;
+    align-content: start;
+    row-gap: 8px;
     padding: 24px 16px;
     border: 1px solid black;
     box-shadow: 6px 6px 0 0 black;
     text-align: center;
-    transition: padding $fixometer-transition, box-shadow $fixometer-transition, border-color $fixometer-transition, background-color $fixometer-transition, flex-direction $fixometer-transition, gap $fixometer-transition;
+    height: 100%;
 
     &--gold {
         background-color: #FFBE5F;
@@ -179,29 +115,14 @@ $fixometer-transition: $fixometer-transition-duration $fixometer-transition-easi
 
     &--light {
         background-color: #4aaebc;
-        color: #fff;
+        color: #000;
 
         .fixometer__label {
-            color: #fff;
+            color: #000;
         }
-    }
 
-    .fixometer--compact & {
-        flex-direction: row;
-        padding: 6px 12px;
-        border-color: transparent;
-        box-shadow: none;
-        gap: 6px;
-        border-radius: 4px;
-    }
-
-    // Compact cards keep the same solid background colors as expanded
-
-    // Hide volunteers + CO2 on very small screens in compact mode
-    @media (max-width: 575px) {
-        .fixometer--compact &--purple,
-        .fixometer--compact &--teal {
-            display: none;
+        .fixometer__icon {
+            filter: brightness(0);
         }
     }
 }
@@ -209,14 +130,15 @@ $fixometer-transition: $fixometer-transition-duration $fixometer-transition-easi
 .fixometer__icon {
     height: 46px;
     width: auto;
-    margin-bottom: 10px;
-    transition: height $fixometer-transition, margin $fixometer-transition, opacity $fixometer-transition;
+    margin: 0;
+}
 
-    .fixometer--compact & {
-        height: 0;
-        margin: 0;
-        opacity: 0;
-    }
+.fixometer__metric {
+    min-height: 48px;
+    display: inline-flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 6px;
 }
 
 .fixometer__value {
@@ -224,14 +146,9 @@ $fixometer-transition: $fixometer-transition-duration $fixometer-transition-easi
     font-weight: 700;
     font-size: 36px;
     line-height: 1.1;
-    transition: font-size $fixometer-transition;
 
     @media (min-width: 992px) {
         font-size: 42px;
-    }
-
-    .fixometer--compact & {
-        font-size: 18px;
     }
 }
 
@@ -239,30 +156,15 @@ $fixometer-transition: $fixometer-transition-duration $fixometer-transition-easi
     font-family: 'Open Sans', sans-serif;
     font-size: 16px;
     font-weight: 700;
+    line-height: 1;
     margin-bottom: 4px;
-    transition: font-size $fixometer-transition, margin $fixometer-transition;
-
-    .fixometer--compact & {
-        font-size: 12px;
-        margin-bottom: 0;
-    }
 }
 
 .fixometer__label {
     font-family: 'Open Sans', sans-serif;
     font-size: 14px;
+    line-height: 1.4;
     color: $brand;
-    transition: font-size $fixometer-transition;
-
-    .fixometer--compact & {
-        font-size: 11px;
-    }
-
-    @media (max-width: 767px) {
-        .fixometer--compact & {
-            display: none;
-        }
-    }
 }
 
 .fixometer__disclaimer {
@@ -272,27 +174,6 @@ $fixometer-transition: $fixometer-transition-duration $fixometer-transition-easi
     color: #777;
     margin-top: 20px;
     margin-bottom: 0;
-    max-height: 60px;
-    overflow: hidden;
-    transition: max-height $fixometer-transition, margin $fixometer-transition, opacity $fixometer-transition;
-
-    .fixometer--compact & {
-        max-height: 0;
-        margin: 0;
-        opacity: 0;
-    }
-}
-
-#fixometer-spacer {
-    height: 0;
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .fixometer,
-    .fixometer * {
-        transition: none !important;
-        animation: none !important;
-    }
 }
 
 // ─── Hero (split layout) ────────────────────────────────────────────────────

@@ -54,7 +54,6 @@ import RichTextEditor from './components/RichTextEditor'
 import Notifications from './components/Notifications'
 import GroupTimeZone from './components/GroupTimeZone'
 import StatsShare  from './components/StatsShare.vue'
-import initFixometerTransition from './landing/fixometerTransition'
 
 // Without this, the default map marker doesn't appear in production.  Fairly well-known problem.
 // eslint-disable-next-line
@@ -1261,8 +1260,6 @@ jQuery(document).ready(function () {
     // Set the current scroll position as the last scroll position
     lastScrollPosition = currentScrollPosition
   })
-
-  initFixometerTransition()
 
   // Sentry error
   Sentry.init({
