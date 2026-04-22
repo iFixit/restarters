@@ -10,6 +10,7 @@ use App\Models\GroupTags;
 use App\Helpers\Fixometer;
 use App\Helpers\FixometerFile;
 use App\Http\Controllers\Controller;
+use Stevebauman\Purify\Facades\Purify;
 use App\Http\Resources\PartySummaryCollection;
 use App\Http\Resources\TagCollection;
 use App\Http\Resources\VolunteerCollection;
@@ -830,7 +831,7 @@ class GroupController extends Controller
             'latitude' => $latitude,
             'longitude' => $longitude,
             'country_code' => $country,
-            'free_text' => $description,
+            'free_text' => Purify::clean($description),
             'shareable_code' => Fixometer::generateUniqueShareableCode(\App\Models\Group::class, 'shareable_code'),
             'timezone' => $timezone,
             'phone' => $phone,
@@ -1005,7 +1006,7 @@ class GroupController extends Controller
             'latitude' => $latitude,
             'longitude' => $longitude,
             'country_code' => $country,
-            'free_text' => $description,
+            'free_text' => Purify::clean($description),
             'timezone' => $timezone,
             'phone' => $phone,
             'network_data' => $network_data,

@@ -9,6 +9,7 @@ use App\Models\Group;
 use App\Helpers\Fixometer;
 use App\Helpers\FixometerFile;
 use App\Http\Controllers\Controller;
+use Stevebauman\Purify\Facades\Purify;
 use App\Models\Invite;
 use App\Models\Network;
 use App\Notifications\AdminModerationEvent;
@@ -489,7 +490,7 @@ class EventController extends Controller
             'timezone' => $timezone,
             'event_start_utc' => $event_start_utc,
             'event_end_utc' => $event_end_utc,
-            'free_text' => $description,
+            'free_text' => Purify::clean($description),
             'link' => $link,
             'venue' => $title,
             'location' => $location,
@@ -654,7 +655,7 @@ class EventController extends Controller
             'event_start_utc' => $event_start_utc,
             'event_end_utc' => $event_end_utc,
             'hours' => $hours,
-            'free_text' => $description,
+            'free_text' => Purify::clean($description),
             'online' => $online,
             'venue' => $title,
             'link' => $link,
