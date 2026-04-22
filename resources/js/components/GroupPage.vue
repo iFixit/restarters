@@ -164,8 +164,11 @@ export default {
       return this.$store.getters['groups/get'](this.idgroups)
     },
     translatedHaveLeft() {
+      const el = document.createElement('span')
+      el.textContent = this.group.name
+      const escapedName = el.innerHTML
       return this.$lang.get('groups.now_unfollowed', {
-        name: this.group.name,
+        name: escapedName,
         link: '/group/view/' + this.group.id
       })
     }

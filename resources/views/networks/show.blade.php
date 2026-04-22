@@ -110,7 +110,7 @@
                     <p>
                         {!! __('networks.general.count', [
                             'count' => $network->groups->count(),
-                            'name' => $network->name,
+                            'name' => e($network->name),
                             'id' => $network->id
                         ]) !!}
                     </p>

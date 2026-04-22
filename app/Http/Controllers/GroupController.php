@@ -455,7 +455,7 @@ class GroupController extends Controller
             $group->delete();
 
             return redirect('/group')->with('success', __('groups.delete_succeeded', [
-                'name' => $name,
+                'name' => e($name),
             ]));
         } else {
             return redirect('/user/forbidden');
@@ -576,7 +576,7 @@ class GroupController extends Controller
             return redirect()
                 ->back()
                 ->with('success', __('groups.now_following', [
-                    'name' => $group->name,
+                    'name' => e($group->name),
                     'link' => url('/group/view/'.$group->idgroups),
                 ]));
         } catch (\Exception $e) {
@@ -661,7 +661,7 @@ class GroupController extends Controller
             }
         }
 
-        return redirect('/group/nearby/'.intval($groupId))->with('success', $user->name.' has been invited');
+        return redirect('/group/nearby/'.intval($groupId))->with('success', e($user->name).' has been invited');
     }
 
     /**
