@@ -59,6 +59,7 @@
         "bootstrap4-datetimepicker": "^5.2.3",
         "chart.js": "^2.7.2",
         "codemirror": "^5.39.2",
+        "dompurify": "^3.4.0",
         "dropzone": "^5.7.2",
         "ekko-lightbox": "^5.3.0",
         "floatthead": "^2.1.2",
