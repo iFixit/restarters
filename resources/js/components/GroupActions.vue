@@ -56,10 +56,10 @@
     <ConfirmModal :key="'leavegroupmodal-' + idgroups" ref="confirmLeave" @confirm="leaveConfirmed"
       :message="__('groups.leave_group_confirm')" />
     <ConfirmModal :key="'deletegroupmodal-' + idgroups" ref="confirmDelete" @confirm="deleteConfirmed" :message="__('groups.delete_group_confirm', {
-      name: group.name
+      name: escapeHtml(group.name)
     })" />
     <ConfirmModal :key="'archivegroupmodal-' + idgroups" ref="confirmArchive" @confirm="archiveConfirmed" :message="__('groups.archive_group_confirm', {
-      name: group.name
+      name: escapeHtml(group.name)
     })" />
   </div>
 </template>
@@ -100,6 +100,11 @@ export default {
     }
   },
   methods: {
+    escapeHtml(str) {
+      const el = document.createElement('span')
+      el.textContent = str
+      return el.innerHTML
+    },
     leaveGroup() {
       this.$refs.confirmLeave.show()
     },

@@ -294,7 +294,7 @@ class UserController extends Controller
 
         if (Auth::id() !== $user_id) {
             return redirect('user/all')->with('danger', __('profile.soft_deleted', [
-                'name' => $old_user_name
+                'name' => e($old_user_name)
             ]));
         } else {
             return redirect('login');
