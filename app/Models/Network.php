@@ -6,10 +6,21 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\Group;
 use Illuminate\Database\Eloquent\Model;
+use Stevebauman\Purify\Facades\Purify;
 
 class Network extends Model
 {
     use HasFactory;
+
+    public function setNameAttribute($value)
+    {
+        $this->attributes['name'] = $value === null ? null : strip_tags((string) $value);
+    }
+
+    public function setDescriptionAttribute($value)
+    {
+        $this->attributes['description'] = $value === null ? null : Purify::clean((string) $value);
+    }
 
     public function groups(): BelongsToMany
     {

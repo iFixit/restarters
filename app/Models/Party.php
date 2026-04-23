@@ -13,6 +13,7 @@ use Carbon\Carbon;
 use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Stevebauman\Purify\Facades\Purify;
 use Illuminate\Support\Str;
 use Notification;
 use OwenIt\Auditing\Contracts\Auditable;
@@ -765,6 +766,16 @@ class Party extends Model implements Auditable
 
     public function getEventEndUtcAttribute() {
         return array_key_exists('event_end_utc', $this->attributes) ? Carbon::parse($this->attributes['event_end_utc'], 'UTC')->toIso8601String() : null;
+    }
+
+    public function setVenueAttribute($value)
+    {
+        $this->attributes['venue'] = $value === null ? null : strip_tags((string) $value);
+    }
+
+    public function setFreeTextAttribute($value)
+    {
+        $this->attributes['free_text'] = $value === null ? null : Purify::clean((string) $value);
     }
 
     // Mutators for previous event_date/start/end fields.  These are now superceded by the UTC fields and therefore

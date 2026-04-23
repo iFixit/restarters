@@ -42,5 +42,10 @@ class GroupTags extends Model
 
     // Setters
 
+    public function setTagNameAttribute($value)
+    {
+        $this->attributes['tag_name'] = $value === null ? null : strip_tags((string) $value);
+    }
+
     //Getters
 }

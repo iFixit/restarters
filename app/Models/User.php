@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Events\UserDeleted;
 use App\Events\UserUpdated;
+use Stevebauman\Purify\Facades\Purify;
 use App\Helpers\Fixometer;
 use App\Models\Network;
 use App\Models\UserGroups;
@@ -63,6 +64,16 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
         'last_login_at',
         'remember_token',
     ];
+
+    public function setNameAttribute($value)
+    {
+        $this->attributes['name'] = $value === null ? null : strip_tags((string) $value);
+    }
+
+    public function setBiographyAttribute($value)
+    {
+        $this->attributes['biography'] = $value === null ? null : Purify::clean((string) $value);
+    }
 
     /**
      * The event map for the model.

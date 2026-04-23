@@ -33,6 +33,11 @@ class Category extends Model
 
     // Setters
 
+    public function setNameAttribute($value)
+    {
+        $this->attributes['name'] = $value === null ? null : strip_tags((string) $value);
+    }
+
     //Getters
     public function findAll()
     {
