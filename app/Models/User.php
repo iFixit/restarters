@@ -70,6 +70,11 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
         $this->attributes['name'] = $value === null ? null : strip_tags((string) $value);
     }
 
+    public function setLocationAttribute($value)
+    {
+        $this->attributes['location'] = $value === null ? null : strip_tags((string) $value);
+    }
+
     public function setBiographyAttribute($value)
     {
         $this->attributes['biography'] = $value === null ? null : Purify::clean((string) $value);
