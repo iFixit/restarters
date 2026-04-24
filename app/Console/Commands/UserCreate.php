@@ -101,7 +101,6 @@ class UserCreate extends Command
                 'name' => $name,
                 'email' => $email,
                 'password' => Hash::make($password),
-                'role' => $role,
                 'recovery' => substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24),
                 'recovery_expires' => strftime('%Y-%m-%d %X', time() + (24 * 60 * 60)),
                 'calendar_hash' => Str::random(15),
@@ -118,6 +117,9 @@ class UserCreate extends Command
 
             if ($user)
             {
+                $user->role = $role;
+                $user->save();
+
                 $this->info("User created {$user->name} (#{$user->id})");
                 $this->info("Role: {$this->getRoleName($user->role)}");
 
