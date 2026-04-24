@@ -149,10 +149,9 @@ class UserController extends Controller
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        if ($request->input('id') !== null) {
-            $id = $request->input('id');
-        } else {
-            $id = Auth::id();
+        $id = $request->input('id', Auth::id());
+        if ($id != Auth::id() && !Auth::user()->hasRole('Administrator')) {
+            abort(403);
         }
 
         User::find($id)->update([
@@ -188,10 +187,9 @@ class UserController extends Controller
 
     public function postProfilePasswordEdit(Request $request): RedirectResponse
     {
-        if ($request->input('id') !== null) {
-            $id = $request->input('id');
-        } else {
-            $id = Auth::id();
+        $id = $request->input('id', Auth::id());
+        if ($id != Auth::id() && !Auth::user()->hasRole('Administrator')) {
+            abort(403);
         }
 
         $user = User::find($id);
@@ -346,10 +344,9 @@ class UserController extends Controller
 
     public function postProfilePictureEdit(Request $request): RedirectResponse
     {
-        if ($request->input('id') !== null) {
-            $id = $request->input('id');
-        } else {
-            $id = Auth::id();
+        $id = $request->input('id', Auth::id());
+        if ($id != Auth::id() && !Auth::user()->hasRole('Administrator')) {
+            abort(403);
         }
 
         if (isset($_FILES) && ! empty($_FILES)) {
@@ -364,20 +361,19 @@ class UserController extends Controller
 
     public function postAdminEdit(Request $request): RedirectResponse
     {
-        if ($request->input('id') !== null) {
-            $user_id = $request->input('id');
-        } else {
-            $user_id = Auth::id();
+        if (!Auth::user()->hasRole('Administrator')) {
+            abort(403);
         }
+
+        $user_id = $request->input('id', Auth::id());
 
         $user = User::find($user_id);
 
         $oldRole = $user->role;
 
         // Set role for User
-        $user->update([
-            'role' => $request->input('user_role'),
-        ]);
+        $user->role = $request->input('user_role');
+        $user->save();
 
         // If we are demoting from NetworkCoordinator, remove them from the list of coordinators for
         // any networks they are currently coordinating.
