@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use App\Http\Controllers\Controller;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
@@ -62,10 +63,12 @@ class RegisterController extends Controller implements HasMiddleware
                                 'name' => $data['name'],
                                 'email' => $data['email'],
                                 'password' => Hash::make($data['password']),
-            'role' => 4,
             'recovery' => substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24),
             'recovery_expires' => strftime('%Y-%m-%d %X', time() + (24 * 60 * 60)),
                             ]);
+
+        $user->role = Role::RESTARTER;
+        $user->save();
 
         Session::createSession($user->id);
 

@@ -1007,7 +1007,6 @@ class UserController extends Controller
                 'name' => $request->input('name'),
                 'email' => $request->input('email'),
                 'password' => Hash::make($request->input('password')),
-                'role' => $role,
                 'recovery' => substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24),
                 'recovery_expires' => strftime('%Y-%m-%d %X', time() + (24 * 60 * 60)),
                 'country_code' => $request->input('country'),
@@ -1017,6 +1016,9 @@ class UserController extends Controller
                 'calendar_hash' => Str::random(15),
                 'username' => '',
             ]);
+
+            $user->role = $role;
+            $user->save();
         }
 
         $user->generateAndSetUsername();
