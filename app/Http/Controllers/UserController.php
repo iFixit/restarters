@@ -819,11 +819,14 @@ class UserController extends Controller
             $Groups = new Group;
             $Groups = $Groups->findAll();
 
-            $data = $request->post();
-
             if (! Fixometer::hasRole($User->find($id), 'Administrator')) {
-                $sent_groups = $data['groups'];
+                $sent_groups = $request->input('groups');
             }
+
+            $data = $request->only([
+                'name', 'email', 'location', 'age', 'gender', 'country_code',
+                'biography', 'language', 'newsletter', 'invites',
+            ]);
 
             $error = false;
             // check for email in use
@@ -832,20 +835,13 @@ class UserController extends Controller
                 $error['email'] = 'The email you entered is already in use in our database. Please use another one.';
             }
 
-            if (! empty($data['new-password'])) {
-                if ($data['new-password'] !== $data['password-confirm']) {
+            if (! empty($request->input('new-password'))) {
+                if ($request->input('new-password') !== $request->input('password-confirm')) {
                     $error['password'] = 'The passwords are not identical!';
                 } else {
-                    $data['password'] = Hash::make($data['new-password']);
+                    $data['password'] = Hash::make($request->input('new-password'));
                 }
             }
-
-            unset($data['new-password']);
-            unset($data['password-confirm']);
-
-            unset($data['groups']);
-            unset($data['profile']);
-            unset($data['id']);
 
             if (! is_array($error)) {
                 $u = $User->find($id)->update($data);
