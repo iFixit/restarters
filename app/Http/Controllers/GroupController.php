@@ -376,7 +376,7 @@ class GroupController extends Controller
 
         // Don't log to Sentry - legitimate user error.
         return redirect()->back()->with('warning', __('groups.invite_success_apart_from', [
-            'emails' => rtrim(implode(', ', $not_sent))
+            'emails' => e(rtrim(implode(', ', $not_sent)))
         ]));
     }
 
