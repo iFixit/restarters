@@ -60,6 +60,7 @@ import GroupDevicesMostRepaired from './GroupDevicesMostRepaired'
 import GroupDevicesBreakdown from './GroupDevicesBreakdown'
 import AlertBanner from './AlertBanner'
 import auth from '../mixins/auth'
+import { escapeHtml } from '../helpers/escapeHtml'
 
 export default {
   components: {
@@ -160,11 +161,7 @@ export default {
     }
   },
   methods: {
-    escapeHtml(str) {
-      const el = document.createElement('span')
-      el.textContent = str
-      return el.innerHTML
-    },
+    escapeHtml,
   },
   computed: {
     group() {

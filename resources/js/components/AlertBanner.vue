@@ -10,7 +10,7 @@
               <!-- <span class='badge badge-warning'>NEW!</span> -->
               <strong>{{ alert.title }}</strong>
             </div>
-            <div v-html="alert.html" />
+            <div v-html="sanitize(alert.html)" />
           </div>
         </div>
 
@@ -24,6 +24,7 @@
 </template>
 <script>
 import moment from 'moment'
+import DOMPurify from 'dompurify'
 
 export default {
   computed: {
@@ -53,6 +54,9 @@ export default {
     await this.$store.dispatch('alerts/fetch')
   },
   methods: {
+    sanitize(html) {
+      return DOMPurify.sanitize(html)
+    },
     dismissed(id) {
       try {
         localStorage.setItem('alert-' + id, true)

@@ -69,7 +69,7 @@ export default {
         val_container = val_container.substring(0, this.maxChars) + "...";
       }
 
-      return val_container;
+      return DOMPurify.sanitize(val_container);
     },
     sanitizedHtml() {
       return this.html ? DOMPurify.sanitize(this.html) : null
@@ -84,7 +84,7 @@ export default {
       return this.truncatedHTML ? DOMPurify.sanitize(this.truncatedHTML) : null
     },
     needsTruncating() {
-      if (this.text && (text.length > maxChars)) {
+      if (this.text && (this.text.length > this.maxChars)) {
         return true
       }
 

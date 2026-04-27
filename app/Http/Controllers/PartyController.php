@@ -704,7 +704,7 @@ class PartyController extends Controller
 
             // Don't log to Sentry - legitimate user error.
             return redirect()->back()->with('warning', __('events.invite_invalid_emails', [
-                'emails' => implode(', ', $not_sent)
+                'emails' => e(implode(', ', $not_sent))
             ]));
         }
 

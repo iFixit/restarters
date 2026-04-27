@@ -66,6 +66,7 @@
 <script>
 import group from '../mixins/group'
 import ConfirmModal from './ConfirmModal'
+import { escapeHtml } from '../helpers/escapeHtml'
 
 export default {
   components: { ConfirmModal },
@@ -100,11 +101,7 @@ export default {
     }
   },
   methods: {
-    escapeHtml(str) {
-      const el = document.createElement('span')
-      el.textContent = str
-      return el.innerHTML
-    },
+    escapeHtml,
     leaveGroup() {
       this.$refs.confirmLeave.show()
     },

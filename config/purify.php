@@ -49,6 +49,7 @@ return [
                 'http' => true,
                 'https' => true,
                 'mailto' => true,
+                'tel' => true,
             ],
             'AutoFormat.AutoParagraph' => false,
             'AutoFormat.RemoveEmpty' => false,
