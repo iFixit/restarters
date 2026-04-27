@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Log;
 use OwenIt\Auditing\Contracts\Auditable;
+use Stevebauman\Purify\Facades\Purify;
 
 class Alert extends Model implements Auditable
 {
@@ -32,4 +33,9 @@ class Alert extends Model implements Auditable
         'end',
         'variant'
     ];
+
+    public function setHtmlAttribute($value)
+    {
+        $this->attributes['html'] = $value === null ? null : Purify::clean((string) $value);
+    }
 }
