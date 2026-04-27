@@ -26,5 +26,10 @@ class Skills extends Model
 
     // Setters
 
+    public function setSkillNameAttribute($value)
+    {
+        $this->attributes['skill_name'] = $value === null ? null : strip_tags((string) $value);
+    }
+
     //Getters
 }

@@ -21,4 +21,9 @@ class Brands extends Model
      * @var array
      */
     protected $hidden = [];
+
+    public function setBrandNameAttribute($value)
+    {
+        $this->attributes['brand_name'] = $value === null ? null : strip_tags((string) $value);
+    }
 }

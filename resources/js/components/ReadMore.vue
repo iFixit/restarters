@@ -4,10 +4,10 @@
       <p v-html="formattedString"></p>
     </span>
     <span v-else-if="html">
-      <span v-if="!needsTruncating" v-html="html" class="w-100" />
+      <span v-if="!needsTruncating" v-html="sanitizedHtml" class="w-100" />
       <span v-else>
-        <span v-if="!isReadMore" v-html="truncatedHTML" class="w-100" />
-        <span v-else v-html="html" class="w-100" />
+        <span v-if="!isReadMore" v-html="sanitizedTruncatedHtml" class="w-100" />
+        <span v-else v-html="sanitizedHtml" class="w-100" />
       </span>
     </span>
     <span v-if="needsTruncating">
@@ -20,6 +20,7 @@
 <script>
 const htmlToText = require('html-to-text');
 import clip from "text-clipper"
+import DOMPurify from "dompurify"
 // Originally based on https://github.com/orlyyani/read-more, with thanks.
 
 export default {
@@ -70,11 +71,17 @@ export default {
 
       return val_container;
     },
+    sanitizedHtml() {
+      return this.html ? DOMPurify.sanitize(this.html) : null
+    },
     truncatedHTML() {
       // We need to truncate HTML with care to ensure that the result is tag safe; string truncation isn't good
       // enough.
       const ret = this.html ? clip(this.html, this.maxChars, { html: true, maxLines: this.maxLines }) : null
       return ret
+    },
+    sanitizedTruncatedHtml() {
+      return this.truncatedHTML ? DOMPurify.sanitize(this.truncatedHTML) : null
     },
     needsTruncating() {
       if (this.text && (text.length > maxChars)) {

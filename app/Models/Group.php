@@ -12,6 +12,7 @@ use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Log;
+use Stevebauman\Purify\Facades\Purify;
 use OwenIt\Auditing\Contracts\Auditable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -444,6 +445,16 @@ class Group extends Model implements Auditable
     public function setDistanceAttribute($val)
     {
         $this->distance = $val;
+    }
+
+    public function setNameAttribute($value)
+    {
+        $this->attributes['name'] = $value === null ? null : strip_tags((string) $value);
+    }
+
+    public function setFreeTextAttribute($value)
+    {
+        $this->attributes['free_text'] = $value === null ? null : Purify::clean((string) $value);
     }
 
     public function createDiscourseGroup() {

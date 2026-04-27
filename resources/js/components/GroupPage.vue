@@ -159,13 +159,20 @@ export default {
       haveLeft: false
     }
   },
+  methods: {
+    escapeHtml(str) {
+      const el = document.createElement('span')
+      el.textContent = str
+      return el.innerHTML
+    },
+  },
   computed: {
     group() {
       return this.$store.getters['groups/get'](this.idgroups)
     },
     translatedHaveLeft() {
       return this.$lang.get('groups.now_unfollowed', {
-        name: this.group.name,
+        name: this.escapeHtml(this.group.name),
         link: '/group/view/' + this.group.id
       })
     }
