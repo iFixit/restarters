@@ -824,20 +824,18 @@ class Party extends Model implements Auditable
             $volunteer['fullName'] = $volunteer->getFullName();
 
             if ($volunteer->volunteer) {
-                $volunteer['volunteer'] = $volunteer->volunteer;
+                $user = $volunteer->volunteer;
+                $volunteer['volunteer'] = [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $showEmails ? $user->email : null,
+                ];
 
-                if (!$showEmails) {
-                    $volunteer['volunteer']['email'] = NULL;
-                }
+                $volunteer['userSkills'] = $user->userSkills->all();
+                $volunteer['profilePath'] = '/uploads/thumbnail_'.$user->getProfile($user->id)->path;
 
-                if (! empty($volunteer->volunteer)) {
-                    $volunteer['userSkills'] = $volunteer->volunteer->userSkills->all();
-                    $volunteer['profilePath'] = '/uploads/thumbnail_'.$volunteer->volunteer->getProfile($volunteer->volunteer->id)->path;
-
-                    foreach ($volunteer['userSkills'] as $skill) {
-                        // Force expansion
-                        $skill->skillName->skill_name;
-                    }
+                foreach ($volunteer['userSkills'] as $skill) {
+                    $skill->skillName->skill_name;
                 }
             }
 

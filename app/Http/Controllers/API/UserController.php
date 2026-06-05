@@ -57,15 +57,9 @@ class UserController extends Controller
 
     protected static function mapUserAndAuditToUserChange($user, $audit)
     {
-        // Hide fields not relevant for Zapier.
         $user->makeHidden([
             'updated_at',
             'deleted_at',
-            'api_token',
-            'recovery',
-            'recovery_expires',
-            'calendar_hash',
-            'number_of_logins',
             'consent_past_data',
             'consent_gdpr',
             'consent_future_data',

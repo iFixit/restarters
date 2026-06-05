@@ -164,8 +164,6 @@ class ApiController extends Controller
     {
         $user = Auth::user();
 
-        $user->makeHidden('api_token');
-
         return response()->json($user->toArray());
     }
 
