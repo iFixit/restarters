@@ -825,11 +825,6 @@ class Party extends Model implements Auditable
 
             if ($volunteer->volunteer) {
                 $user = $volunteer->volunteer;
-                $volunteer['volunteer'] = [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $showEmails ? $user->email : null,
-                ];
 
                 $volunteer['userSkills'] = $user->userSkills->all();
                 $volunteer['profilePath'] = '/uploads/thumbnail_'.$user->getProfile($user->id)->path;
@@ -837,6 +832,17 @@ class Party extends Model implements Auditable
                 foreach ($volunteer['userSkills'] as $skill) {
                     $skill->skillName->skill_name;
                 }
+
+                // Drop the loaded Eloquent relation before overwriting it with the
+                // allowlist. Otherwise relationsToArray() re-injects the full User
+                // model during serialization, overriding the array set below and
+                // leaking the entire user record to public event pages.
+                $volunteer->unsetRelation('volunteer');
+                $volunteer['volunteer'] = [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $showEmails ? $user->email : null,
+                ];
             }
 
             $ret[] = $volunteer;
