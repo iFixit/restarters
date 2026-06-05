@@ -842,6 +842,10 @@ class Party extends Model implements Auditable
                     'id' => $user->id,
                     'name' => $user->name,
                     'email' => $showEmails ? $user->email : null,
+                    // The event page reads volunteer.user_skills (see
+                    // EventAttendee.vue); keep it in the allowlist so the skills
+                    // list still renders. Skill associations are not sensitive.
+                    'user_skills' => $volunteer['userSkills'],
                 ];
             }
 

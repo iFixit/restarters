@@ -104,10 +104,12 @@ class PublicEventDataLeakTest extends TestCase
             $keys = array_keys($object);
             sort($keys);
 
+            // The test volunteer has no skills, so user_skills is an empty array
+            // and the volunteer object stays flat (the regex above assumes that).
             $this->assertSame(
-                ['email', 'id', 'name'],
+                ['email', 'id', 'name', 'user_skills'],
                 $keys,
-                'Volunteer object exposes more than the {id, name, email} allowlist: ' . $json
+                'Volunteer object must be limited to the {id, name, email, user_skills} allowlist: ' . $json
             );
         }
 
