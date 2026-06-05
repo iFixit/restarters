@@ -54,7 +54,16 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token',
+        'password',
+        'remember_token',
+        'api_token',
+        'calendar_hash',
+        'recovery',
+        'recovery_expires',
+        'latitude',
+        'longitude',
+        'last_login_at',
+        'number_of_logins',
     ];
 
     /**
