@@ -13,13 +13,16 @@ use Tests\TestCase;
 
 class PublicEventDataLeakTest extends TestCase
 {
+    // Field-name sentinels for keys that are user-only and must never be
+    // serialized. latitude/longitude are deliberately NOT listed here: they
+    // are legitimate public fields on the event itself (Party model), so the
+    // bare key appears in responses for the event's location. The volunteer's
+    // own coordinates are guarded by the numeric value sentinels below instead.
     private array $sensitiveFields = [
         'api_token',
         'calendar_hash',
         'recovery',
         'recovery_expires',
-        'latitude',
-        'longitude',
     ];
 
     private function createEventWithVolunteer(array $userOverrides = []): array
@@ -42,8 +45,8 @@ class PublicEventDataLeakTest extends TestCase
         $volunteer = User::factory()->create(array_merge([
             'api_token' => 'SENSITIVE_TOKEN_VALUE',
             'calendar_hash' => 'SENSITIVE_CAL_HASH',
-            'latitude' => 51.5074,
-            'longitude' => -0.1278,
+            'latitude' => 51.50741234,
+            'longitude' => -0.12781234,
             'recovery' => 'SENSITIVE_RECOVERY_TOKEN',
             'recovery_expires' => now()->addHour(),
             'username' => 'SENSITIVE_USERNAME',
@@ -62,10 +65,16 @@ class PublicEventDataLeakTest extends TestCase
 
     private function assertNoSensitiveFields(string $content): void
     {
+        // Props are json_encode()d then HTML-escaped by Blade ({{ }}) on the
+        // public page path, so the raw content contains &quot;api_token&quot;
+        // rather than "api_token". Decode entities first, otherwise these
+        // field-name checks are no-ops there.
+        $decoded = html_entity_decode($content, ENT_QUOTES);
+
         foreach ($this->sensitiveFields as $field) {
             $this->assertStringNotContainsString(
                 '"' . $field . '"',
-                $content,
+                $decoded,
                 "Sensitive field '$field' found in response"
             );
         }
@@ -73,6 +82,12 @@ class PublicEventDataLeakTest extends TestCase
         $this->assertStringNotContainsString('SENSITIVE_TOKEN_VALUE', $content);
         $this->assertStringNotContainsString('SENSITIVE_CAL_HASH', $content);
         $this->assertStringNotContainsString('SENSITIVE_RECOVERY_TOKEN', $content);
+
+        // latitude/longitude have no string token to match on, so assert on
+        // their distinctive numeric values. These guard against the coordinates
+        // leaking even if the allowlist assertion is ever weakened.
+        $this->assertStringNotContainsString('51.50741234', $content, 'Volunteer latitude leaked');
+        $this->assertStringNotContainsString('0.12781234', $content, 'Volunteer longitude leaked');
     }
 
     /**
