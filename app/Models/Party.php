@@ -818,27 +818,34 @@ class Party extends Model implements Auditable
         $ret = [];
 
         foreach ($volunteers as $volunteer) {
-            $volunteer['userSkills'] = [];
             $volunteer['confirmed'] = intval($volunteer->status) === 1;
             $volunteer['profilePath'] = '/uploads/thumbnail_placeholder.png';
             $volunteer['fullName'] = $volunteer->getFullName();
 
             if ($volunteer->volunteer) {
-                $volunteer['volunteer'] = $volunteer->volunteer;
+                $user = $volunteer->volunteer;
 
-                if (!$showEmails) {
-                    $volunteer['volunteer']['email'] = NULL;
+                $userSkills = $user->userSkills->all();
+                $volunteer['profilePath'] = '/uploads/thumbnail_'.$user->getProfile($user->id)->path;
+
+                foreach ($userSkills as $skill) {
+                    $skill->skillName->skill_name;
                 }
 
-                if (! empty($volunteer->volunteer)) {
-                    $volunteer['userSkills'] = $volunteer->volunteer->userSkills->all();
-                    $volunteer['profilePath'] = '/uploads/thumbnail_'.$volunteer->volunteer->getProfile($volunteer->volunteer->id)->path;
-
-                    foreach ($volunteer['userSkills'] as $skill) {
-                        // Force expansion
-                        $skill->skillName->skill_name;
-                    }
-                }
+                // Drop the loaded Eloquent relation before overwriting it with the
+                // allowlist. Otherwise relationsToArray() re-injects the full User
+                // model during serialization, overriding the array set below and
+                // leaking the entire user record to public event pages.
+                $volunteer->unsetRelation('volunteer');
+                $volunteer['volunteer'] = [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $showEmails ? $user->email : null,
+                    // The event page reads volunteer.user_skills (see
+                    // EventAttendee.vue); keep it in the allowlist so the skills
+                    // list still renders. Skill associations are not sensitive.
+                    'user_skills' => $userSkills,
+                ];
             }
 
             $ret[] = $volunteer;
