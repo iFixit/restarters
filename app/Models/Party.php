@@ -818,7 +818,6 @@ class Party extends Model implements Auditable
         $ret = [];
 
         foreach ($volunteers as $volunteer) {
-            $volunteer['userSkills'] = [];
             $volunteer['confirmed'] = intval($volunteer->status) === 1;
             $volunteer['profilePath'] = '/uploads/thumbnail_placeholder.png';
             $volunteer['fullName'] = $volunteer->getFullName();
@@ -826,10 +825,10 @@ class Party extends Model implements Auditable
             if ($volunteer->volunteer) {
                 $user = $volunteer->volunteer;
 
-                $volunteer['userSkills'] = $user->userSkills->all();
+                $userSkills = $user->userSkills->all();
                 $volunteer['profilePath'] = '/uploads/thumbnail_'.$user->getProfile($user->id)->path;
 
-                foreach ($volunteer['userSkills'] as $skill) {
+                foreach ($userSkills as $skill) {
                     $skill->skillName->skill_name;
                 }
 
@@ -845,7 +844,7 @@ class Party extends Model implements Auditable
                     // The event page reads volunteer.user_skills (see
                     // EventAttendee.vue); keep it in the allowlist so the skills
                     // list still renders. Skill associations are not sensitive.
-                    'user_skills' => $volunteer['userSkills'],
+                    'user_skills' => $userSkills,
                 ];
             }
 
