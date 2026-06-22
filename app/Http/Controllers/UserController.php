@@ -150,11 +150,10 @@ class UserController extends Controller
         }
 
         $id = $request->input('id', Auth::id());
-        if ($id != Auth::id() && !Auth::user()->hasRole('Administrator')) {
-            abort(403);
-        }
+        $user = User::findOrFail($id);
+        Gate::authorize('update', $user);
 
-        User::find($id)->update([
+        $user->update([
         'email'    => $request->input('email'),
         'name'     => $request->input('name'),
         'country_code' => $request->input('country'),
@@ -163,8 +162,6 @@ class UserController extends Controller
         'gender'   => $request->input('gender'),
         'biography'=> $request->input('biography'),
         ]);
-
-        $user = User::find($id);
 
         if (! empty($user->location)) {
             $geocoded = $geocoder->geocode("{$user->location}, " . Fixometer::getCountryFromCountryCode($user->country_code));
@@ -188,11 +185,8 @@ class UserController extends Controller
     public function postProfilePasswordEdit(Request $request): RedirectResponse
     {
         $id = $request->input('id', Auth::id());
-        if ($id != Auth::id() && !Auth::user()->hasRole('Administrator')) {
-            abort(403);
-        }
-
-        $user = User::find($id);
+        $user = User::findOrFail($id);
+        Gate::authorize('update', $user);
 
         if ($request->input('new-password') !== $request->input('new-password-repeat')) {
             return redirect()->back()->with('error', __('profile.password_new_mismatch'));
@@ -259,7 +253,8 @@ class UserController extends Controller
         }
 
         $newLanguage = $request->input('user_language');
-        $user = User::find($userId);
+        $user = User::findOrFail($userId);
+        Gate::authorize('update', $user);
         $user->language = $newLanguage;
         $user->save();
 
@@ -284,7 +279,9 @@ class UserController extends Controller
             $id = Auth::id();
         }
 
-        $user = User::find($id);
+        $user = User::findOrFail($id);
+        Gate::authorize('delete', $user);
+
         $old_user_name = $user->name;
         $user_id = $user->id;
 
@@ -307,7 +304,8 @@ class UserController extends Controller
             $id = Auth::id();
         }
 
-        $user = User::find($id);
+        $user = User::findOrFail($id);
+        Gate::authorize('update', $user);
 
         if ($request->input('invites') !== null) :
             $user->invites = 1; else :
@@ -327,7 +325,8 @@ class UserController extends Controller
             $id = Auth::id();
         }
 
-        $user = User::find($id);
+        $user = User::findOrFail($id);
+        Gate::authorize('update', $user);
 
         $skills = $request->input('tags');
         $user->skillsold()->sync($skills);
@@ -345,9 +344,7 @@ class UserController extends Controller
     public function postProfilePictureEdit(Request $request): RedirectResponse
     {
         $id = $request->input('id', Auth::id());
-        if ($id != Auth::id() && !Auth::user()->hasRole('Administrator')) {
-            abort(403);
-        }
+        Gate::authorize('update', User::findOrFail($id));
 
         if (isset($_FILES) && ! empty($_FILES)) {
             $file = new FixometerFile;
@@ -752,163 +749,112 @@ class UserController extends Controller
 
         $user = Auth::user();
         $User = new User;
-        
-        // Check if this is a POST request
-        if ($request->isMethod('post')) {
-            // Check for password mismatch first (for testEditBadPassword)
-            if ($request->has('new-password') && $request->has('password-confirm') && 
-                $request->input('new-password') !== $request->input('password-confirm')) {
-                
-                $userdata = User::find($id);
-                
-                // Make sure userdata has groups property as an array
-                $usergroups = [];
-                $ugroups = $User->getUserGroups($id);
-                foreach ($ugroups as $g) {
-                    $usergroups[] = $g->group;
-                }
-                
-                $userdata->groups = $usergroups;
-                
-                return view('user.edit', [
-                    'title' => 'Edit User',
-                    'langs' => $fixometer_languages,
-                    'user' => $user,
-                    'header' => true,
-                    'roles' => (new Role)->findAll(),
-                    'groups' => (new Group)->findAll(),
-                    'data' => $userdata,
-                    'error' => ['password' => 'The passwords are not identical!'],
-                ]);
-            }
-            
-            // For POST requests, we need different behavior based on user roles
-            if (Fixometer::hasRole($user, 'Administrator') || Fixometer::hasRole($user, 'Host')) {
-                // Admins and hosts should see "Edit User"
-                $userdata = User::find($id);
-                
-                // Make sure userdata has groups property as an array
-                $usergroups = [];
-                $ugroups = $User->getUserGroups($id);
-                foreach ($ugroups as $g) {
-                    $usergroups[] = $g->group;
-                }
-                
-                $userdata->groups = $usergroups;
-                
-                return view('user.edit', [
-                    'title' => 'Edit User',
-                    'langs' => $fixometer_languages,
-                    'user' => $user,
-                    'header' => true,
-                    'roles' => (new Role)->findAll(),
-                    'groups' => (new Group)->findAll(),
-                    'data' => $userdata,
-                ]);
+
+        // Administrators can edit any user; users can edit themselves. (Hosts may NOT edit
+        // arbitrary users - that was an account-takeover vector, F002.) Centralised in UserPolicy.
+        $editingUser = User::findOrFail($id);
+        Gate::authorize('update', $editingUser);
+
+        $Roles = new Role;
+        $Roles = $Roles->findAll();
+
+        $Groups = new Group;
+        $Groups = $Groups->findAll();
+
+        // Group membership is an admin-only field. Only an administrator may (re)assign groups,
+        // and never for an Administrator target. This restores the pre-existing protection and
+        // stops a self-editing non-admin from rewriting their own memberships (createUsersGroups
+        // wipes all existing memberships before re-inserting). Left null when not applicable so
+        // the isset() guard below skips the sync entirely.
+        $sent_groups = null;
+        if (Fixometer::hasRole($user, 'Administrator') && ! Fixometer::hasRole($editingUser, 'Administrator')) {
+            $sent_groups = $request->input('groups');
+        }
+
+        $data = $request->only([
+            'name', 'email', 'location', 'age', 'gender', 'country_code',
+            'biography', 'language', 'newsletter', 'invites',
+        ]);
+
+        $error = false;
+        // check for email in use
+        if ($editingUser->email !== $data['email'] && ! $User->checkEmail($data['email'])) {
+            $error['email'] = 'The email you entered is already in use in our database. Please use another one.';
+        }
+
+        if ($request->filled('new-password')) {
+            if ($request->input('new-password') !== $request->input('password-confirm')) {
+                $error['password'] = 'The passwords are not identical!';
             } else {
-                // Regular users and restarters should get an empty response
-                return view('empty');
+                $data['password'] = Hash::make($request->input('new-password'));
             }
         }
-        
-        // Administrators can edit users.
-        if (Fixometer::hasRole($user, 'Administrator') || Fixometer::hasRole($user, 'Host')) {
-            $Roles = new Role;
-            $Roles = $Roles->findAll();
 
-            $Groups = new Group;
-            $Groups = $Groups->findAll();
+        if (! is_array($error)) {
+            $u = $User->find($id)->update($data);
 
-            if (! Fixometer::hasRole($User->find($id), 'Administrator')) {
-                $sent_groups = $request->input('groups');
+            $ug = new UserGroups;
+            if (isset($sent_groups)) {
+                $ug->createUsersGroups($id, $sent_groups);
             }
 
-            $data = $request->only([
-                'name', 'email', 'location', 'age', 'gender', 'country_code',
-                'biography', 'language', 'newsletter', 'invites',
-            ]);
-
-            $error = false;
-            // check for email in use
-            $editingUser = $User->find($id);
-            if ($editingUser->email !== $data['email'] && ! $User->checkEmail($data['email'])) {
-                $error['email'] = 'The email you entered is already in use in our database. Please use another one.';
+            if (isset($_FILES) && ! empty($_FILES)) {
+                $file = new FixometerFile;
+                $file->upload('profile', 'image', $id, env('TBL_USERS'), false, true);
             }
 
-            if (! empty($request->input('new-password'))) {
-                if ($request->input('new-password') !== $request->input('password-confirm')) {
-                    $error['password'] = 'The passwords are not identical!';
-                } else {
-                    $data['password'] = Hash::make($request->input('new-password'));
-                }
-            }
-
-            if (! is_array($error)) {
-                $u = $User->find($id)->update($data);
-
-                $ug = new UserGroups;
-                if (isset($sent_groups)) {
-                    $ug->createUsersGroups($id, $sent_groups);
-                }
-
-                if (isset($_FILES) && ! empty($_FILES)) {
-                    $file = new FixometerFile;
-                    $file->upload('profile', 'image', $id, env('TBL_USERS'), false, true);
-                }
-
-                if (! $u) {
-                    $response['danger'] = 'Something went wrong. Please check the data and try again.';
-                    \Sentry\CaptureMessage($response['danger']);
-                } else {
-                    $response['success'] = 'User updated!';
-                    if (Fixometer::hasRole($user, 'Host')) {
-                        // Use @ for phpunit tests.
-                        @header('Location: /host?action=ue&code=200');
-                    }
-                }
-
-                $userdata = User::find($id);
-
-                $usergroups = [];
-                $ugroups = $User->getUserGroups($id);
-                foreach ($ugroups as $g) {
-                    $usergroups[] = $g->group;
-                }
-
-                $userdata->groups = $usergroups;
-
-                return view('user.edit', [
-                'title' => 'Edit User',
-                'langs' => $fixometer_languages,
-                'user' => $user,
-                'header' => true,
-                'response' => $response,
-                'roles' => $Roles,
-                'groups' => $Groups,
-                'data' => $userdata,
-                ]);
+            if (! $u) {
+                $response['danger'] = 'Something went wrong. Please check the data and try again.';
+                \Sentry\CaptureMessage($response['danger']);
             } else {
-                $userdata = User::find($id);
-
-                $usergroups = [];
-                $ugroups = $User->getUserGroups($id);
-                foreach ($ugroups as $g) {
-                    $usergroups[] = $g->group;
+                $response['success'] = 'User updated!';
+                if ($user->id == $id && ! Fixometer::hasRole($user, 'Administrator')) {
+                    // Regular users editing themselves should return empty response
+                    return response('');
                 }
-
-                $userdata->groups = $usergroups;
-
-                return view('user.edit', [
-                'title' => 'Edit User',
-                'langs' => $fixometer_languages,
-                'user' => $user,
-                'header' => true,
-                'error' => $error,
-                'roles' => $Roles,
-                'groups' => $Groups,
-                'data' => $userdata,
-                ]);
             }
+
+            $userdata = User::find($id);
+
+            $usergroups = [];
+            $ugroups = $User->getUserGroups($id);
+            foreach ($ugroups as $g) {
+                $usergroups[] = $g->group;
+            }
+
+            $userdata->groups = $usergroups;
+
+            return view('user.edit', [
+            'title' => 'Edit User',
+            'langs' => $fixometer_languages,
+            'user' => $user,
+            'header' => true,
+            'response' => $response,
+            'roles' => $Roles,
+            'groups' => $Groups,
+            'data' => $userdata,
+            ]);
+        } else {
+            $userdata = User::find($id);
+
+            $usergroups = [];
+            $ugroups = $User->getUserGroups($id);
+            foreach ($ugroups as $g) {
+                $usergroups[] = $g->group;
+            }
+
+            $userdata->groups = $usergroups;
+
+            return view('user.edit', [
+            'title' => 'Edit User',
+            'langs' => $fixometer_languages,
+            'user' => $user,
+            'header' => true,
+            'error' => $error,
+            'roles' => $Roles,
+            'groups' => $Groups,
+            'data' => $userdata,
+            ]);
         }
     }
 
