@@ -12,6 +12,31 @@ class UserPolicy
     use HandlesAuthorization;
 
     /**
+     * Determine whether the acting user may modify the target user's account/profile.
+     *
+     * The canonical "self or administrator" rule, shared by every user-profile mutation
+     * endpoint so the check cannot be omitted piecemeal.
+     *
+     * @param  \App\Models\User  $user    The authenticated user
+     * @param  \App\Models\User  $target  The user being modified
+     */
+    public function update(User $user, User $target): bool
+    {
+        return $user->id == $target->id || Fixometer::hasRole($user, 'Administrator');
+    }
+
+    /**
+     * Determine whether the acting user may delete (soft-delete) the target user's account.
+     *
+     * @param  \App\Models\User  $user    The authenticated user
+     * @param  \App\Models\User  $target  The user being deleted
+     */
+    public function delete(User $user, User $target): bool
+    {
+        return $user->id == $target->id || Fixometer::hasRole($user, 'Administrator');
+    }
+
+    /**
      * Determine whether one user can change the Repair Directory role of another to a specific value.
      *
      * @param  \App\Models\User  $user  The authenticated user
