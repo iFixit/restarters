@@ -238,6 +238,7 @@ envGroups:
     FEATURE__AUTO_APPROVE_GROUPS: "false"
     FEATURE__AUTO_APPROVE_EVENTS: "false"
     FEATURE__PUBLIC_EVENTS_API: "false"
+    FEATURE__PUBLIC_REPAIRS_API: "false"
 
   # Logging configuration
   logging:
@@ -361,3 +362,15 @@ envGroups:
     REPAIRDIRECTORY_URL: ""
     META_TWITTER_SITE: ""
     META_TWITTER_IMAGE_ALT: ""
+
+  # Open Repair Data Standard export (/api/public/v2/repairs)
+  #
+  # ORDS_ID_PREFIX is the ORA-assigned partner namespace for this instance. It
+  # is intentionally blank here: the exporter refuses to serve (503) unless an
+  # instance sets it explicitly, because ORDS ids are a stable key that ORA
+  # upserts on, so a wrong prefix silently overwrites another provider's rows.
+  ords:
+    ORDS_ID_PREFIX: ""
+    ORDS_DATA_PROVIDER: ""
+    ORDS_INCLUDE_PROBLEM: "true"
+    ORDS_SCRUB_PROBLEM: "true"
