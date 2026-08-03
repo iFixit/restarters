@@ -16,7 +16,7 @@ class ApiClientsCreate extends Command
      */
     protected $signature = 'api-clients:create
                             {--name= : Display name for the integration client}
-                            {--scopes=events:read : Comma-separated scopes}
+                            {--scopes=events:read : Comma-separated scopes (events:read, repairs:read)}
                             {--origins= : Comma-separated allowed origins}
                             {--networks= : Comma-separated allowed network IDs}
                             {--rate=120 : Requests per minute}
