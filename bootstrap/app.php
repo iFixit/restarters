@@ -100,6 +100,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'localizationRedirect' => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRedirectFilter::class,
             'localize' => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRoutes::class,
             'publicEventsApiEnabled' => \App\Http\Middleware\EnsurePublicEventsApiEnabled::class,
+            'publicRepairsApiEnabled' => \App\Http\Middleware\EnsurePublicRepairsApiEnabled::class,
             'publicApiCors' => \App\Http\Middleware\PublicApiCors::class,
             'centralizedAuth' => \App\Http\Middleware\CentralizedAuth::class,
         ]);

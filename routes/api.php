@@ -43,16 +43,29 @@ Route::prefix('')->group(function () {
     Route::get('timezone', [API\TimeZoneController::class, 'lookup']);
 });
 
+// The feature flag sits on each scope rather than the whole group so the repairs
+// export can ship dark while the events API stays live.
 Route::prefix('public/v2')
     ->withoutMiddleware('customApiAuth')
-    ->middleware(['publicEventsApiEnabled', 'publicApiCors'])
+    ->middleware(['publicApiCors'])
     ->group(function () {
-        Route::options('{any}', fn () => response()->noContent())->where('any', '.*');
+        Route::options('{any}', function () {
+            if (! config('restarters.features.public_events_api', false)
+                && ! config('restarters.features.public_repairs_api', false)) {
+                abort(404);
+            }
 
-        Route::middleware(['apiClient:events:read', 'apiClientOrigin', 'throttle:public-api'])->group(function () {
+            return response()->noContent();
+        })->where('any', '.*');
+
+        Route::middleware(['publicEventsApiEnabled', 'apiClient:events:read', 'apiClientOrigin', 'throttle:public-api'])->group(function () {
             Route::get('events', [API\PublicEventController::class, 'listEvents']);
             Route::get('events/{id}', [API\PublicEventController::class, 'showEvent']);
             Route::get('groups/{id}/events', [API\PublicEventController::class, 'listGroupEvents']);
+        });
+
+        Route::middleware(['publicRepairsApiEnabled', 'apiClient:repairs:read', 'apiClientOrigin', 'throttle:public-api'])->group(function () {
+            Route::get('repairs', [API\PublicRepairController::class, 'listRepairs']);
         });
     });
 
