@@ -43,16 +43,24 @@ Route::prefix('')->group(function () {
     Route::get('timezone', [API\TimeZoneController::class, 'lookup']);
 });
 
+// Two layers of flag. The group gate takes the whole prefix off the map when no
+// scope is live, and has to precede publicApiCors because that middleware answers
+// OPTIONS without calling $next. The per-scope gates then let the repairs export
+// ship dark while the events API stays live.
 Route::prefix('public/v2')
     ->withoutMiddleware('customApiAuth')
-    ->middleware(['publicEventsApiEnabled', 'publicApiCors'])
+    ->middleware(['publicApiEnabled', 'publicApiCors'])
     ->group(function () {
         Route::options('{any}', fn () => response()->noContent())->where('any', '.*');
 
-        Route::middleware(['apiClient:events:read', 'apiClientOrigin', 'throttle:public-api'])->group(function () {
+        Route::middleware(['publicEventsApiEnabled', 'apiClient:events:read', 'apiClientOrigin', 'throttle:public-api'])->group(function () {
             Route::get('events', [API\PublicEventController::class, 'listEvents']);
             Route::get('events/{id}', [API\PublicEventController::class, 'showEvent']);
             Route::get('groups/{id}/events', [API\PublicEventController::class, 'listGroupEvents']);
+        });
+
+        Route::middleware(['publicRepairsApiEnabled', 'apiClient:repairs:read', 'apiClientOrigin', 'throttle:public-api'])->group(function () {
+            Route::get('repairs', [API\PublicRepairController::class, 'listRepairs']);
         });
     });
 

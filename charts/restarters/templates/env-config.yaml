@@ -66,3 +66,6 @@ data:
 
         # Meta Configuration
         {{- include "restarters.envGroup" (dict "groupName" "meta" "context" .) | nindent 8 }}
+
+        # Open Repair Data Standard export
+        {{- include "restarters.envGroup" (dict "groupName" "ords" "context" .) | nindent 8 }}

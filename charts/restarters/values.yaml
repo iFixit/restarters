@@ -238,6 +238,7 @@ envGroups:
     FEATURE__AUTO_APPROVE_GROUPS: "false"
     FEATURE__AUTO_APPROVE_EVENTS: "false"
     FEATURE__PUBLIC_EVENTS_API: "false"
+    FEATURE__PUBLIC_REPAIRS_API: "false"
 
   # Logging configuration
   logging:
@@ -361,3 +362,18 @@ envGroups:
     REPAIRDIRECTORY_URL: ""
     META_TWITTER_SITE: ""
     META_TWITTER_IMAGE_ALT: ""
+
+  # Open Repair Data Standard export (/api/public/v2/repairs)
+  #
+  # ORDS_ID_PREFIX is the ORA-assigned partner namespace for this instance. It
+  # is intentionally blank here: the exporter refuses to serve (503) unless an
+  # instance sets it explicitly, because ORDS ids are a stable key that ORA
+  # upserts on, so a wrong prefix silently overwrites another provider's rows.
+  ords:
+    ORDS_ID_PREFIX: ""
+    ORDS_DATA_PROVIDER: ""
+    # Off by default so turning the endpoint on and publishing the free-text
+    # column stay two separate decisions. The scrubber removes contact details
+    # and identifiers but cannot remove names, so this needs a deliberate opt-in.
+    ORDS_INCLUDE_PROBLEM: "false"
+    ORDS_SCRUB_PROBLEM: "true"
