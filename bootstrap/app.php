@@ -99,6 +99,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'localeViewPath' => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationViewPath::class,
             'localizationRedirect' => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRedirectFilter::class,
             'localize' => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRoutes::class,
+            'publicApiEnabled' => \App\Http\Middleware\EnsurePublicApiEnabled::class,
             'publicEventsApiEnabled' => \App\Http\Middleware\EnsurePublicEventsApiEnabled::class,
             'publicRepairsApiEnabled' => \App\Http\Middleware\EnsurePublicRepairsApiEnabled::class,
             'publicApiCors' => \App\Http\Middleware\PublicApiCors::class,

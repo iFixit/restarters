@@ -126,6 +126,28 @@ class PublicRepairsApiTest extends TestCase
             ->assertSuccessful();
     }
 
+    public function test_preflight_is_absent_when_both_flags_are_off(): void
+    {
+        // A dark instance should not answer preflight with CORS headers.
+        $this->withExceptionHandling();
+        config([
+            'restarters.features.public_events_api' => false,
+            'restarters.features.public_repairs_api' => false,
+        ]);
+
+        $this->options('/api/public/v2/repairs')->assertStatus(404);
+        $this->options('/api/public/v2/events')->assertStatus(404);
+    }
+
+    public function test_preflight_answers_when_a_scope_is_live(): void
+    {
+        config(['restarters.features.public_repairs_api' => false]);
+
+        $this->options('/api/public/v2/repairs')
+            ->assertStatus(204)
+            ->assertHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    }
+
     // ------------------------------------------------------ id namespace
 
     public function test_refuses_to_serve_under_an_unassigned_id_namespace(): void

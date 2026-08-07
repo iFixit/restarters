@@ -43,20 +43,15 @@ Route::prefix('')->group(function () {
     Route::get('timezone', [API\TimeZoneController::class, 'lookup']);
 });
 
-// The feature flag sits on each scope rather than the whole group so the repairs
-// export can ship dark while the events API stays live.
+// Two layers of flag. The group gate takes the whole prefix off the map when no
+// scope is live, and has to precede publicApiCors because that middleware answers
+// OPTIONS without calling $next. The per-scope gates then let the repairs export
+// ship dark while the events API stays live.
 Route::prefix('public/v2')
     ->withoutMiddleware('customApiAuth')
-    ->middleware(['publicApiCors'])
+    ->middleware(['publicApiEnabled', 'publicApiCors'])
     ->group(function () {
-        Route::options('{any}', function () {
-            if (! config('restarters.features.public_events_api', false)
-                && ! config('restarters.features.public_repairs_api', false)) {
-                abort(404);
-            }
-
-            return response()->noContent();
-        })->where('any', '.*');
+        Route::options('{any}', fn () => response()->noContent())->where('any', '.*');
 
         Route::middleware(['publicEventsApiEnabled', 'apiClient:events:read', 'apiClientOrigin', 'throttle:public-api'])->group(function () {
             Route::get('events', [API\PublicEventController::class, 'listEvents']);
