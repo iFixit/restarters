@@ -25,12 +25,15 @@ records have been published under a prefix it must not change.
 
 Optional:
 
-- `ORDS_INCLUDE_PROBLEM` (default `false`) — set `true` to add the `problem` column; the export is
-  structured fields only until you do
+- `ORDS_INCLUDE_PROBLEM` (default `false`) — set `true` to populate the `problem` column; it is
+  emitted empty otherwise
 - `ORDS_SCRUB_PROBLEM` (default `true`) — redaction pass over the `problem` column
 
-Publishing free text is a separate decision from enabling the endpoint, so the column is opt-in.
-The scrub cannot remove personal names, which is why the default is off.
+The column shape never changes, so an export is valid against the standard either way. What the
+flag controls is whether the free text carries a value.
+
+Publishing that text is a separate decision from enabling the endpoint, so it is opt-in. The
+scrub cannot remove personal names, which is why the default is off.
 
 ## Authentication
 
@@ -68,8 +71,8 @@ escaped, since spreadsheet software executes them on open.
 
 ## Columns
 
-Fourteen columns in the order the standard defines, of which `problem` is emitted only when
-`ORDS_INCLUDE_PROBLEM` is on. Expect thirteen by default.
+Fourteen columns in the order the standard defines, always all fourteen. A column with no value
+is emitted as `null` in JSON and as an empty cell in CSV.
 
 | Column | Source |
 | --- | --- |
@@ -86,7 +89,7 @@ Fourteen columns in the order the standard defines, of which `problem` is emitte
 | `repair_barrier_if_end_of_life` | first `barriers` row, only when end of life |
 | `group_identifier` | `groups.name` |
 | `event_date` | `events.event_start_utc` as a local date in the event's timezone |
-| `problem` | `devices.problem`, scrubbed; only when `ORDS_INCLUDE_PROBLEM` is on |
+| `problem` | `devices.problem`, scrubbed; empty unless `ORDS_INCLUDE_PROBLEM` is on |
 
 ## Vocabulary notes
 
