@@ -78,7 +78,18 @@ class PublicRepairController extends Controller
             return;
         }
 
-        $normalised = filter_var($request->input('powered'), FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
+        $raw = $request->input('powered');
+
+        // filter_var maps "" and null to false rather than firing
+        // FILTER_NULL_ON_FAILURE, so an empty `?powered=` would narrow the
+        // export to unpowered items. Null instead, which applyFilters skips.
+        if ($raw === null || $raw === '') {
+            $request->merge(['powered' => null]);
+
+            return;
+        }
+
+        $normalised = filter_var($raw, FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
 
         if ($normalised !== null) {
             $request->merge(['powered' => $normalised]);

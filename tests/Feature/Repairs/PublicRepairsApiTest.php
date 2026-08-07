@@ -578,6 +578,26 @@ class PublicRepairsApiTest extends TestCase
         $this->assertNotContains('testinstance_' . $powered->iddevices, $falseIds);
     }
 
+    public function test_an_empty_powered_param_returns_both_datasets(): void
+    {
+        // An empty param is how plenty of clients spell an unset one.
+        Category::factory()->create([
+            'idcategories' => 504,
+            'name' => 'Bicycle',
+            'revision' => 2,
+            'aggregate' => 0,
+            'powered' => 0,
+        ]);
+
+        $powered = $this->seedRepair();
+        $unpowered = $this->seedRepair(['category' => 504, 'category_creation' => 504], ['reuse' => true]);
+
+        $ids = array_column($this->fetchRecords([], ['powered' => '']), 'id');
+
+        $this->assertContains('testinstance_' . $powered->iddevices, $ids);
+        $this->assertContains('testinstance_' . $unpowered->iddevices, $ids);
+    }
+
     public function test_a_date_only_event_end_includes_that_whole_day(): void
     {
         // The fixture event runs at 18:00 on 2024-06-15. A caller asking for a
