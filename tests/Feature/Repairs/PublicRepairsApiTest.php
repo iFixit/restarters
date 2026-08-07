@@ -148,6 +148,24 @@ class PublicRepairsApiTest extends TestCase
             ->assertHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
     }
 
+    public function test_csv_pagination_headers_are_exposed_to_browsers(): void
+    {
+        // The CSV metadata travels in headers, and cross-origin JavaScript can
+        // read none of it without an explicit expose list.
+        $this->seedRepair();
+
+        $token = $this->createPublicApiToken();
+
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->get('/api/public/v2/repairs?format=csv');
+
+        $exposed = $response->headers->get('Access-Control-Expose-Headers');
+
+        foreach (['X-Total-Count', 'X-Page', 'X-Per-Page', 'X-Last-Page', 'X-Max-Updated-At'] as $header) {
+            $this->assertStringContainsString($header, (string) $exposed);
+        }
+    }
+
     // ------------------------------------------------------ id namespace
 
     public function test_refuses_to_serve_under_an_unassigned_id_namespace(): void
