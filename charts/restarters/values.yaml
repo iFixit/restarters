@@ -372,5 +372,8 @@ envGroups:
   ords:
     ORDS_ID_PREFIX: ""
     ORDS_DATA_PROVIDER: ""
-    ORDS_INCLUDE_PROBLEM: "true"
+    # Off by default so turning the endpoint on and publishing the free-text
+    # column stay two separate decisions. The scrubber removes contact details
+    # and identifiers but cannot remove names, so this needs a deliberate opt-in.
+    ORDS_INCLUDE_PROBLEM: "false"
     ORDS_SCRUB_PROBLEM: "true"

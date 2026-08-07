@@ -24,9 +24,10 @@ return [
 
     // `include` drops the column for a structured-fields-only export. `scrub`
     // is the redaction pass. Personal names are not pattern-detectable and are
-    // not removed.
+    // not removed, so `include` defaults off: enabling the endpoint and
+    // publishing volunteer free text are two decisions, not one.
     'problem' => [
-        'include' => env('ORDS_INCLUDE_PROBLEM', true),
+        'include' => env('ORDS_INCLUDE_PROBLEM', false),
         'scrub' => env('ORDS_SCRUB_PROBLEM', true),
     ],
 
