@@ -4,7 +4,7 @@ RUN GOBIN=/usr/bin go install github.com/go-task/task/v3/cmd/task@v3.43.3
 
 # Multi-stage build for Restarters production image
 # Build stage
-FROM php:8.2-fpm AS builder
+FROM php:8.2.35-fpm AS builder
 
 # Install build dependencies in a single layer with cleanup
 RUN apt-get update && \
@@ -60,7 +60,7 @@ RUN php artisan lang:js --no-lib resources/js/translations.js && \
     rm -rf node_modules
 
 # Production stage
-FROM php:8.2-fpm AS production
+FROM php:8.2.35-fpm AS production
 
 # Install minimal runtime dependencies
 RUN apt-get update && \
@@ -87,6 +87,10 @@ RUN install-php-extensions pdo_mysql pcntl bcmath zip xmlrpc intl gd && \
 # security in a live environment.
 # -----------------------------------------------------------
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
+
+# Laravel doesn't use native PHP sessions, so upload progress tracking is
+# unused. Disabled as defense in depth for CVE-2026-109619.
+RUN echo "session.upload_progress.enabled=0" > "$PHP_INI_DIR/conf.d/zz-security.ini"
 
 # Set working directory
 WORKDIR /var/www
