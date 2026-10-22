@@ -3,7 +3,7 @@ FROM golang:bullseye AS go
 RUN GOBIN=/usr/bin go install github.com/go-task/task/v3/cmd/task@v3.43.3
 
 # This is the docker for restarters.  It's used from docker-compose.
-FROM php:8.2-fpm
+FROM php:8.2.35-fpm
 
 # Install dependencies
 RUN apt-get update && \
